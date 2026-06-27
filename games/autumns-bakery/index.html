@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Autumn's Bakery</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif;background:#8b4b21}
+
+#game{
+  position:relative;
+  width:100vw;
+  height:100dvh;
+  min-height:100vh;
+  overflow:hidden;
+  background:#8b4b21 url("bakery_background.png") center center/100% 100% no-repeat;
+}
+
+#game::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to bottom,rgba(0,0,0,.18),rgba(0,0,0,.03));
+  z-index:0;
+  pointer-events:none;
+}
+
+#topUI{
+  position:absolute;
+  top:calc(8px + env(safe-area-inset-top));
+  left:50%;
+  transform:translateX(-50%);
+  width:96vw;
+  text-align:center;
+  color:white;
+  text-shadow:0 4px 10px #000;
+  z-index:90;
+}
+
+#topUI h1{font-size:clamp(30px,5vw,62px);font-weight:900;line-height:1}
+#topUI p{font-size:clamp(14px,1.8vw,23px);font-weight:900;margin-top:6px}
+
+#gameStats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:8px}
+
+.statBox{
+  background:rgba(255,255,255,.94);
+  color:#5b2b10;
+  border:3px solid #9c5528;
+  border-radius:16px;
+  padding:6px 12px;
+  font-size:clamp(12px,1.2vw,17px);
+  font-weight:900;
+  box-shadow:0 4px 12px rgba(0,0,0,.35);
+}
+
+#orderBox{
+  position:absolute;
+  top:calc(160px + env(safe-area-inset-top));
+  left:50%;
+  transform:translateX(-50%);
+  width:min(92vw,760px);
+  background:rgba(255,248,231,.94);
+  border:4px solid #9c5528;
+  border-radius:22px;
+  padding:10px 14px;
+  z-index:85;
+  box-shadow:0 8px 20px rgba(0,0,0,.4);
+  color:#5b2b10;
+  text-align:center;
+  font-weight:900;
+}
+
+#orderTitle{font-size:clamp(15px,1.7vw,22px);margin-bottom:4px}
+#orderText{font-size:clamp(13px,1.4vw,18px);line-height:1.3}
+#messageText{margin-top:6px;color:#9b2b12;font-size:clamp(12px,1.2vw,16px);min-height:18px}
+
+#cakeArea{
+  position:absolute;
+  left:50%;
+  top:54%;
+  transform:translate(-50%,-50%);
+  width:min(92vw,900px);
+  height:min(64vh,690px);
+  z-index:20;
+}
+
+.asset,.frostingLayer,.toppingLayer{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  pointer-events:none;
+  object-fit:contain;
+}
+
+#pedestal{width:min(70vw,620px);bottom:0;z-index:1}
+#cake{width:min(39vw,340px);bottom:168px;display:none;z-index:2}
+
+.frostingLayer{width:min(50vw,440px);bottom:158px;z-index:3}
+.toppingLayer{z-index:8}
+
+.ringTop{
+  width:min(38vw,340px);
+  bottom:214px;
+  transform:translateX(-50%) scaleY(.42);
+  transform-origin:center center;
+}
+.flatTop{width:min(30vw,270px);bottom:238px}
+
+
+.centerTop{width:min(25vw,225px);bottom:242px}
+.whipTop{width:min(24vw,220px);bottom:287px}
+.smallTop{width:min(18vw,150px);bottom:287px}
+.mediumTop{width:min(28vw,250px);bottom:287px}
+.waferTop{width:min(46vw,420px);bottom:237px}
+
+#bottomPanel{
+  position:absolute;
+  left:50%;
+  bottom:calc(10px + env(safe-area-inset-bottom));
+  transform:translateX(-50%);
+  width:min(96vw,1180px);
+  z-index:300;
+  background:rgba(35,16,5,.72);
+  backdrop-filter:blur(10px);
+  border:3px solid rgba(255,220,160,.45);
+  border-radius:22px;
+  padding:10px;
+  box-shadow:0 8px 20px rgba(0,0,0,.45);
+}
+
+#tabs{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.tabBtn{min-width:115px;background:linear-gradient(#bd743a,#733817)}
+.tabBtn.active{outline:3px solid #ffe066;background:linear-gradient(#e19b42,#8c4719)}
+
+.panel{
+  display:none;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:8px;
+  max-height:23vh;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.panel.active{display:flex}
+
+button{
+  border:none;
+  border-radius:15px;
+  padding:9px 12px;
+  background:linear-gradient(#a65f31,#6c3514);
+  color:white;
+  font-size:13px;
+  font-weight:900;
+  box-shadow:0 4px 9px #0008;
+  touch-action:manipulation;
+}
+button:active{transform:scale(.94)}
+button.selected{outline:3px solid #ffdf61;background:linear-gradient(#d68a37,#7a3a12)}
+.clearBtn{background:linear-gradient(#c54b4b,#762020)}
+.doneBtn{background:linear-gradient(#70bd35,#2f7417)}
+
+#resultScreen{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.72);
+  z-index:999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+#resultCard{
+  width:min(92vw,560px);
+  background:#fff3dc;
+  border:5px solid #9c5528;
+  border-radius:28px;
+  padding:26px;
+  text-align:center;
+  color:#5b2b10;
+  box-shadow:0 12px 35px rgba(0,0,0,.6);
+}
+
+#resultTitle{font-size:clamp(34px,7vw,58px);font-weight:900;margin-bottom:10px}
+#resultMessage{font-size:clamp(17px,3vw,24px);font-weight:900;margin-bottom:20px}
+#resultCard button{font-size:18px;padding:14px 22px}
+
+@media(max-width:800px){
+  #game{background-size:cover}
+  #topUI h1{font-size:clamp(26px,8vw,42px)}
+  #topUI p{font-size:13px}
+  #gameStats{gap:5px;margin-top:5px}
+  .statBox{padding:5px 8px;font-size:11px}
+  #orderBox{top:calc(135px + env(safe-area-inset-top));padding:8px 10px}
+  #cakeArea{top:49%;width:100vw;height:47vh}
+  #pedestal{width:96vw;bottom:0}
+  #cake{width:56vw;bottom:126px}
+  .frostingLayer{width:68vw;bottom:120px}
+  .ringTop{
+    width:52vw;
+    bottom:160px;
+    transform:translateX(-50%) scaleY(.38);
+    transform-origin:center center;
+  }
+  .flatTop{width:45vw;bottom:169px}
+
+
+  .centerTop{width:40vw;bottom:169px}
+  .whipTop{width:42vw;bottom:206px}
+  .smallTop{width:30vw;bottom:206px}
+  .mediumTop{width:46vw;bottom:206px}
+  .waferTop{width:72vw;bottom:156px}
+  #bottomPanel{
+    bottom:calc(70px + env(safe-area-inset-bottom));
+    padding:8px;
+  }
+  .panel{max-height:38vh}
+  .tabBtn{min-width:92px}
+  button{font-size:12px;padding:8px 9px}
+}
+</style>
+</head>
+
+<body>
+
+<audio id="bgMusic" loop preload="auto">
+  <source src="Lollipop.m4a" type="audio/mp4">
+  <source src="music/Lollipop.m4a" type="audio/mp4">
+</audio>
+
+<div id="game">
+
+  <div id="topUI">
+    <h1>Autumn's Bakery</h1>
+    <p>Build the customer’s cake!</p>
+    <div id="gameStats">
+      <div class="statBox">⏱️ Time: <span id="timer">20</span></div>
+      <div class="statBox">✅ Completed: <span id="wins">0</span>/8</div>
+      <div class="statBox">❌ Fails: <span id="fails">0</span>/8</div>
+    </div>
+  </div>
+
+  <div id="orderBox">
+    <div id="orderTitle">Customer Order</div>
+    <div id="orderText">Choose a cake to begin!</div>
+    <div id="messageText"></div>
+  </div>
+
+  <div id="cakeArea">
+    <img id="pedestal" class="asset" src="cake_pedastal.png">
+    <img id="cake" class="asset" src="vanilla_cake.png">
+  </div>
+
+  <div id="bottomPanel">
+    <div id="tabs">
+      <button class="tabBtn active" onclick="openPanel('cakePanel',this)">🎂 Cake</button>
+      <button class="tabBtn" onclick="openPanel('frostingPanel',this)">🍰 Frosting</button>
+      <button class="tabBtn" onclick="openPanel('toppingPanel',this)">✨ Toppings</button>
+      <button class="tabBtn" onclick="openPanel('actionPanel',this)">✅ Finish</button>
+    </div>
+
+    <div id="cakePanel" class="panel active">
+      <button onclick="chooseCake('vanilla_cake.png','Vanilla',this)">Vanilla</button>
+      <button onclick="chooseCake('chocolate_cake.png','Chocolate',this)">Chocolate</button>
+      <button onclick="chooseCake('yellow_cake.png','Yellow',this)">Yellow</button>
+      <button onclick="chooseCake('pink_cake.png','Pink',this)">Pink</button>
+      <button onclick="chooseCake('orange_cake.png','Orange',this)">Orange</button>
+    </div>
+
+    <div id="frostingPanel" class="panel">
+      <button onclick="addFrosting('white_frosting.png','White',this)">White</button>
+      <button onclick="addFrosting('cream_frosting.png','Cream',this)">Cream</button>
+      <button onclick="addFrosting('chocolate_frosting.png','Chocolate',this)">Chocolate</button>
+      <button onclick="addFrosting('caramel_frosting.png','Caramel',this)">Caramel</button>
+      <button onclick="addFrosting('light_pink_frosting.png','Light Pink',this)">Light Pink</button>
+      <button onclick="addFrosting('hot_pink_frosting.png','Hot Pink',this)">Hot Pink</button>
+      <button onclick="addFrosting('lavender_frosting.png','Lavender',this)">Lavender</button>
+      <button onclick="addFrosting('purple_frosting.png','Purple',this)">Purple</button>
+      <button onclick="addFrosting('lime_frosting.png','Lime',this)">Lime</button>
+      <button onclick="addFrosting('mint_frosting.png','Mint',this)">Mint</button>
+      <button onclick="addFrosting('blue_frosting.png','Blue',this)">Blue</button>
+      <button onclick="addFrosting('royal_blue_frosting.png','Royal Blue',this)">Royal Blue</button>
+      <button onclick="addFrosting('navy_frosting.png','Navy',this)">Navy</button>
+      <button onclick="addFrosting('teal_frosting.png','Teal',this)">Teal</button>
+      <button onclick="addFrosting('peach_frosting.png','Peach',this)">Peach</button>
+      <button onclick="addFrosting('orange_frosting.png','Orange',this)">Orange</button>
+      <button onclick="addFrosting('red_frosting.png','Red',this)">Red</button>
+      <button onclick="addFrosting('yellow_frosting.png','Yellow',this)">Yellow</button>
+      <button onclick="addFrosting('sky_blue_frosting.png','Sky Blue',this)">Sky Blue</button>
+      <button onclick="addFrosting('periwinkle_frosting.png','Periwinkle',this)">Periwinkle</button>
+    </div>
+
+    <div id="toppingPanel" class="panel">
+      <button onclick="addTopping('sprinkles.png','Sprinkles','flatTop',this)">Sprinkles</button>
+      <button onclick="addTopping('cherries.png','Cherry Ring','ringTop',this)">Cherry Ring</button>
+      <button onclick="addTopping('strawberry_ring.png','Strawberry Ring','ringTop',this)">Strawberry Ring</button>
+      <button onclick="addTopping('cookie_ring.png','Cookie Ring','ringTop',this)">Cookie Ring</button>
+      <button onclick="addTopping('cookie_ring_wafer_sticks.png','Cookie Wafer Ring','ringTop',this)">Cookie Wafer Ring</button>
+      <button onclick="addTopping('single_strawberry.png','Single Strawberry','smallTop',this)">Single Strawberry</button>
+      <button onclick="addTopping('three_strawberries.png','3 Strawberries','mediumTop',this)">3 Strawberries</button>
+      <button onclick="addTopping('wafer_crumble.png','Wafer Center','centerTop',this)">Wafer Center</button>
+      <button onclick="addTopping('wafers.png','Wafers','waferTop',this)">Wafers</button>
+      <button onclick="addTopping('whip_cream.png','Whip Cream','whipTop',this)">Whip Cream</button>
+    </div>
+
+    <div id="actionPanel" class="panel">
+      <button class="doneBtn" onclick="submitCake()">Serve Cake</button>
+      <button class="clearBtn" onclick="clearFrosting()">Clear Frosting</button>
+      <button class="clearBtn" onclick="clearToppings()">Clear Toppings</button>
+      <button class="clearBtn" onclick="resetCurrentCake()">Reset Current Cake</button>
+    </div>
+  </div>
+
+  <div id="resultScreen">
+    <div id="resultCard">
+      <div id="resultTitle">You Win!</div>
+      <div id="resultMessage">Great bakery work!</div>
+      <button onclick="restartGame()">Play Again</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const music=document.getElementById("bgMusic");
+music.volume=.28;
+
+function startMusic(){
+  music.play().catch(()=>{});
+  document.removeEventListener("click",startMusic);
+  document.removeEventListener("touchstart",startMusic);
+}
+document.addEventListener("click",startMusic);
+document.addEventListener("touchstart",startMusic);
+
+const cakeArea=document.getElementById("cakeArea");
+const cake=document.getElementById("cake");
+const orderText=document.getElementById("orderText");
+const messageText=document.getElementById("messageText");
+const timerEl=document.getElementById("timer");
+const winsEl=document.getElementById("wins");
+const failsEl=document.getElementById("fails");
+const resultScreen=document.getElementById("resultScreen");
+const resultTitle=document.getElementById("resultTitle");
+const resultMessage=document.getElementById("resultMessage");
+
+let cakeChosen=false;
+let chosenCake="";
+let chosenFrostings=[];
+let chosenToppings=[];
+let wins=0;
+let fails=0;
+let timeLeft=20;
+let timerInterval=null;
+let order=null;
+let roundActive=true;
+
+const cakes=[
+  {name:"Vanilla",file:"vanilla_cake.png"},
+  {name:"Chocolate",file:"chocolate_cake.png"},
+  {name:"Yellow",file:"yellow_cake.png"},
+  {name:"Pink",file:"pink_cake.png"},
+  {name:"Orange",file:"orange_cake.png"}
+];
+
+const frostings=[
+  {name:"White",file:"white_frosting.png"},
+  {name:"Cream",file:"cream_frosting.png"},
+  {name:"Chocolate",file:"chocolate_frosting.png"},
+  {name:"Light Pink",file:"light_pink_frosting.png"},
+  {name:"Hot Pink",file:"hot_pink_frosting.png"},
+  {name:"Lavender",file:"lavender_frosting.png"},
+  {name:"Mint",file:"mint_frosting.png"},
+  {name:"Blue",file:"blue_frosting.png"},
+  {name:"Red",file:"red_frosting.png"}
+];
+
+const toppings=[
+  {name:"Sprinkles",file:"sprinkles.png"},
+  {name:"Cherry Ring",file:"cherries.png"},
+  {name:"Strawberry Ring",file:"strawberry_ring.png"},
+  {name:"Whip Cream",file:"whip_cream.png"},
+  {name:"3 Strawberries",file:"three_strawberries.png"},
+  {name:"Wafer Center",file:"wafer_crumble.png"}
+];
+
+function buzz(){if(navigator.vibrate)navigator.vibrate(25)}
+function showMessage(msg){messageText.innerHTML=msg}
+function clearMessage(){messageText.innerHTML=""}
+
+function openPanel(panelId,btn){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.getElementById(panelId).classList.add("active");
+  document.querySelectorAll(".tabBtn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+function pickRandom(list){
+  return list[Math.floor(Math.random()*list.length)];
+}
+
+function updateOrderText(){
+  if(!order)return;
+  orderText.innerHTML=`Make a <b>${order.cake.name}</b> cake with <b>${order.frosting.name}</b> frosting and <b>${order.topping.name}</b>.`;
+}
+
+function makeOrder(){
+  order={cake:pickRandom(cakes),frosting:pickRandom(frostings),topping:pickRandom(toppings)};
+  resetCurrentCake(false);
+  updateOrderText();
+  clearMessage();
+  startTimer();
+}
+
+function startTimer(){
+  clearInterval(timerInterval);
+  timeLeft=20;
+  timerEl.textContent=timeLeft;
+  timerInterval=setInterval(()=>{
+    timeLeft--;
+    timerEl.textContent=timeLeft;
+    if(timeLeft<=0){
+      clearInterval(timerInterval);
+      failRound("Time ran out!");
+    }
+  },1000);
+}
+
+function chooseCake(file,name,btn){
+  if(!roundActive)return;
+  buzz();
+  clearMessage();
+  cake.src=file;
+  cake.style.display="block";
+  cakeChosen=true;
+  chosenCake=name;
+  document.querySelectorAll("#cakePanel button").forEach(b=>b.classList.remove("selected"));
+  btn.classList.add("selected");
+  openPanel("frostingPanel",document.querySelectorAll(".tabBtn")[1]);
+}
+
+function addFrosting(file,name,btn){
+  if(!roundActive)return;
+  buzz();
+  if(!cakeChosen){showMessage("Choose a cake first 🎂");return}
+  clearMessage();
+  chosenFrostings.push(name);
+  const layer=document.createElement("img");
+  layer.src=file;
+  layer.className="frostingLayer";
+  const count=document.querySelectorAll(".frostingLayer").length;
+  layer.style.transform=`translateX(-50%) scale(${Math.max(.88,1-count*.03)})`;
+  layer.style.opacity=".98";
+  layer.style.zIndex=3+count;
+  cakeArea.appendChild(layer);
+  btn.classList.add("selected");
+  openPanel("toppingPanel",document.querySelectorAll(".tabBtn")[2]);
+}
+
+function addTopping(file,name,styleClass,btn){
+  if(!roundActive)return;
+  buzz();
+  if(!cakeChosen){showMessage("Choose a cake first 🎂");return}
+  if(chosenFrostings.length===0){showMessage("Add frosting before toppings 🍰");return}
+  clearMessage();
+  chosenToppings.push(name);
+  const top=document.createElement("img");
+  top.src=file;
+  top.className=`toppingLayer ${styleClass}`;
+  const count=document.querySelectorAll(".toppingLayer").length;
+  top.style.zIndex=8+count;
+  top.onerror=()=>{top.remove();showMessage("That topping image is missing from the game folder.")};
+  cakeArea.appendChild(top);
+  btn.classList.add("selected");
+  openPanel("actionPanel",document.querySelectorAll(".tabBtn")[3]);
+}
+
+function submitCake(){
+  if(!roundActive)return;
+  buzz();
+  updateOrderText();
+
+  if(!cakeChosen){showMessage("Choose the cake for this order 🎂");openPanel("cakePanel",document.querySelectorAll(".tabBtn")[0]);return}
+  if(chosenFrostings.length===0){showMessage("Add the frosting for this order 🍰");openPanel("frostingPanel",document.querySelectorAll(".tabBtn")[1]);return}
+  if(chosenToppings.length===0){showMessage("Add the topping for this order ✨");openPanel("toppingPanel",document.querySelectorAll(".tabBtn")[2]);return}
+
+  const cakeCorrect=chosenCake===order.cake.name;
+  const frostingCorrect=chosenFrostings.includes(order.frosting.name);
+  const toppingCorrect=chosenToppings.includes(order.topping.name);
+
+  if(cakeCorrect && frostingCorrect && toppingCorrect){completeRound()}
+  else{failRound("Wrong order!")}
+}
+
+function completeRound(){
+  clearInterval(timerInterval);
+  wins++;
+  winsEl.textContent=wins;
+  if(wins>=8){showResult(true);return}
+  showMessage("Correct! New customer coming up...");
+  setTimeout(makeOrder,900);
+}
+
+function failRound(message){
+  clearInterval(timerInterval);
+  fails++;
+  failsEl.textContent=fails;
+  if(fails>=8){showResult(false);return}
+  showMessage(message+" Try the next customer.");
+  setTimeout(makeOrder,1000);
+}
+
+function clearFrosting(){
+  buzz();
+  document.querySelectorAll(".frostingLayer").forEach(el=>el.remove());
+  document.querySelectorAll("#frostingPanel button").forEach(b=>b.classList.remove("selected"));
+  chosenFrostings=[];
+  showMessage("Frosting cleared.");
+}
+
+function clearToppings(){
+  buzz();
+  document.querySelectorAll(".toppingLayer").forEach(el=>el.remove());
+  document.querySelectorAll("#toppingPanel button").forEach(b=>b.classList.remove("selected"));
+  chosenToppings=[];
+  showMessage("Toppings cleared.");
+}
+
+function resetCurrentCake(showMessageFlag=true){
+  cake.style.display="none";
+  cake.src="vanilla_cake.png";
+  cakeChosen=false;
+  chosenCake="";
+  chosenFrostings=[];
+  chosenToppings=[];
+  document.querySelectorAll(".frostingLayer,.toppingLayer").forEach(el=>el.remove());
+  document.querySelectorAll("#cakePanel button,#frostingPanel button,#toppingPanel button").forEach(btn=>btn.classList.remove("selected"));
+  openPanel("cakePanel",document.querySelectorAll(".tabBtn")[0]);
+  if(showMessageFlag){
+    updateOrderText();
+    showMessage("Cake cleared. Build the customer order!");
+  }
+}
+
+function showResult(playerWon){
+  roundActive=false;
+  clearInterval(timerInterval);
+  resultScreen.style.display="flex";
+  if(playerWon){
+    resultTitle.innerHTML="You Win! 🎉";
+    resultMessage.innerHTML="You completed 8 customer cakes!";
+  }else{
+    resultTitle.innerHTML="Game Over";
+    resultMessage.innerHTML="The bakery had 8 missed orders.";
+  }
+}
+
+function restartGame(){
+  wins=0;
+  fails=0;
+  winsEl.textContent=wins;
+  failsEl.textContent=fails;
+  resultScreen.style.display="none";
+  roundActive=true;
+  makeOrder();
+}
+
+makeOrder();
+</script>
+
+</body>
+</html>
