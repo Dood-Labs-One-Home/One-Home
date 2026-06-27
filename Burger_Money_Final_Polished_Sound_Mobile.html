@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Burger Money: Meal Quest</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #140018;
+      touch-action: none;
+      user-select: none;
+    }
+
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      background: #160024;
+    }
+
+    #soundBtn {
+      position: fixed;
+      right: max(12px, env(safe-area-inset-right));
+      bottom: max(96px, calc(env(safe-area-inset-bottom) + 96px));
+      z-index: 7;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.55);
+      background: rgba(0,0,0,.28);
+      color: white;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+      box-shadow: 0 6px 16px rgba(0,0,0,.32);
+      backdrop-filter: blur(4px);
+    }
+
+    #soundBtn:active { transform: scale(.96); }
+
+    .screen {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at center, rgba(255,210,60,.15), transparent 28%),
+        linear-gradient(180deg, rgba(20,0,35,.94), rgba(5,0,10,.98));
+      color: white;
+      text-align: center;
+      padding: 18px;
+      box-sizing: border-box;
+    }
+
+    .panel {
+      width: min(720px, 94vw);
+      max-height: 90vh;
+      overflow: auto;
+      background: rgba(15, 5, 35, .96);
+      border: 3px solid #ffd34d;
+      border-radius: 18px;
+      box-shadow: 0 0 35px rgba(255, 211, 77, .35);
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { color: #ffd34d; text-shadow: 0 3px 0 #8b3b00; }
+    .sub { color: #ffeaa1; line-height: 1.35; }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      color: #2a1700;
+      background: linear-gradient(#fff07a, #ffb700);
+      box-shadow: 0 4px 0 #9b6200, 0 0 14px rgba(255,210,60,.35);
+      margin: 5px;
+    }
+
+    button:active { transform: translateY(2px); box-shadow: 0 2px 0 #9b6200; }
+    .blue { background: linear-gradient(#b8efff, #40c7ff); box-shadow: 0 4px 0 #006d93; }
+    .pink { background: linear-gradient(#ffb4cc, #ff4f87); box-shadow: 0 4px 0 #9b003a; color: white; }
+    .green { background: linear-gradient(#baff9f, #4de15c); box-shadow: 0 4px 0 #13751e; }
+    .small { font-size: 13px; padding: 8px 12px; }
+
+    #hud {
+      position: fixed;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+      color: white;
+      font-weight: 800;
+      text-shadow: 0 2px 4px rgba(0,0,0,.75);
+    }
+
+    #topLeft, #topRight, #topCenter {
+      position: absolute;
+      top: 8px;
+      font-size: clamp(12px, 2.6vw, 18px);
+      line-height: 1.25;
+    }
+
+    #topLeft { left: 8px; text-align: left; }
+    #topRight { right: 8px; text-align: right; }
+    #topCenter {
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(390px, 42vw);
+      text-align: center;
+    }
+
+    #goalBar {
+      width: 100%;
+      height: 12px;
+      background: rgba(255,255,255,.22);
+      border: 2px solid rgba(255,255,255,.75);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 2px;
+    }
+
+    #goalFill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #ff4242, #ffd13f, #56ff55);
+    }
+
+    #controls {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: max(12px, env(safe-area-inset-bottom));
+      z-index: 6;
+      pointer-events: none;
+    }
+
+    .padButton {
+      position: absolute;
+      bottom: 0;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.20);
+      border: 2px solid rgba(255,255,255,.55);
+      color: white;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 6px 16px rgba(0,0,0,.3);
+    }
+
+    #leftBtn { left: max(15px, env(safe-area-inset-left)); }
+    #rightBtn { left: max(86px, calc(env(safe-area-inset-left) + 86px)); }
+    #jumpBtn {
+      right: max(15px, env(safe-area-inset-right));
+      width: 72px;
+      height: 72px;
+      background: rgba(255,211,77,.30);
+      border-color: rgba(255,211,77,.85);
+    }
+
+    #scoreboardOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,.82);
+      color: white;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .scorePanel {
+      width: min(860px, 96vw);
+      max-height: 90vh;
+      overflow: auto;
+      background: #fff7cf;
+      color: #2b1500;
+      border: 4px solid #ffbf00;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 0 38px rgba(255,210,60,.55);
+      box-sizing: border-box;
+    }
+
+    .scorePanel h2 { color: #5d2600; }
+    .tabs { margin-bottom: 10px; }
+    .scoreTable {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      font-size: 14px;
+    }
+    .scoreTable th, .scoreTable td {
+      padding: 8px;
+      border-bottom: 1px solid #f0d27c;
+      text-align: left;
+    }
+    .scoreTable th {
+      background: #ffcc35;
+      color: #3a1d00;
+    }
+
+    .badgeRow {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin: 12px 0;
+      font-size: 13px;
+    }
+
+    .badge {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 12px;
+      padding: 8px;
+      line-height: 1.25;
+    }
+
+    #toast {
+      position: fixed;
+      left: 50%;
+      top: 18%;
+      transform: translateX(-50%);
+      z-index: 25;
+      background: rgba(0,0,0,.72);
+      color: #fff;
+      border: 2px solid #ffd34d;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-weight: 900;
+      display: none;
+      text-align: center;
+      max-width: 90vw;
+      box-shadow: 0 0 22px rgba(255,211,77,.35);
+    }
+
+    @media (max-width: 620px) {
+      .screen { padding: 10px; align-items: flex-start; padding-top: max(12px, env(safe-area-inset-top)); }
+      .panel { padding: 14px; max-height: 94vh; }
+      h1 { font-size: 26px; }
+      h2 { font-size: 20px; }
+      .sub { font-size: 14px; }
+      .badgeRow { grid-template-columns: 1fr; gap: 6px; margin: 8px 0; }
+      .badge { padding: 7px; font-size: 12px; }
+      button { font-size: 15px; padding: 10px 14px; margin: 4px; }
+      #topCenter { top: 62px; width: 60vw; }
+      #topLeft, #topRight { top: max(6px, env(safe-area-inset-top)); }
+      .padButton { width: 64px; height: 64px; }
+      #rightBtn { left: max(92px, calc(env(safe-area-inset-left) + 92px)); }
+      #jumpBtn { width: 78px; height: 78px; }
+      #soundBtn { bottom: max(102px, calc(env(safe-area-inset-bottom) + 102px)); }
+    }
+
+    @media (min-width: 900px) and (pointer: coarse) {
+      .padButton { width: 74px; height: 74px; font-size: 20px; }
+      #rightBtn { left: max(104px, calc(env(safe-area-inset-left) + 104px)); }
+      #jumpBtn { width: 92px; height: 92px; }
+      #soundBtn { width: 54px; height: 54px; bottom: max(120px, calc(env(safe-area-inset-bottom) + 120px)); }
+    }
+
+    @media (max-height: 560px) and (orientation: landscape) {
+      .panel { transform: scale(.88); max-height: 108vh; }
+      .badgeRow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #topCenter { top: 8px; width: 38vw; }
+      .padButton { width: 54px; height: 54px; }
+      #jumpBtn { width: 66px; height: 66px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <button id="soundBtn" aria-label="Toggle sound">🔊</button>
+
+  <div id="hud">
+    <div id="topLeft">
+      <div id="moneyText">Money: $0.00</div>
+      <div id="scoreText">Score: 0</div>
+      <div id="rankText">Rank: Fry Finder</div>
+    </div>
+    <div id="topCenter">
+      <div id="levelText">Level 1</div>
+      <div id="goalBar"><div id="goalFill"></div></div>
+    </div>
+    <div id="topRight">
+      <div id="timeText">Time: 0.0s</div>
+      <div id="jumpText">Biggest Jump: 0 ft</div>
+      <div id="comboText">Combo: 0</div>
+    </div>
+  </div>
+
+  <div id="controls">
+    <div id="leftBtn" class="padButton">◀</div>
+    <div id="rightBtn" class="padButton">▶</div>
+    <div id="jumpBtn" class="padButton">JUMP</div>
+  </div>
+
+  <div id="toast"></div>
+
+  <div id="startScreen" class="screen">
+    <div class="panel">
+      <h1>🍔 Burger Money</h1>
+      <h2>Meal Quest</h2>
+      <p class="sub">
+        Collect burger money, climb longer scenes, dodge DROP obstacles, and earn enough for the ultimate meal prize.
+        This is a fast-food-inspired arcade game with saved local scoreboards.
+      </p>
+      <div class="badgeRow">
+        <div class="badge">🪙 Collect money and keep combos going.</div>
+        <div class="badge">☁️ Jump cloud-to-cloud through longer scenes.</div>
+        <div class="badge">🚀 Grab power-ups: rocket, magnet, shield, mega jump.</div>
+        <div class="badge">🚫 Hit DROP and you restart at the bottom of that scene.</div>
+      </div>
+      <button onclick="startGame()">Play</button>
+      <button class="blue" onclick="showHow()">How to Play</button>
+      <button class="green" onclick="showScoreboard()">Scoreboards</button>
+      <p class="sub" style="font-size:12px;margin-top:12px;">Keyboard: arrows/A-D to move, up/space/W to jump. Mobile: use the buttons.</p>
+    </div>
+  </div>
+
+  <div id="howScreen" class="screen" style="display:none;">
+    <div class="panel">
+      <h2>How to Play</h2>
+      <p class="sub">
+        Move left and right to land on clouds. Tap JUMP for a double jump. Each scene is longer now, and the game only
+        moves you forward when you complete both the climb and money goal.
+      </p>
+      <div class="badgeRow">
+        <div class="badge">🛡 Shield blocks one DROP hit.</div>
+        <div class="badge">🧲 Magnet pulls money toward you.</div>
+        <div class="badge">🚀 Rocket gives a short climb boost.</div>
+        <div class="badge">💥 Mega Jump launches you higher.</div>
+      </div>
+      <button onclick="hideHow()">Back</button>
+      <button onclick="startGame()">Play</button>
+    </div>
+  </div>
+
+  <div id="gameOverScreen" class="screen" style="display:none;">
+    <div class="panel">
+      <h2 id="gameOverTitle">Run Complete!</h2>
+      <p id="finalStats" class="sub"></p>
+      <button onclick="startGame()">Play Again</button>
+      <button class="green" onclick="showScoreboard()">View Scoreboards</button>
+      <button class="blue" onclick="showStart()">Home</button>
+    </div>
+  </div>
+
+  <div id="scoreboardOverlay">
+    <div class="scorePanel">
+      <h2>🏆 Top 10 Scoreboards</h2>
+      <div class="tabs">
+        <button class="small" onclick="renderBoard('overall')">Overall Score</button>
+        <button class="small" onclick="renderBoard('fastest')">Fastest Finish</button>
+        <button class="small" onclick="renderBoard('money')">Most Money</button>
+        <button class="small" onclick="renderBoard('jump')">Biggest Jump</button>
+        <button class="small" onclick="renderBoard('combo')">Best Combo</button>
+      </div>
+      <div id="boardContent"></div>
+      <button class="pink" onclick="clearBoards()">Reset Saved Boards</button>
+      <button onclick="hideScoreboard()">Close</button>
+    </div>
+  </div>
+
+<script>
+(() => {
+  "use strict";
+
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+
+  function fitCanvas() {
+    canvas.width = Math.max(320, window.innerWidth);
+    canvas.height = Math.max(520, window.innerHeight);
+  }
+  fitCanvas();
+  window.addEventListener("resize", () => {
+    fitCanvas();
+    if (state.running) rebuildScene("resize");
+  });
+
+  const ASSET_URLS = {
+    player: "https://i.ibb.co/r2qpJbRj/clown.png",
+    coin: "https://i.ibb.co/4w1bcGcf/burgermoney.png",
+    power: "https://i.ibb.co/27XkGpn7/power.png"
+  };
+
+  function loadImage(src) {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.ready = false;
+    img.failed = false;
+    img.onload = () => img.ready = true;
+    img.onerror = () => img.failed = true;
+    img.src = src;
+    return img;
+  }
+
+  const img = {
+    player: loadImage(ASSET_URLS.player),
+    coin: loadImage(ASSET_URLS.coin),
+    power: loadImage(ASSET_URLS.power)
+  };
+
+  const audio = {
+    ctx: null,
+    muted: localStorage.getItem("burger_money_sound_muted") === "1",
+    unlocked: false
+  };
+
+  function unlockAudio() {
+    if (audio.muted) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    if (!audio.ctx) audio.ctx = new AC();
+    if (audio.ctx.state === "suspended") audio.ctx.resume();
+    audio.unlocked = true;
+    updateSoundButton();
+  }
+
+  function tone(freq, duration = 0.08, type = "sine", volume = 0.04, delay = 0) {
+    if (audio.muted) return;
+    unlockAudio();
+    if (!audio.ctx) return;
+    const now = audio.ctx.currentTime + delay;
+    const osc = audio.ctx.createOscillator();
+    const gain = audio.ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, now);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(volume, now + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+    osc.connect(gain);
+    gain.connect(audio.ctx.destination);
+    osc.start(now);
+    osc.stop(now + duration + 0.02);
+  }
+
+  function sound(name) {
+    if (name === "button") tone(520, .055, "triangle", .025);
+    if (name === "jump") tone(360, .08, "sine", .035);
+    if (name === "bounce") { tone(260, .045, "triangle", .025); tone(420, .055, "triangle", .022, .035); }
+    if (name === "coin") { tone(760, .06, "square", .025); tone(1040, .07, "triangle", .026, .045); }
+    if (name === "power") { tone(520, .06, "sine", .03); tone(780, .07, "sine", .03, .05); tone(1040, .09, "sine", .025, .10); }
+    if (name === "drop") { tone(160, .14, "sawtooth", .045); tone(92, .20, "sawtooth", .035, .08); }
+    if (name === "shield") { tone(300, .05, "triangle", .03); tone(600, .12, "triangle", .03, .04); }
+    if (name === "level") { tone(440, .08, "triangle", .028); tone(660, .09, "triangle", .028, .07); tone(880, .12, "triangle", .028, .15); }
+    if (name === "win") { tone(523, .10, "triangle", .03); tone(659, .10, "triangle", .03, .11); tone(784, .18, "triangle", .03, .23); }
+  }
+
+  function vibe(pattern) {
+    if (navigator.vibrate) navigator.vibrate(pattern);
+  }
+
+  function updateSoundButton() {
+    const btn = document.getElementById("soundBtn");
+    if (btn) btn.textContent = audio.muted ? "🔇" : "🔊";
+  }
+
+  function toggleSound() {
+    audio.muted = !audio.muted;
+    localStorage.setItem("burger_money_sound_muted", audio.muted ? "1" : "0");
+    updateSoundButton();
+    if (!audio.muted) { unlockAudio(); sound("button"); }
+  }
+
+  updateSoundButton();
+
+  const levels = [
+    {
+      name: "Drive-Thru Dash",
+      sky1: "#22002f", sky2: "#4c006e",
+      height: 14500, moneyGoal: 160, minProgress: 13500,
+      platformGap: [82, 118], platformWidth: 172, obstacleRate: 0.08
+    },
+    {
+      name: "Play Place Climb",
+      sky1: "#001d3d", sky2: "#005f73",
+      height: 17000, moneyGoal: 250, minProgress: 16000,
+      platformGap: [90, 126], platformWidth: 164, obstacleRate: 0.11
+    },
+    {
+      name: "Golden Fry Skies",
+      sky1: "#3d2100", sky2: "#996400",
+      height: 19500, moneyGoal: 360, minProgress: 18400,
+      platformGap: [96, 135], platformWidth: 156, obstacleRate: 0.13
+    },
+    {
+      name: "Late Night Neon Run",
+      sky1: "#050014", sky2: "#31005e",
+      height: 22500, moneyGoal: 500, minProgress: 21200,
+      platformGap: [100, 140], platformWidth: 150, obstacleRate: 0.15
+    }
+  ];
+
+  const ranks = [
+    [0, "Fry Finder"],
+    [120, "Burger Buddy"],
+    [240, "Nugget Ninja"],
+    [400, "Meal Hero"],
+    [650, "Drive-Thru Legend"],
+    [950, "Golden Champion"]
+  ];
+
+  const state = {
+    running: false,
+    levelIndex: 0,
+    money: 0,
+    totalMoney: 0,
+    score: 0,
+    combo: 0,
+    bestCombo: 0,
+    biggestJump: 0,
+    obstacleHits: 0,
+    startTime: 0,
+    elapsed: 0,
+    sceneProgress: 0,
+    levelStartMoney: 0,
+    levelCompletePause: 0,
+    platforms: [],
+    coins: [],
+    powers: [],
+    obstacles: [],
+    particles: [],
+    clouds: [],
+    player: null,
+    inputLeft: false,
+    inputRight: false,
+    jumpPressed: false,
+    jumpWasDown: false,
+    activePower: "",
+    powerTimer: 0,
+    shield: 0,
+    lastBounceWorld: 0,
+    boardMode: "overall"
+  };
+
+  const STORE_KEY = "burger_money_meal_quest_boards_v4";
+  const emptyBoards = () => ({ overall: [], fastest: [], money: [], jump: [], combo: [] });
+
+  function readBoards() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return emptyBoards();
+      const parsed = JSON.parse(raw);
+      return { ...emptyBoards(), ...parsed };
+    } catch {
+      return emptyBoards();
+    }
+  }
+
+  function saveBoards(boards) {
+    localStorage.setItem(STORE_KEY, JSON.stringify(boards));
+  }
+
+  function rankName(money) {
+    let name = ranks[0][1];
+    for (const [need, rank] of ranks) if (money >= need) name = rank;
+    return name;
+  }
+
+  function showToast(text, ms = 1200) {
+    const t = document.getElementById("toast");
+    t.textContent = text;
+    t.style.display = "block";
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => t.style.display = "none", ms);
+  }
+
+  function currentLevel() {
+    return levels[state.levelIndex];
+  }
+
+  function rand(min, max) {
+    return min + Math.random() * (max - min);
+  }
+
+  function clamp(v, min, max) {
+    return Math.max(min, Math.min(max, v));
+  }
+
+  function makePlayer() {
+    const size = Math.min(74, Math.max(54, canvas.width * 0.075));
+    return {
+      x: canvas.width / 2 - size / 2,
+      y: canvas.height - 140,
+      w: size,
+      h: size,
+      vx: 0,
+      vy: -5,
+      gravity: 0.32,
+      jumpPower: -11.4,
+      speed: 0.70,
+      maxSpeed: 6.7,
+      jumpsLeft: 2,
+      onGround: false,
+      invincible: 0
+    };
+  }
+
+  function makePlatform(x, y, w, starter = false) {
+    return { x, y, w, h: starter ? 24 : 18, starter };
+  }
+
+  function generateSceneObjects() {
+    const lvl = currentLevel();
+    const platforms = [];
+    const coins = [];
+    const powers = [];
+    const obstacles = [];
+
+    const margin = 18;
+    const starterW = Math.min(canvas.width - 40, Math.max(260, canvas.width * 0.64));
+    let x = canvas.width / 2 - starterW / 2;
+    let y = canvas.height - 72;
+
+    platforms.push(makePlatform(x, y, starterW, true));
+
+    // Guaranteed starter ladder so reset/drop never leaves the player without things to jump on.
+    const starterXs = [
+      canvas.width * 0.46,
+      canvas.width * 0.58,
+      canvas.width * 0.42,
+      canvas.width * 0.55,
+      canvas.width * 0.47,
+      canvas.width * 0.62
+    ];
+    for (let i = 0; i < starterXs.length; i++) {
+      y -= 76;
+      const w = Math.min(canvas.width - 56, lvl.platformWidth + 34);
+      x = clamp(starterXs[i] - w / 2, margin, canvas.width - w - margin);
+      platforms.push(makePlatform(x, y, w, false));
+      coins.push(makeCoin(x + w * 0.5 - 18, y - 50, 5));
+    }
+
+    let side = 1;
+    while (Math.abs(y - (canvas.height - 72)) < lvl.height + 900) {
+      const gap = rand(lvl.platformGap[0], lvl.platformGap[1]);
+      y -= gap;
+      const baseW = lvl.platformWidth + rand(-8, 28);
+      const maxStep = Math.min(220, canvas.width * 0.34);
+      x += side * rand(55, maxStep);
+      if (x < margin) { x = margin + rand(0, 60); side = 1; }
+      if (x + baseW > canvas.width - margin) { x = canvas.width - margin - baseW - rand(0, 45); side = -1; }
+      if (Math.random() < 0.35) side *= -1;
+
+      const platform = makePlatform(x, y, baseW, false);
+      platforms.push(platform);
+
+      // Money: placed near/on routes, not too far off to the side.
+      if (Math.random() < 0.88) {
+        const coinCount = Math.random() < 0.35 ? 2 : 1;
+        for (let c = 0; c < coinCount; c++) {
+          coins.push(makeCoin(
+            clamp(x + 22 + rand(0, Math.max(20, baseW - 58)), 20, canvas.width - 56),
+            y - 48 - c * 32,
+            Math.random() < 0.15 ? 10 : 5
+          ));
+        }
+      }
+
+      // Power-ups are useful but not constant.
+      if (Math.random() < 0.16) {
+        const types = ["magnet", "shield", "rocket", "mega"];
+        powers.push({
+          x: clamp(x + baseW / 2 - 21 + rand(-32, 32), 20, canvas.width - 62),
+          y: y - 88,
+          w: 42,
+          h: 42,
+          type: types[Math.floor(Math.random() * types.length)],
+          collected: false
+        });
+      }
+
+      // DROP obstacles: placed between platforms, not directly on every route.
+      if (platforms.length > 10 && Math.random() < lvl.obstacleRate) {
+        const ow = Math.min(170, Math.max(100, canvas.width * 0.20));
+        const ox = clamp(x + (Math.random() < 0.5 ? -ow * .75 : baseW * .65), 10, canvas.width - ow - 10);
+        obstacles.push({
+          x: ox,
+          y: y + rand(34, 62),
+          w: ow,
+          h: 22,
+          hit: false
+        });
+      }
+    }
+
+    return { platforms, coins, powers, obstacles };
+  }
+
+  function makeCoin(x, y, value) {
+    return { x, y, w: 40, h: 40, value, collected: false, pull: false };
+  }
+
+  function rebuildScene(reason) {
+    const keepRunning = state.running;
+    const lvlMoney = Math.max(0, state.money - state.levelStartMoney);
+    const generated = generateSceneObjects();
+    state.platforms = generated.platforms;
+    state.coins = generated.coins;
+    state.powers = generated.powers;
+    state.obstacles = generated.obstacles;
+    state.sceneProgress = 0;
+    state.activePower = "";
+    state.powerTimer = 0;
+    state.player = makePlayer();
+    state.player.y = canvas.height - 150;
+    state.player.vy = -6;
+    state.lastBounceWorld = 0;
+
+    // Keep level money, but after DROP add fresh bottom coins/powers.
+    if (reason === "drop") {
+      state.obstacleHits++;
+      state.combo = 0;
+      state.money = Math.max(state.levelStartMoney, state.money - 10);
+      for (let i = 0; i < 8; i++) {
+        state.coins.push(makeCoin(45 + (i % 4) * Math.min(92, canvas.width / 5), canvas.height - 210 - Math.floor(i / 4) * 75, 5));
+      }
+      state.powers.push({ x: canvas.width / 2 - 20, y: canvas.height - 275, w: 42, h: 42, type: "shield", collected: false });
+      sound("drop");
+      vibe([80, 35, 80]);
+      showToast("DROP! Back to the bottom — platforms rebuilt.", 1600);
+    } else if (reason === "resize") {
+      state.money = state.levelStartMoney + lvlMoney;
+    }
+    state.running = keepRunning;
+  }
+
+  function nextLevel() {
+    state.levelIndex++;
+    if (state.levelIndex >= levels.length) {
+      finishGame(true);
+      return;
+    }
+    state.levelStartMoney = state.money;
+    const generated = generateSceneObjects();
+    state.platforms = generated.platforms;
+    state.coins = generated.coins;
+    state.powers = generated.powers;
+    state.obstacles = generated.obstacles;
+    state.sceneProgress = 0;
+    state.player = makePlayer();
+    state.combo = 0;
+    state.activePower = "";
+    state.powerTimer = 0;
+    state.shield = Math.max(state.shield, 1);
+    sound("level");
+    vibe([30, 20, 30]);
+    showToast("Scene " + (state.levelIndex + 1) + ": " + currentLevel().name, 1700);
+  }
+
+  function startGame() {
+    unlockAudio();
+    sound("button");
+    vibe(20);
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("howScreen").style.display = "none";
+    document.getElementById("gameOverScreen").style.display = "none";
+    document.getElementById("scoreboardOverlay").style.display = "none";
+
+    state.running = true;
+    state.levelIndex = 0;
+    state.money = 0;
+    state.totalMoney = 0;
+    state.score = 0;
+    state.combo = 0;
+    state.bestCombo = 0;
+    state.biggestJump = 0;
+    state.obstacleHits = 0;
+    state.startTime = performance.now();
+    state.elapsed = 0;
+    state.levelStartMoney = 0;
+    state.shield = 0;
+    state.particles = [];
+    state.clouds = [];
+    for (let i = 0; i < 18; i++) {
+      state.clouds.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        s: rand(0.5, 1.4),
+        speed: rand(0.12, 0.34)
+      });
+    }
+    rebuildScene("start");
+    showToast("Collect $" + currentLevel().moneyGoal + " and climb the full scene!", 1700);
+    requestAnimationFrame(loop);
+  }
+
+  function finishGame(won) {
+    state.running = false;
+    state.elapsed = (performance.now() - state.startTime) / 1000;
+    const stats = {
+      score: state.score,
+      money: Math.round(state.money),
+      time: state.elapsed,
+      jump: Math.round(state.biggestJump),
+      combo: state.bestCombo,
+      level: state.levelIndex + 1,
+      date: new Date().toLocaleDateString()
+    };
+    sound(won ? "win" : "drop");
+    vibe(won ? [35, 25, 35] : [60, 30, 60]);
+    maybeSaveScores(stats);
+    document.getElementById("gameOverTitle").textContent = won ? "Meal Quest Complete!" : "Run Over!";
+    document.getElementById("finalStats").innerHTML =
+      "Score: <b>" + stats.score + "</b><br>" +
+      "Money: <b>$" + stats.money.toFixed(2) + "</b><br>" +
+      "Time: <b>" + stats.time.toFixed(1) + "s</b><br>" +
+      "Biggest Jump: <b>" + stats.jump + " ft</b><br>" +
+      "Best Combo: <b>" + stats.combo + "</b><br>" +
+      "Obstacle Hits: <b>" + state.obstacleHits + "</b><br>" +
+      "Rank: <b>" + rankName(state.money) + "</b>";
+    document.getElementById("gameOverScreen").style.display = "flex";
+  }
+
+  function maybeSaveScores(stats) {
+    const boards = readBoards();
+
+    const checks = [
+      ["overall", stats.score, true, "Overall Score"],
+      ["fastest", stats.time, false, "Fastest Finish"],
+      ["money", stats.money, true, "Most Money"],
+      ["jump", stats.jump, true, "Biggest Jump"],
+      ["combo", stats.combo, true, "Best Combo"]
+    ];
+
+    let qualifies = false;
+    for (const [key, value, highWins] of checks) {
+      const board = boards[key] || [];
+      if (board.length < 10) qualifies = true;
+      else {
+        const worst = board[board.length - 1];
+        if (highWins && value > worst.value) qualifies = true;
+        if (!highWins && value < worst.value) qualifies = true;
+      }
+    }
+
+    let name = "Player";
+    if (qualifies) {
+      name = prompt("You made a Top 10 board! Enter your name:", localStorage.getItem("burger_money_last_name") || "Player") || "Player";
+      localStorage.setItem("burger_money_last_name", name);
+    }
+
+    for (const [key, value, highWins] of checks) {
+      boards[key] = boards[key] || [];
+      boards[key].push({ name, value, stats, date: stats.date });
+      boards[key].sort((a, b) => highWins ? b.value - a.value : a.value - b.value);
+      boards[key] = boards[key].slice(0, 10);
+    }
+    saveBoards(boards);
+  }
+
+  function update() {
+    const p = state.player;
+    const lvl = currentLevel();
+    state.elapsed = (performance.now() - state.startTime) / 1000;
+
+    if (state.activePower) {
+      state.powerTimer--;
+      if (state.powerTimer <= 0) state.activePower = "";
+    }
+
+    const moveLeft = state.inputLeft;
+    const moveRight = state.inputRight;
+    if (moveLeft) p.vx -= p.speed;
+    if (moveRight) p.vx += p.speed;
+    if (!moveLeft && !moveRight) p.vx *= 0.88;
+    p.vx = clamp(p.vx, -p.maxSpeed, p.maxSpeed);
+
+    if (state.activePower === "rocket") {
+      // Share-ready tune: rocket is a controlled boost, not an uncontrollable launch.
+      // It still helps you climb, but keeps you slow enough to steer into money and platforms.
+      p.vy += p.gravity * 0.20;
+      p.vy -= 0.055;
+      p.vy = clamp(p.vy, -4.15, 1.35);
+      p.vx *= 0.985;
+    } else {
+      p.vy += p.gravity;
+    }
+
+    // Jump logic: one press, not held repeat.
+    const jumpDown = state.jumpPressed;
+    if (jumpDown && !state.jumpWasDown && p.jumpsLeft > 0) {
+      p.vy = p.jumpPower * (state.activePower === "mega" ? 1.12 : 1);
+      p.jumpsLeft--;
+      p.onGround = false;
+      sound("jump");
+      vibe(14);
+      addParticles(p.x + p.w/2, p.y + p.h, 10, "#fff2a6");
+    }
+    state.jumpWasDown = jumpDown;
+
+    p.x += p.vx;
+    p.y += p.vy;
+
+    // Wrap sides.
+    if (p.x > canvas.width + 16) p.x = -p.w;
+    if (p.x + p.w < -16) p.x = canvas.width;
+
+    // Platform collision: forgiving landing, only when moving downward.
+    p.onGround = false;
+    if (p.vy >= -1) {
+      for (const plat of state.platforms) {
+        if (p.x + p.w * 0.82 > plat.x &&
+            p.x + p.w * 0.18 < plat.x + plat.w &&
+            p.y + p.h > plat.y - 8 &&
+            p.y + p.h < plat.y + plat.h + Math.max(18, p.vy + 16)) {
+          p.y = plat.y - p.h;
+          p.vy = p.jumpPower;
+          p.jumpsLeft = 2;
+          p.onGround = true;
+          state.combo++;
+          state.bestCombo = Math.max(state.bestCombo, state.combo);
+          const jumpFt = Math.max(0, Math.round((state.sceneProgress - state.lastBounceWorld) / 12));
+          state.biggestJump = Math.max(state.biggestJump, jumpFt);
+          state.lastBounceWorld = state.sceneProgress;
+          sound("bounce");
+          vibe(8);
+          addParticles(p.x + p.w/2, p.y + p.h, 7, plat.starter ? "#ffd34d" : "#ffffff");
+          break;
+        }
+      }
+    }
+
+    // Camera scroll: slower and stable.
+    const scrollLine = canvas.height * 0.44;
+    if (p.y < scrollLine) {
+      const wantedScroll = (scrollLine - p.y) * 0.56;
+      const scroll = Math.min(wantedScroll, state.activePower === "rocket" ? 8.5 : 14);
+      p.y += scroll;
+      state.sceneProgress += scroll;
+      for (const arr of [state.platforms, state.coins, state.powers, state.obstacles]) {
+        for (const o of arr) o.y += scroll;
+      }
+      for (const c of state.clouds) c.y += scroll * 0.22;
+      state.score += Math.floor(scroll / 5);
+    }
+
+    // Passive item pull: fixes "floating past everything" problem.
+    for (const coin of state.coins) {
+      if (coin.collected) continue;
+      const cx = coin.x + coin.w/2;
+      const cy = coin.y + coin.h/2;
+      const px = p.x + p.w/2;
+      const py = p.y + p.h/2;
+      const dx = px - cx;
+      const dy = py - cy;
+      const dist = Math.hypot(dx, dy);
+      const pullDist = state.activePower === "magnet" ? 260 : state.activePower === "rocket" ? 185 : 118;
+      if (dist < pullDist && dist > 1) {
+        const pullSpeed = state.activePower === "magnet" ? 8.5 : state.activePower === "rocket" ? 5.2 : 3.4;
+        coin.x += dx / dist * pullSpeed;
+        coin.y += dy / dist * pullSpeed;
+      }
+      const grabPad = state.activePower === "rocket" ? 24 : 16;
+      if (rectHit(p, { x: coin.x - grabPad, y: coin.y - grabPad, w: coin.w + grabPad * 2, h: coin.h + grabPad * 2 })) {
+        coin.collected = true;
+        state.money += coin.value;
+        state.totalMoney += coin.value;
+        state.score += coin.value * 9 + Math.min(state.combo * 4, 80);
+        sound("coin");
+        vibe(10);
+        addParticles(coin.x + coin.w/2, coin.y + coin.h/2, 12, "#ffd34d");
+      }
+    }
+
+    for (const pow of state.powers) {
+      if (pow.collected) continue;
+      if (rectHit(p, { x: pow.x - 22, y: pow.y - 22, w: pow.w + 44, h: pow.h + 44 })) {
+        pow.collected = true;
+        activatePower(pow.type);
+        sound("power");
+        vibe([18, 18, 18]);
+        addParticles(pow.x + pow.w/2, pow.y + pow.h/2, 18, "#65e8ff");
+      }
+    }
+
+    if (p.invincible > 0) p.invincible--;
+
+    for (const obs of state.obstacles) {
+      if (obs.hit) continue;
+      if (rectHit(p, obs)) {
+        obs.hit = true;
+        if (state.shield > 0) {
+          state.shield--;
+          p.invincible = 70;
+          sound("shield");
+          vibe(45);
+          showToast("Shield blocked DROP!", 1000);
+          addParticles(obs.x + obs.w/2, obs.y, 20, "#64ff77");
+        } else if (p.invincible <= 0) {
+          rebuildScene("drop");
+          return;
+        }
+      }
+    }
+
+    // Falling below bottom: reset to bottom, do not game-over immediately.
+    if (p.y > canvas.height + 140) {
+      rebuildScene("drop");
+      return;
+    }
+
+    // Remove only far-below items; never remove current playable path.
+    state.platforms = state.platforms.filter(o => o.y < canvas.height + 260);
+    state.coins = state.coins.filter(o => !o.collected && o.y < canvas.height + 260);
+    state.powers = state.powers.filter(o => !o.collected && o.y < canvas.height + 260);
+    state.obstacles = state.obstacles.filter(o => o.y < canvas.height + 260);
+
+    updateParticles();
+
+    const levelMoney = state.money - state.levelStartMoney;
+    if (levelMoney >= lvl.moneyGoal && state.sceneProgress >= lvl.minProgress) {
+      state.levelCompletePause++;
+      if (state.levelCompletePause > 22) {
+        state.levelCompletePause = 0;
+        nextLevel();
+      }
+    } else {
+      state.levelCompletePause = 0;
+    }
+  }
+
+  function activatePower(type) {
+    if (type === "shield") {
+      state.shield++;
+      showToast("Shield ready! Blocks one DROP.", 1200);
+      return;
+    }
+    state.activePower = type;
+    state.powerTimer = type === "rocket" ? 155 : type === "magnet" ? 390 : 180;
+    if (type === "mega") state.player.vy = state.player.jumpPower * 1.16;
+    showToast(type.toUpperCase() + " power!", 1000);
+  }
+
+  function rectHit(a, b) {
+    return a.x < b.x + b.w &&
+           a.x + a.w > b.x &&
+           a.y < b.y + b.h &&
+           a.y + a.h > b.y;
+  }
+
+  function addParticles(x, y, count, color) {
+    for (let i = 0; i < count; i++) {
+      state.particles.push({
+        x, y,
+        vx: rand(-3, 3),
+        vy: rand(-4, 1),
+        life: rand(22, 44),
+        color,
+        size: rand(2, 5)
+      });
+    }
+  }
+
+  function updateParticles() {
+    state.particles = state.particles.filter(pt => {
+      pt.x += pt.vx;
+      pt.y += pt.vy;
+      pt.vy += 0.15;
+      pt.life--;
+      return pt.life > 0;
+    });
+  }
+
+  function draw() {
+    const lvl = currentLevel();
+    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    grad.addColorStop(0, lvl.sky1);
+    grad.addColorStop(1, lvl.sky2);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    drawBackground(lvl);
+
+    for (const plat of state.platforms) drawPlatform(plat);
+    for (const coin of state.coins) if (!coin.collected) drawCoin(coin);
+    for (const pow of state.powers) if (!pow.collected) drawPower(pow);
+    for (const obs of state.obstacles) drawObstacle(obs);
+    for (const pt of state.particles) {
+      ctx.globalAlpha = Math.max(0, pt.life / 44);
+      ctx.fillStyle = pt.color;
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    if (state.player) drawPlayer(state.player);
+  }
+
+  function drawBackground(lvl) {
+    ctx.save();
+    for (const c of state.clouds) {
+      c.x += c.speed;
+      if (c.x > canvas.width + 100) c.x = -140;
+      if (c.y > canvas.height + 120) c.y = -80;
+      drawSoftCloud(c.x, c.y, 75 * c.s, 0.13);
+    }
+
+    // Scene decorations.
+    const progressRatio = Math.min(1, state.sceneProgress / lvl.minProgress);
+    ctx.globalAlpha = 0.16;
+    ctx.fillStyle = "#ffd34d";
+    ctx.font = "900 " + Math.max(40, canvas.width * 0.07) + "px Arial";
+    ctx.textAlign = "center";
+    const words = ["DRIVE", "PLAY", "FRY", "NEON"];
+    ctx.fillText(words[state.levelIndex] || "MEAL", canvas.width/2, canvas.height * (0.68 - progressRatio * 0.25));
+    ctx.restore();
+  }
+
+  function drawSoftCloud(x, y, size, alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.arc(x, y, size * .28, 0, Math.PI*2);
+    ctx.arc(x + size*.25, y - size*.13, size*.32, 0, Math.PI*2);
+    ctx.arc(x + size*.55, y, size*.28, 0, Math.PI*2);
+    ctx.arc(x + size*.82, y + size*.05, size*.22, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawPlatform(p) {
+    ctx.save();
+    ctx.shadowColor = p.starter ? "rgba(255,211,77,.8)" : "rgba(255,255,255,.45)";
+    ctx.shadowBlur = p.starter ? 18 : 10;
+    ctx.fillStyle = p.starter ? "#ffd34d" : "#f8f0ff";
+    ctx.beginPath();
+    roundRect(ctx, p.x, p.y, p.w, p.h, p.h/2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = p.starter ? "#a75d00" : "#8c79a6";
+    ctx.globalAlpha = 0.35;
+    ctx.beginPath();
+    roundRect(ctx, p.x + 8, p.y + p.h * .55, p.w - 16, p.h * .22, p.h/4);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawCoin(c) {
+    if (img.coin.ready && !img.coin.failed) {
+      ctx.drawImage(img.coin, c.x, c.y, c.w, c.h);
+    } else {
+      ctx.save();
+      ctx.fillStyle = "#ffd34d";
+      ctx.beginPath();
+      ctx.arc(c.x + c.w/2, c.y + c.h/2, c.w/2, 0, Math.PI*2);
+      ctx.fill();
+      ctx.fillStyle = "#7b3f00";
+      ctx.font = "900 18px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("$", c.x + c.w/2, c.y + c.h/2);
+      ctx.restore();
+    }
+  }
+
+  function drawPower(p) {
+    if (img.power.ready && !img.power.failed) {
+      ctx.drawImage(img.power, p.x, p.y, p.w, p.h);
+    } else {
+      ctx.save();
+      ctx.fillStyle = "#62eaff";
+      ctx.beginPath();
+      ctx.arc(p.x+p.w/2, p.y+p.h/2, p.w/2, 0, Math.PI*2);
+      ctx.fill();
+      ctx.fillStyle = "#001b2a";
+      ctx.font = "900 11px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(p.type[0].toUpperCase(), p.x+p.w/2, p.y+p.h/2);
+      ctx.restore();
+    }
+    ctx.save();
+    ctx.fillStyle = "white";
+    ctx.font = "900 10px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(labelForPower(p.type), p.x + p.w/2, p.y - 4);
+    ctx.restore();
+  }
+
+  function labelForPower(type) {
+    return type === "magnet" ? "MAG" : type === "shield" ? "SHIELD" : type === "rocket" ? "BOOST" : "MEGA";
+  }
+
+  function drawObstacle(o) {
+    ctx.save();
+    ctx.fillStyle = "#ff2a35";
+    ctx.shadowColor = "rgba(255,0,0,.7)";
+    ctx.shadowBlur = 14;
+    ctx.beginPath();
+    roundRect(ctx, o.x, o.y, o.w, o.h, 8);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = "white";
+    ctx.font = "900 14px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("DROP!", o.x + o.w/2, o.y + o.h/2);
+    ctx.restore();
+  }
+
+  function drawPlayer(p) {
+    ctx.save();
+    if (p.invincible > 0 && Math.floor(p.invincible / 5) % 2 === 0) ctx.globalAlpha = .55;
+
+    if (state.shield > 0) {
+      ctx.strokeStyle = "#64ff77";
+      ctx.lineWidth = 4;
+      ctx.shadowColor = "#64ff77";
+      ctx.shadowBlur = 14;
+      ctx.beginPath();
+      ctx.arc(p.x + p.w/2, p.y + p.h/2, p.w * .68, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+
+    if (img.player.ready && !img.player.failed) {
+      ctx.drawImage(img.player, p.x, p.y, p.w, p.h);
+    } else {
+      ctx.fillStyle = "#ffcf4d";
+      ctx.beginPath();
+      ctx.arc(p.x + p.w/2, p.y + p.h/2, p.w/2, 0, Math.PI*2);
+      ctx.fill();
+      ctx.fillStyle = "#3a1700";
+      ctx.font = "900 12px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("YOU", p.x+p.w/2, p.y+p.h/2);
+    }
+    ctx.restore();
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    r = Math.min(r, w/2, h/2);
+    ctx.moveTo(x+r, y);
+    ctx.arcTo(x+w, y, x+w, y+h, r);
+    ctx.arcTo(x+w, y+h, x, y+h, r);
+    ctx.arcTo(x, y+h, x, y, r);
+    ctx.arcTo(x, y, x+w, y, r);
+  }
+
+  function updateHud() {
+    const lvl = currentLevel();
+    const levelMoney = Math.max(0, state.money - state.levelStartMoney);
+    const moneyPct = levelMoney / lvl.moneyGoal;
+    const climbPct = state.sceneProgress / lvl.minProgress;
+    const goalPct = Math.min(100, Math.floor(Math.min(moneyPct, climbPct) * 100));
+
+    document.getElementById("moneyText").textContent = "Money: $" + state.money.toFixed(2) + " / $" + (state.levelStartMoney + lvl.moneyGoal).toFixed(0);
+    document.getElementById("scoreText").textContent = "Score: " + state.score;
+    document.getElementById("rankText").textContent = "Rank: " + rankName(state.money);
+    document.getElementById("levelText").textContent =
+      "Level " + (state.levelIndex + 1) + ": " + lvl.name + " • " + goalPct + "%";
+    document.getElementById("goalFill").style.width = goalPct + "%";
+    document.getElementById("timeText").textContent = "Time: " + state.elapsed.toFixed(1) + "s";
+    document.getElementById("jumpText").textContent = "Biggest Jump: " + Math.round(state.biggestJump) + " ft";
+    document.getElementById("comboText").textContent =
+      "Combo: " + state.combo + (state.activePower ? " • " + state.activePower.toUpperCase() : "") + (state.shield ? " • Shield " + state.shield : "");
+  }
+
+  function loop() {
+    if (!state.running) return;
+    update();
+    draw();
+    updateHud();
+    requestAnimationFrame(loop);
+  }
+
+  // Controls
+  window.addEventListener("touchmove", e => e.preventDefault(), { passive: false });
+  window.addEventListener("contextmenu", e => e.preventDefault());
+  window.addEventListener("keydown", e => {
+    if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") state.inputLeft = true;
+    if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") state.inputRight = true;
+    if (e.key === "ArrowUp" || e.key === " " || e.key.toLowerCase() === "w") { e.preventDefault(); state.jumpPressed = true; }
+  });
+  window.addEventListener("keyup", e => {
+    if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") state.inputLeft = false;
+    if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") state.inputRight = false;
+    if (e.key === "ArrowUp" || e.key === " " || e.key.toLowerCase() === "w") state.jumpPressed = false;
+  });
+
+  function bindHold(id, down, up) {
+    const el = document.getElementById(id);
+    const start = e => { e.preventDefault(); down(); };
+    const end = e => { e.preventDefault(); up(); };
+    el.addEventListener("pointerdown", start);
+    el.addEventListener("pointerup", end);
+    el.addEventListener("pointercancel", end);
+    el.addEventListener("pointerleave", end);
+  }
+
+  bindHold("leftBtn", () => state.inputLeft = true, () => state.inputLeft = false);
+  bindHold("rightBtn", () => state.inputRight = true, () => state.inputRight = false);
+  bindHold("jumpBtn", () => state.jumpPressed = true, () => state.jumpPressed = false);
+  document.getElementById("soundBtn").addEventListener("click", e => { e.preventDefault(); toggleSound(); });
+
+  // UI functions
+  window.startGame = startGame;
+  window.showHow = () => {
+    unlockAudio(); sound("button"); vibe(10);
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("howScreen").style.display = "flex";
+  };
+  window.hideHow = () => {
+    sound("button"); vibe(10);
+    document.getElementById("howScreen").style.display = "none";
+    document.getElementById("startScreen").style.display = "flex";
+  };
+  window.showStart = () => {
+    sound("button"); vibe(10);
+    document.getElementById("gameOverScreen").style.display = "none";
+    document.getElementById("startScreen").style.display = "flex";
+  };
+
+  window.showScoreboard = () => {
+    unlockAudio(); sound("button"); vibe(10);
+    document.getElementById("scoreboardOverlay").style.display = "flex";
+    renderBoard(state.boardMode || "overall");
+  };
+  window.hideScoreboard = () => {
+    sound("button"); vibe(10);
+    document.getElementById("scoreboardOverlay").style.display = "none";
+  };
+  window.renderBoard = (mode) => {
+    state.boardMode = mode;
+    const boards = readBoards();
+    const labels = {
+      overall: "Overall Score",
+      fastest: "Fastest Finish",
+      money: "Most Money",
+      jump: "Biggest Jump",
+      combo: "Best Combo"
+    };
+    const rows = boards[mode] || [];
+    let html = "<h3>" + labels[mode] + "</h3>";
+    if (!rows.length) {
+      html += "<p>No scores yet. Play a run to save the first score.</p>";
+    } else {
+      html += "<table class='scoreTable'><thead><tr><th>#</th><th>Name</th><th>Value</th><th>Money</th><th>Time</th><th>Date</th></tr></thead><tbody>";
+      rows.forEach((r, i) => {
+        let value = r.value;
+        if (mode === "fastest") value = Number(value).toFixed(1) + "s";
+        else if (mode === "money") value = "$" + Number(value).toFixed(0);
+        else if (mode === "jump") value = Number(value).toFixed(0) + " ft";
+        html += "<tr><td>" + (i+1) + "</td><td>" + escapeHtml(r.name) + "</td><td><b>" + value + "</b></td><td>$" + Number(r.stats.money).toFixed(0) + "</td><td>" + Number(r.stats.time).toFixed(1) + "s</td><td>" + escapeHtml(r.date || "") + "</td></tr>";
+      });
+      html += "</tbody></table>";
+    }
+    document.getElementById("boardContent").innerHTML = html;
+  };
+  window.clearBoards = () => {
+    if (confirm("Reset saved scoreboards on this browser?")) {
+      saveBoards(emptyBoards());
+      renderBoard(state.boardMode || "overall");
+    }
+  };
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;" }[s]));
+  }
+
+  // Draw a quiet background before play.
+  draw();
+})();
+</script>
+</body>
+</html>
