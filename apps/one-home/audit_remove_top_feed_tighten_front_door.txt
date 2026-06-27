@@ -1,0 +1,18 @@
+ONE HOME — REMOVE TOP TICKER + TIGHTEN FRONT DOOR
+
+Requested:
+- Remove the existing top scrolling positive-message feed.
+- Keep the lower What’s Happening feed style.
+- Move Welcome Home and Ember closer to the header.
+
+Done:
+- Retired V177B's old top ticker at the code level. It now removes the
+  ticker instead of creating it.
+- Stopped V180 from writing Admin positive-message rows into the removed
+  top ticker. The message data remains available for future real activity.
+- Added a CSS safety lock so any legacy ticker DOM has zero visual space.
+- Reduced the Home Front Door top spacing.
+- Kept the lower What’s Happening feed unchanged.
+
+No visual redesign beyond moving the Front Door upward and removing the
+older top banner.

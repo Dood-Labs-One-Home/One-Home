@@ -1,0 +1,23 @@
+ONE HOME FRONT DOOR — WHAT'S HAPPENING LIVE FEED
+
+Placement:
+- Full width under the Welcome Home/action card and Ember card.
+- Does not interrupt the first impression.
+- Makes the world feel active after the visitor understands Home and Ember.
+
+Current seed activity:
+- One Home: new profiles and rooms
+- Arcade: Rollies
+- Memory Room: Night Shots
+- Market: drops/collections
+- Studio: new creations
+
+Behavior:
+- Slow continuous ticker
+- Pauses on hover
+- Mobile-safe responsive layout
+- No new backend or Admin controls in this step
+- Static seed feed only, ready to be connected to real activity later
+
+No other Front Door layout, Admin configuration, identity, wallet, assets,
+Rollies, or Night Shots behavior was changed.

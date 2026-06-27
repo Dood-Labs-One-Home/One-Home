@@ -1,0 +1,24 @@
+{
+  "name": "One Home by Dood Labs",
+  "short_name": "One Home",
+  "description": "Create. Collect. Connect. Discover.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#020402",
+  "theme_color": "#020402",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/dood-portal-guide-v54.png?v=54",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.png?v=54",
+      "sizes": "256x256",
+      "type": "image/png"
+    }
+  ]
+}

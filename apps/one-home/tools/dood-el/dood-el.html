@@ -1,0 +1,2072 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dood-el | Pixel Art Creator</title>
+  <meta name="description" content="Create pixel art with Dood-el—our custom XRPL-powered drawing tool. Save, export, animate, and build your Noggin masterpiece." />
+  <meta name="keywords" content="doodel, pixel art, 32x32 draw tool, nft art, doodbrand, xrpl, mint NFT, noggins, $dOOd, pixel creator" />
+  <meta property="og:title" content="Dood-el | Pixel Creator" />
+  <meta property="og:description" content="Draw, save, animate, and export pixel art. Unlock DOOD MODE for layers + animation." />
+  <meta property="og:image" content="https://www.doodbrand.com/assets/doodel-preview.png" />
+  <meta property="og:url" content="https://www.doodbrand.com/dood-el.html" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@doodxrpl" />
+  <meta name="twitter:title" content="Dood-el | Pixel Creator" />
+  <meta name="twitter:description" content="Pixel draw. Save. Animate. Export. Unlock DOOD MODE." />
+  <meta name="twitter:image" content="https://www.doodbrand.com/assets/doodel-preview.png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" href="https://www.doodbrand.com/DOOD_HUGE.png" type="image/png" />
+  <script defer src="https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js?v=2.7.1"></script>
+  <script defer src="/lab/js/config.js?v=158"></script>
+  <link rel="stylesheet" href="/lab/css/lab-mobile.css?v=158" />
+  <link rel="stylesheet" href="/lab/css/creator-tools-lab.css?v=158" />
+  <link rel="stylesheet" href="../../shared/labs.css" />
+  <script src="../../shared/labs-session.js"></script>
+  <script defer src="/lab/js/config.js?v=158"></script>
+
+  <style>
+    body {
+      background:#0d0d0d; color:#fff; font-family:'Roboto',sans-serif; line-height:1.6;
+      background-image:radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px); background-size:25px 25px;
+      margin:0;
+    }
+    header { background:#111; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; border-bottom:1px solid #1f1f1f;}
+    header img {height:50px;}
+    nav a { color:#fff; margin:0 10px; text-decoration:none; font-weight:bold; }
+    nav a:hover {color:#00ff99;}
+
+    .wrap { max-width:1100px; margin:0 auto; padding:18px 14px 40px; }
+    .topbar2 { text-align:center; padding:14px 10px 6px; }
+    .topbar2 h2 { margin:0 0 6px; font-family:'Permanent Marker',cursive; font-size:2rem; }
+    .topbar2 p { margin:4px 0; color:#cfcfcf; }
+    .topbar2 a { color:#00ff99; font-weight:800; text-decoration:none; }
+    .topbar2 a:hover { text-decoration:underline; }
+
+    .controls { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:10px 0; }
+    input[type=color], select, button, input[type=text] { height:36px; border-radius:10px; border:1px solid #2a2a2a; padding:0 10px; background:#161616; color:#fff; font-size:14px; cursor:pointer; }
+    button:hover { background:#232323; }
+    button:active { transform:scale(0.98); }
+    .active { border:2px solid #ffd700; box-shadow:0 0 8px rgba(255,215,0,0.55); }
+    .pill { border-radius:999px; }
+
+    .canvasShell { display:flex; justify-content:center; }
+    canvas { display:block; margin: 10px auto 6px; background:#fff; border: 2px solid #2b2b2b; border-radius:10px; touch-action:none; }
+
+    .legend { background:#111; color:#cfcfcf; font-size: 0.9rem; padding: 1rem; text-align:center; border-top:1px solid #222; border-radius:14px; margin:16px auto 6px; }
+    .legend strong { color:#ffd700; }
+
+    .links { margin-top: 18px; display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+    .links a { color:#aaa; text-decoration:none; border:1px solid #333; border-radius:10px; padding:8px 12px; background:#0f0f0f; }
+    .links a:hover { background:#1b1b1b; color:#fff; }
+
+    .cta-row{ display:flex; gap:10px; justify-content:center; align-items:center; margin:12px 0 6px; flex-wrap:wrap; }
+    .cta-note{ color:#9ad; opacity:.9; }
+    .dood-btn{
+      --g1:#00ccff; --g2:#00ff99; --sh:rgba(0,255,153,.32);
+      position:relative; display:inline-flex; align-items:center; gap:.6rem; padding:12px 18px;
+      border-radius:999px; border:0; cursor:pointer; font-weight:900; letter-spacing:.2px; color:#0d0d0d;
+      background:linear-gradient(135deg,var(--g1),var(--g2));
+      box-shadow:0 8px 30px var(--sh), inset 0 1px 0 rgba(255,255,255,.22);
+      transition:transform .15s ease, box-shadow .2s ease;
+    }
+    .dood-btn:hover{ transform:translateY(-2px) scale(1.02); box-shadow:0 12px 40px var(--sh); }
+    .dood-ghost{
+      display:inline-flex; align-items:center; gap:.5rem; padding:10px 16px; border-radius:12px;
+      text-decoration:none; font-weight:800; background:transparent; color:#eaeaea; border:1px solid #2a2a2a;
+    }
+    .dood-ghost:hover{ border-color:#3a3a3a; background:#161616; }
+
+    .panelRow { display:grid; grid-template-columns: 1fr; gap:12px; margin:14px auto 6px; }
+    @media(min-width: 980px){
+      .panelRow { grid-template-columns: 1.15fr .85fr; align-items:start; }
+    }
+    .card {
+      background:linear-gradient(180deg,#121212,#0e0e0e);
+      border:1px solid #1f1f1f; border-radius:16px; padding:14px;
+      box-shadow:0 18px 50px rgba(0,0,0,.35);
+      position:relative;
+    }
+    .card h3 { margin:0 0 8px; font-family:'Permanent Marker',cursive; color:#00ccff; font-size:1.3rem; letter-spacing:.2px;}
+    .muted { color:#a9a9a9; font-size:.95rem; }
+    .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .row > * { margin:2px 0; }
+
+    .lockedWrap.locked { opacity:.55; filter:blur(.15px); }
+    .lockBadge{
+      position:absolute; top:10px; right:10px;
+      padding:6px 10px; border-radius:999px; font-weight:900;
+      background:rgba(0,0,0,.5); border:1px solid #2a2a2a; color:#fff;
+    }
+    .lockedWrap.locked .lockBadge{ background:rgba(0,0,0,.65); border-color:#3a3a3a; }
+    .lockedCover {
+      display:none;
+      position:absolute; inset:0; border-radius:16px;
+      background:linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.55));
+      cursor:pointer;
+    }
+    .lockedWrap.locked .lockedCover { display:block; }
+
+    .miniList { display:flex; flex-direction:column; gap:8px; }
+    .miniItem {
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      border:1px solid #232323; border-radius:12px; padding:10px; background:#111;
+    }
+    .miniItem strong { color:#fff; }
+    .miniActions { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+    .miniTag { font-size:.85rem; color:#9ad; }
+
+    .dood-modal{ position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter: blur(4px);
+      display:flex; align-items:center; justify-content:center; z-index:1000; opacity:0; pointer-events:none; transition:opacity .18s ease;
+    }
+    .dood-modal.show{ opacity:1; pointer-events:auto; }
+    .dood-dialog{
+      width:min(620px,92vw); background:#121212; border:1px solid #222; border-radius:16px; padding:20px;
+      box-shadow:0 20px 60px rgba(0,0,0,.6); text-align:left;
+    }
+    .dood-dialog h3{ margin:0 0 6px; font-family:'Permanent Marker', cursive; color:#00ccff; font-size:1.6rem; }
+    .dood-dialog p{ color:#cfcfcf; margin:0 0 14px; }
+    .modal-actions{ display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; }
+    .dood-primary{
+      display:inline-flex; align-items:center; gap:.5rem; padding:10px 16px; border-radius:12px;
+      text-decoration:none; font-weight:900; background:linear-gradient(135deg,#00ccff,#00ff99); color:#0b0b0b; border:none;
+    }
+
+    .social-footer {text-align:center;margin:40px 0 10px;}
+    .social-footer a {margin:0 10px;display:inline-block;}
+    .social-footer img {width:40px;height:40px;filter:brightness(1.2);}
+    footer { background:#111; text-align:center; padding:30px; margin-top:30px; border-top:1px solid #1f1f1f; }
+    footer a { color:#00ff99; margin:0 10px; text-decoration:none; }
+    footer a:hover {text-decoration:underline;}
+  
+</style>
+
+  <!-- XRPL + XUMM SDKs -->
+  <script src="https://unpkg.com/xrpl@2.13.0/build/xrpl-latest.min.js" defer></script>
+  <script src="https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js" defer></script>
+
+  <!-- GIF Export (DOOD MODE) -->
+  <script src="https://cdn.jsdelivr.net/npm/gif.js.optimized/dist/gif.js" defer></script>
+<style id="dood-brand-header-style">
+  .dood-return-header{position:sticky;top:0;z-index:99999;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 18px;background:#050806;border-bottom:1px solid rgba(85,255,154,.35);box-shadow:0 12px 30px rgba(0,0,0,.35);font-family:Arial,Helvetica,sans-serif}
+  .dood-brand{display:flex;align-items:center;gap:10px;color:#f6fff9;text-decoration:none;font-weight:950}
+  .dood-brand img{width:38px;height:38px;border-radius:999px;background:#fff;border:1px solid rgba(85,255,154,.5);object-fit:cover;box-shadow:0 0 18px rgba(85,255,154,.25)}
+  .dood-brand strong{font-size:18px;letter-spacing:.01em;color:#f6fff9}
+  .dood-return-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  .dood-return-actions a{color:#55ff9a;text-decoration:none;border:1px solid rgba(85,255,154,.45);border-radius:999px;padding:9px 12px;font-weight:950;background:rgba(85,255,154,.06)}
+  .dood-return-actions a:hover{background:rgba(85,255,154,.14)}
+  @media(max-width:640px){.dood-return-header{align-items:flex-start;flex-direction:column}.dood-return-actions{width:100%}.dood-return-actions a{width:100%;text-align:center}}
+</style>
+
+<style id="dood-single-header-cleanup">
+  #labGlobalHeader,
+  header#labGlobalHeader,
+  .appbar#labGlobalHeader,
+  .dood-v7-tool-bar,
+  .dood-hub-header {
+    display:none !important;
+    height:0 !important;
+    min-height:0 !important;
+    padding:0 !important;
+    margin:0 !important;
+    border:0 !important;
+    overflow:hidden !important;
+  }
+</style>
+
+
+<style id="dood-v53-force-logo">
+  .brand .mark,
+  .brand-mark,
+  .logo-mark,
+  .dood-logo,
+  .site-logo,
+  .app-logo {
+    background: transparent url('/assets/dood-portal-guide-v54.png?v=54') center/contain no-repeat !important;
+    color: transparent !important;
+    overflow: hidden !important;
+  }
+  .brand .mark::before,
+  .brand .mark::after,
+  .brand-mark::before,
+  .brand-mark::after,
+  .logo-mark::before,
+  .logo-mark::after {
+    content: none !important;
+    display: none !important;
+  }
+  .brand .mark img,
+  .brand-mark img,
+  .logo-mark img,
+  .dood-logo img,
+  .site-logo img,
+  .app-logo img {
+    content: url('/assets/dood-portal-guide-v54.png?v=54') !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    display: block !important;
+  }
+</style>
+
+
+<style id="dood-v54-portal-logo-component">
+  :root {
+    --dood-portal-logo-url: url('/assets/dood-portal-guide-v54.png?v=54');
+  }
+
+  .dood-portal-logo,
+  .brand .mark,
+  .brand-mark,
+  .logo-mark,
+  .site-logo,
+  .app-logo {
+    width: 46px !important;
+    height: 46px !important;
+    min-width: 46px !important;
+    border-radius: 999px !important;
+    border: 0 !important;
+    background: transparent var(--dood-portal-logo-url) center/contain no-repeat !important;
+    color: transparent !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    transition: transform .18s ease, filter .18s ease !important;
+    text-decoration: none !important;
+  }
+
+  .dood-portal-logo:hover,
+  .dood-portal-logo:focus-visible,
+  .brand .mark:hover,
+  .brand .mark:focus-visible,
+  .brand-mark:hover,
+  .brand-mark:focus-visible,
+  .logo-mark:hover,
+  .logo-mark:focus-visible,
+  .site-logo:hover,
+  .app-logo:hover {
+    transform: scale(1.05) !important;
+    filter: drop-shadow(0 0 10px rgba(85,255,154,.82)) drop-shadow(0 0 22px rgba(85,255,154,.32)) !important;
+  }
+
+  .dood-portal-logo img,
+  .brand .mark img,
+  .brand-mark img,
+  .logo-mark img,
+  .site-logo img,
+  .app-logo img {
+    content: url('/assets/dood-portal-guide-v54.png?v=54') !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    object-fit: contain !important;
+    pointer-events: none !important;
+  }
+
+  .brand .mark::before,
+  .brand .mark::after,
+  .brand-mark::before,
+  .brand-mark::after,
+  .logo-mark::before,
+  .logo-mark::after,
+  .dood-portal-logo::before,
+  .dood-portal-logo::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  @media (min-width: 821px) {
+    .dood-portal-logo,
+    .brand .mark,
+    .brand-mark,
+    .logo-mark,
+    .site-logo,
+    .app-logo {
+      width: 66px !important;
+      height: 66px !important;
+      min-width: 66px !important;
+    }
+  }
+
+  @media (max-width: 820px) {
+    .brand span,
+    .brand-name,
+    .logo-text {
+      display: none !important;
+    }
+    .dood-portal-logo,
+    .brand .mark,
+    .brand-mark,
+    .logo-mark,
+    .site-logo,
+    .app-logo {
+      width: 46px !important;
+      height: 46px !important;
+      min-width: 46px !important;
+    }
+  }
+
+  @keyframes doodPortalPulse {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(85,255,154,0)); }
+    50% { filter: drop-shadow(0 0 12px rgba(85,255,154,.36)); }
+  }
+
+  .dood-portal-logo.is-alive,
+  .brand .mark {
+    animation: doodPortalPulse 4.5s ease-in-out infinite !important;
+  }
+</style>
+
+
+<style id="dood-v56-theme-modes">
+  :root,
+  body.theme-dood {
+    --dood-accent: #55ff9a;
+    --dood-accent-2: #00d68f;
+    --dood-accent-soft: rgba(85,255,154,.14);
+    --dood-accent-line: rgba(85,255,154,.32);
+    --dood-accent-glow: rgba(85,255,154,.34);
+    --dood-bg-main: #020402;
+    --dood-bg-panel: rgba(5, 17, 8, .88);
+    --dood-text-main: #f6fff9;
+  }
+
+  body.theme-doodette {
+    --dood-accent: #ff4fd8;
+    --dood-accent-2: #ff149d;
+    --dood-accent-soft: rgba(255,79,216,.16);
+    --dood-accent-line: rgba(255,79,216,.38);
+    --dood-accent-glow: rgba(255,79,216,.38);
+    --dood-bg-main: #09020a;
+    --dood-bg-panel: rgba(22, 5, 20, .90);
+    --dood-text-main: #fff3fb;
+  }
+
+  body.theme-dark {
+    --dood-accent: #bfc7d5;
+    --dood-accent-2: #6f7a8d;
+    --dood-accent-soft: rgba(191,199,213,.12);
+    --dood-accent-line: rgba(191,199,213,.28);
+    --dood-accent-glow: rgba(191,199,213,.22);
+    --dood-bg-main: #020202;
+    --dood-bg-panel: rgba(10, 10, 12, .94);
+    --dood-text-main: #f4f6fb;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 12% 4%, var(--dood-accent-soft), transparent 24rem),
+      linear-gradient(180deg, var(--dood-bg-main), #050705) !important;
+    color: var(--dood-text-main) !important;
+  }
+
+  header,
+  .site-header,
+  .topbar,
+  .panel,
+  .hero,
+  .section,
+  .screen,
+  .builder-card,
+  .preview-card,
+  .item,
+  .profile-auth-card,
+  .card,
+  .district-card,
+  .game-card {
+    border-color: var(--dood-accent-line) !important;
+  }
+
+  .hero,
+  .section,
+  .panel,
+  .screen,
+  .builder-card,
+  .preview-card,
+  .item,
+  .profile-auth-card,
+  .card,
+  .district-card,
+  .game-card {
+    background: linear-gradient(135deg, var(--dood-accent-soft), rgba(255,255,255,.025)) !important;
+  }
+
+  .tagline,
+  .screen-title,
+  .world-feature b,
+  .status,
+  .brand-text,
+  .brand-name,
+  h2,
+  .tab.active,
+  .step-tab.active,
+  a,
+  .footer-links a {
+    color: var(--dood-accent) !important;
+  }
+
+  .btn.primary,
+  button.primary,
+  .primary {
+    background: linear-gradient(135deg, var(--dood-accent), var(--dood-accent-2)) !important;
+    border-color: transparent !important;
+    color: #031006 !important;
+    box-shadow: 0 0 18px var(--dood-accent-glow) !important;
+  }
+
+  .btn,
+  button,
+  input,
+  textarea,
+  select,
+  .step-tab,
+  .tab {
+    border-color: var(--dood-accent-line) !important;
+  }
+
+  .dood-portal-logo:hover,
+  .dood-portal-logo:focus-visible,
+  .brand .mark:hover,
+  .brand .mark:focus-visible,
+  .brand-mark:hover,
+  .brand-mark:focus-visible,
+  .logo-mark:hover,
+  .logo-mark:focus-visible,
+  .site-logo:hover,
+  .app-logo:hover {
+    filter: drop-shadow(0 0 10px var(--dood-accent)) drop-shadow(0 0 22px var(--dood-accent-glow)) !important;
+  }
+
+  .theme-switcher {
+    display: inline-flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    margin-left: 12px;
+  }
+
+  .theme-switcher button {
+    min-height: 34px !important;
+    padding: 7px 10px !important;
+    border-radius: 999px !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    background: rgba(0,0,0,.24) !important;
+    color: var(--dood-text-main) !important;
+  }
+
+  .theme-switcher button.active {
+    color: #031006 !important;
+    background: linear-gradient(135deg, var(--dood-accent), var(--dood-accent-2)) !important;
+    border-color: transparent !important;
+  }
+
+  @media(max-width: 820px) {
+    .theme-switcher {
+      width: 100%;
+      margin-left: 0;
+      justify-content: flex-start;
+    }
+    .theme-switcher button {
+      font-size: 11px !important;
+      padding: 7px 9px !important;
+    }
+  }
+</style>
+
+</head>
+
+<body class="creator-tool-page" data-lab-active="tools" data-lab-badge="Dood-el" data-lab-page="/lab/Dood-el.html">
+
+<div class="dood-return-header">
+  <a class="dood-brand" href="../../index.html#districts" aria-label="Back to Dood Labs">
+    <img src="/assets/dood-portal-guide-v54.png?v=54" alt="Dood Labs logo">
+    <strong>Dood Labs</strong>
+  </a>
+  <div class="dood-return-actions">
+    <a href="../../index.html#districts">← Return to Dood Labs</a>
+    <a href="../../index.html#districts">Back to Districts</a></div></div>
+
+
+<script>
+(function(){
+  window.__DOOD_HUB_BACK = function(){
+    try { localStorage.setItem('doodLabsReturnTarget','districts'); } catch(e) {}
+    window.location.href = '../../index.html#districts';
+  };
+  if (!window.LabsSession) {
+    window.LabsSession = {
+      mountToolNav: function(){},
+      get: function(){ try { return JSON.parse(localStorage.getItem('doodLabsSession')||'null'); } catch(e){ return null; } },
+      set: function(v){ try { localStorage.setItem('doodLabsSession', JSON.stringify(v||{})); } catch(e){} },
+      clear: function(){ try { localStorage.removeItem('doodLabsSession'); } catch(e){} }
+    };
+  }
+})();
+</script>
+<div id="toastHost" aria-live="polite"></div>
+<main class="wrap">
+  <section class="page-hero topbar2">
+    <h2>🎨 Dood-el: Pixel Draw</h2>
+    <p>Make your mark… pixel by pixel.</p>
+    <p>💎 <a href="https://xrp.cafe/collection/dood-el" target="_blank" rel="noopener">Explore the Dood-el Collection on XRP.Cafe</a></p>
+    <div class="wallet-strip">
+      <span id="labWalletLine" class="pill-lab warn">Wallet: not connected</span>
+      <span id="labGatePill" class="pill-lab warn">Dood Mode: locked (1M $dOOd)</span></div>
+    <div class="cta-row">
+      <button id="doodModeBtn" class="dood-btn" aria-haspopup="dialog" type="button">
+        <span>✨</span>
+        <span>$dOOd Holders — DOOD MODE</span>
+        <span>→</span>
+      </button>
+      <button id="doodClear" class="dood-ghost" type="button" title="Clear wallet access">Disconnect</button>
+      <small id="doodPill" class="cta-note">Locked. Connect to verify.</small></div>
+  </section>
+
+  <!-- CORE CONTROLS -->
+  <div class="controls">
+    <label style="display:inline-flex;align-items:center;gap:8px;color:#cfcfcf;font-weight:800;">Grid</label>
+    <select id="gridSizeSelect" class="pill">
+      <option value="12">12×12</option>
+      <option value="32" selected>32×32</option>
+      <option value="64">64×64</option>
+    </select>
+
+    <label style="display:inline-flex;align-items:center;gap:8px;color:#cfcfcf;font-weight:800;">Zoom</label>
+    <button id="zoomOutBtn" class="pill" type="button">➖</button>
+    <button id="zoomInBtn" class="pill" type="button">➕</button>
+    <button id="centerBtn" class="pill" type="button">🎯</button></div>
+
+  <div class="canvasShell">
+    <canvas id="canvas" width="640" height="640"></canvas></div>
+
+  <div class="controls">
+    <input type="color" id="colorPicker" value="#000000">
+    <button id="brushBtn" class="active" type="button">🖌️</button>
+    <button id="eraserBtn" type="button">🧽</button>
+    <button id="bucketBtn" type="button">🪣</button>
+    <button id="undoBtn" type="button">↩️</button>
+    <button id="redoBtn" type="button">↪️</button>
+    <button id="clearBtn" type="button">🧼</button></div>
+
+  <div class="controls">
+    <button id="toggleGridBtn" type="button">🔲</button>
+    <button id="mirrorBtn" type="button">🪞</button>
+    <button id="brickBtn" type="button">🧱</button>
+    <button id="exportJpgBtn" type="button">⬇️ JPG</button>
+    <button id="exportPngBtn" type="button" title="PNG (solid background)">⬇️ PNG</button>
+    <button id="shareBtn" type="button">🐦</button></div>
+
+  <!-- SAVES + TEMPLATES + IMAGE UPLOAD (re-added) -->
+  <div class="controls">
+    <select id="savedList">
+      <option disabled selected>Select a saved design</option>
+    </select>
+
+    <button id="tplBuildBtn" type="button">📦 Build-a-Dood</button>
+    <button id="tplSheepBtn" type="button">🐑 Sheep</button>
+
+    <button id="uploadImgBtn" type="button">🖼️ Upload Image</button>
+    <input id="uploadImgFile" type="file" accept="image/*" style="display:none;">
+
+    <label style="display:inline-flex;align-items:center;gap:8px;color:#cfcfcf;font-weight:800;">
+      Alpha Cut
+      <select id="alphaCutSelect" class="pill" title="How transparent a pixel must be to become empty">
+        <option value="0">0% (none)</option>
+        <option value="15">6%</option>
+        <option value="30" selected>12%</option>
+        <option value="60">24%</option>
+        <option value="100">39%</option>
+      </select>
+    </label>
+
+    <label style="display:inline-flex;align-items:center;gap:8px;color:#cfcfcf;font-weight:800;">
+      Fit
+      <select id="fitModeSelect" class="pill" title="How the image is fit into the grid">
+        <option value="contain" selected>Contain</option>
+        <option value="cover">Cover</option>
+        <option value="stretch">Stretch</option>
+      </select>
+    </label></div>
+
+  <div class="controls">
+    <input type="text" id="saveName" placeholder="Design name">
+    <button id="saveNamedBtn" type="button">💾 Save</button>
+    <button id="deleteNamedBtn" type="button">🗑️ Delete</button></div>
+
+  <div class="legend">
+    <p><strong>Legend:</strong> 🖌️ Brush | 🧽 Eraser | 🪣 Fill | ↩️ Undo | ↪️ Redo | 🧼 Clear | 🔲 Grid | 🪞 Mirror | 🧱 Brick | ⬇️ Export | 🐦 Share | 🖼️ Upload</p></div>
+
+  <!-- DOOD MODE PANELS -->
+  <div class="panelRow">
+    <div class="card lockedWrap locked" id="doodPanel">
+      <div class="lockBadge" id="doodLockBadge">🔒 DOOD MODE</div>
+      <div class="lockedCover" id="doodLockedCover" title="Unlock DOOD MODE"></div>
+
+      <h3>DOOD MODE Studio</h3>
+      <p class="muted" style="margin-top:-4px;">
+        Layers… animation… pro tools… transparent exports… project files… GIF export.
+      </p>
+
+      <div class="row" style="margin-top:10px;">
+        <button id="toolEyeBtn" type="button">🎯 Eyedropper</button>
+        <button id="toolLineBtn" type="button">📏 Line</button>
+        <button id="toolRectBtn" type="button">▭ Rect</button>
+        <button id="toolCircBtn" type="button">◯ Circle</button>
+        <select id="brushSize" title="Brush size">
+          <option value="1" selected>Brush 1x</option>
+          <option value="2">Brush 2x</option>
+          <option value="3">Brush 3x</option>
+          <option value="4">Brush 4x</option>
+        </select></div>
+
+      <div class="row" style="margin-top:10px;">
+        <button id="exportPngTransBtn" type="button" title="PNG with transparency">⬇️ PNG (Transparent)</button>
+        <button id="exportSpriteBtn" type="button" title="Sprite sheet from frames">⬇️ Spritesheet</button>
+        <button id="exportGifBtn" type="button" title="Export animation as GIF">⬇️ GIF</button>
+        <button id="exportProjectBtn" type="button" title="Export .dood project">📦 Export .dood</button>
+        <button id="importProjectBtn" type="button" title="Import .dood project">📥 Import .dood</button>
+        <input id="importFile" type="file" accept=".dood,application/json" style="display:none;"></div>
+
+      <hr style="border:0;border-top:1px solid #1f1f1f;margin:14px 0;">
+
+      <div class="row" style="justify-content:space-between;">
+        <div>
+          <strong>Layers</strong> <span class="miniTag">(opacity / hide)</span></div>
+        <div class="miniActions">
+          <button id="layerAddBtn" type="button">➕</button>
+          <button id="layerDupBtn" type="button">📄</button>
+          <button id="layerDelBtn" type="button">🗑️</button></div></div>
+      <div class="miniList" id="layersList" style="margin-top:8px;"></div>
+
+      <hr style="border:0;border-top:1px solid #1f1f1f;margin:14px 0;">
+
+      <div class="row" style="justify-content:space-between;">
+        <div>
+          <strong>Animation</strong> <span class="miniTag">(frames + onion skin)</span></div>
+        <div class="miniActions">
+          <button id="frameAddBtn" type="button">➕</button>
+          <button id="frameDupBtn" type="button">📄</button>
+          <button id="frameDelBtn" type="button">🗑️</button></div></div>
+      <div class="row" style="margin-top:8px;">
+        <button id="animPlayBtn" type="button">▶️ Play</button>
+        <button id="animStopBtn" type="button">⏹ Stop</button>
+        <label style="display:inline-flex;align-items:center;gap:6px;color:#cfcfcf;font-weight:800;">
+          FPS
+          <select id="fpsSelect">
+            <option value="4">4</option>
+            <option value="6">6</option>
+            <option value="8" selected>8</option>
+            <option value="12">12</option>
+          </select>
+        </label>
+        <label style="display:inline-flex;align-items:center;gap:6px;color:#cfcfcf;font-weight:800;">
+          Onion
+          <select id="onionSelect">
+            <option value="0" selected>Off</option>
+            <option value="0.2">20%</option>
+            <option value="0.35">35%</option>
+            <option value="0.5">50%</option>
+          </select>
+        </label></div>
+      <div class="miniList" id="framesList" style="margin-top:8px;"></div></div>
+
+    <div class="card">
+      <h3>Quick Tips</h3>
+      <p class="muted" style="margin-top:-2px;">
+        Saves are local (browser). DOOD MODE unlocks layers + animation + pro export + GIF.
+      </p>
+
+      <div class="row" style="margin-top:8px;">
+        <button id="bgWhiteBtn" type="button">⬜ Background</button>
+        <button id="bgDarkBtn" type="button">⬛ Background</button>
+        <button id="flattenBtn" type="button" title="Flatten layers into the active layer">🧱 Flatten</button></div>
+
+      <p class="muted" style="margin-top:12px;">
+        Want it clean… block big shapes first… then add details… then shade.
+      </p>
+
+      <div class="links">
+        <a href="../noggins/Noggins.html" target="_blank" rel="noopener">✏️ Noggins</a>
+        <a href="dot-dood.html" target="_blank" rel="noopener">✏️ Dot-Dood</a></div></div></div>
+
+  <section class="info" style="text-align:center;margin:18px auto 0;max-width:900px;">
+    <p>🧠 <strong>Tip:</strong> Upload an image… it auto-pixelizes to your current grid (12/32/64). Use Alpha Cut to keep transparency.</p>
+  </section>
+
+  <div class="social-footer">
+    <h2 style="font-family:'Permanent Marker',cursive;color:#00ccff;margin:0 0 14px;">Join the Conversation</h2>
+    <a href="https://twitter.com/doodxrpl" target="_blank" rel="noopener" title="Follow on X"><img src="/assets/dood-portal-guide-v54.png?v=54" alt="Twitter"></a>
+    <a href="https://doodscord.com" target="_blank" rel="noopener" title="Join Discord"><img src="/assets/dood-portal-guide-v54.png?v=54" alt="Discord"></a>
+    <a href="https://t.me/doodxrpl" target="_blank" rel="noopener" title="Join Telegram"><img src="/assets/dood-portal-guide-v54.png?v=54" alt="Telegram"></a>
+    <a href="https://www.youtube.com/@doodxrpl" target="_blank" rel="noopener" title="YouTube"><img src="/assets/dood-portal-guide-v54.png?v=54" alt="YouTube"></a>
+    <a href="https://www.tiktok.com/@dooddoodles0?_t=ZP-8uox1mM4LaJ&_r=1" target="_blank" rel="noopener" title="TikTok"><img src="/assets/dood-portal-guide-v54.png?v=54" alt="TikTok"></a></div>
+</main>
+
+<footer class="lab-footer">
+  <div style="max-width:1000px;margin:auto;padding:0 20px;text-align:center;">
+    <p style="font-size:1.1rem;margin-bottom:8px;">&copy; 2025 $dOOd • Built on XRPL • <a href="token.html">Token Info</a></p>
+    <p style="margin-bottom:16px;"><a href="https://xrp.cafe/collection/noggins" target="_blank" rel="noopener">NFTs</a> • <a href="../../index.html#shop">Merch</a> • <a href="how-to-buy-dood.html">How to Buy</a> • <a href="community.html">Community</a> • <a href="https://dexscreener.com/xrpl/446f6f6400000000000000000000000000000000.rn5y9n8aptrc7pvqxdmjkg9qvfw7fwi4kc_xrp" target="_blank" rel="noopener">Live Chart</a></p>
+    <p style="margin-bottom:14px;"><a href="https://twitter.com/doodxrpl" target="_blank" rel="noopener">🐦 Twitter/X</a> • <a href="https://doodscord.com" target="_blank" rel="noopener">💬 Discord</a> • <a href="mailto:dood@doodbrand.com">📧 Contact</a></p>
+    <p style="color:#777;font-size:0.9rem;">Memes with utility. NFTs with soul. Built by the people.</p></div>
+</footer>
+
+<!-- DOOD MODE Modal -->
+<div id="doodModeModal" class="dood-modal" role="dialog" aria-modal="true" aria-labelledby="doodModeTitle">
+  <div class="dood-dialog">
+    <h3 id="doodModeTitle">DOOD MODE</h3>
+    <p id="doodModeStatus">Connect your wallet to verify $dOOd holdings.</p>
+    <div class="modal-actions">
+      <button id="doodConnect" class="dood-primary" type="button">Connect &amp; Verify</button>
+      <button id="doodEnter" class="dood-ghost" type="button">Enter</button>
+      <button id="doodDisconnect" class="dood-ghost" type="button">Disconnect</button>
+      <button id="doodClose" class="dood-ghost" type="button">Close</button></div>
+    <small style="color:#9ab">Requires ≥ 1,000,000 $dOOd. Verification cached for 24 hours (sliding).</small></div></div>
+
+<script>
+/* =========================================================
+   DOOD-EL CORE + DOOD MODE STUDIO (single-file)
+   Fixes:
+   - canvas selector bug (was $("canvas"), now $("canvas"))
+   - DOOD MODE unlock actually unlocks panel (window.State + window.applyDoodLock)
+   - re-added Image Upload -> pixelize into grid (no CORS issues)
+   ========================================================= */
+
+const $ = (id)=>document.getElementById(id);
+const canvas = $("canvas"); // (we set id="canvas", so this is correct)
+const ctx = canvas.getContext("2d", { alpha:true });
+
+/* ---------- STATE ---------- */
+const State = {
+  gridSize: 32,
+  canvasPx: 640,
+  cell: 20,
+  showGrid: true,
+  mirror: false,
+  brick: false,
+  bg: "#ffffff",
+  zoom: 1,
+  panX: 0,
+  panY: 0,
+
+  tool: "brush", // brush | eraser | bucket | eye | line | rect | circ
+  color: "#000000",
+  brushSize: 1,
+
+  doodUnlocked: false,
+
+  frames: [],
+  frameIndex: 0,
+  onionAlpha: 0,
+  fps: 8,
+
+  drawing: false,
+  dragPan: false,
+  startX: 0,
+  startY: 0,
+  shapeStart: null,
+
+  undo: [],
+  redo: []
+};
+
+function makeLayer(name="Layer 1"){
+  return {
+    id: cryptoRandomId(),
+    name,
+    visible: true,
+    opacity: 1,
+    pixels: makePixelGrid(State.gridSize) // values: null or "#rrggbb"
+  };
+}
+function makeFrame(name="Frame 1"){
+  return {
+    id: cryptoRandomId(),
+    name,
+    layers: [ makeLayer("Base") ],
+    activeLayer: 0
+  };
+}
+function makePixelGrid(size){
+  return Array.from({length:size}, ()=>Array.from({length:size}, ()=>null));
+}
+function cloneFrame(frame){
+  return JSON.parse(JSON.stringify(frame));
+}
+function cryptoRandomId(){
+  return Math.random().toString(16).slice(2) + Date.now().toString(16);
+}
+
+/* ---------- INIT ---------- */
+function initApp(){
+  State.frames = [ makeFrame("Frame 1") ];
+  State.frameIndex = 0;
+  State.undo = [];
+  State.redo = [];
+  resizeCanvas();
+  bindUI();
+  loadLocalList();
+  renderAll();
+  applyDoodLock();
+}
+window.addEventListener("load", initApp);
+window.addEventListener("resize", resizeCanvas);
+
+/* ---------- CANVAS SIZE / VIEW ---------- */
+function resizeCanvas(){
+  const available = Math.min(window.innerWidth * 0.95, 640);
+  State.canvasPx = available;
+  canvas.width = available;
+  canvas.height = available;
+  State.cell = (State.canvasPx / State.gridSize) * State.zoom;
+  renderAll();
+}
+function centerView(){
+  State.zoom = 1;
+  State.panX = 0;
+  State.panY = 0;
+  State.cell = (State.canvasPx / State.gridSize) * State.zoom;
+  renderAll();
+}
+
+/* ---------- ACCESS HELPERS ---------- */
+function currentFrame(){ return State.frames[State.frameIndex]; }
+function layers(){ return currentFrame().layers; }
+function activeLayer(){ return layers()[currentFrame().activeLayer]; }
+
+/* ---------- HISTORY ---------- */
+function pushHistory(){
+  const snap = JSON.stringify({ frames: State.frames, frameIndex: State.frameIndex, gridSize: State.gridSize, bg: State.bg });
+  State.undo.push(snap);
+  if (State.undo.length > 80) State.undo.shift();
+  State.redo = [];
+}
+function undo(){
+  const snap = State.undo.pop();
+  if(!snap) return;
+  State.redo.push(JSON.stringify({ frames: State.frames, frameIndex: State.frameIndex, gridSize: State.gridSize, bg: State.bg }));
+  const data = JSON.parse(snap);
+  State.frames = data.frames;
+  State.frameIndex = data.frameIndex;
+  State.gridSize = data.gridSize || State.gridSize;
+  State.bg = data.bg || State.bg;
+  $("gridSizeSelect").value = String(State.gridSize);
+  State.cell = (State.canvasPx/State.gridSize)*State.zoom;
+  renderAll();
+  refreshPanels();
+}
+function redo(){
+  const snap = State.redo.pop();
+  if(!snap) return;
+  State.undo.push(JSON.stringify({ frames: State.frames, frameIndex: State.frameIndex, gridSize: State.gridSize, bg: State.bg }));
+  const data = JSON.parse(snap);
+  State.frames = data.frames;
+  State.frameIndex = data.frameIndex;
+  State.gridSize = data.gridSize || State.gridSize;
+  State.bg = data.bg || State.bg;
+  $("gridSizeSelect").value = String(State.gridSize);
+  State.cell = (State.canvasPx/State.gridSize)*State.zoom;
+  renderAll();
+  refreshPanels();
+}
+
+/* ---------- RENDER ---------- */
+function hexToRgba(hex, a=1){
+  const h = hex.replace("#","");
+  const r = parseInt(h.slice(0,2),16);
+  const g = parseInt(h.slice(2,4),16);
+  const b = parseInt(h.slice(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+function renderAll(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  ctx.save();
+  ctx.translate(State.panX, State.panY);
+
+  // background
+  ctx.fillStyle = State.bg;
+  ctx.fillRect(0,0,State.gridSize*State.cell, State.gridSize*State.cell);
+
+  // onion skin prev frame
+  if(State.doodUnlocked && State.onionAlpha > 0 && State.frames.length > 1){
+    const prevIndex = Math.max(0, State.frameIndex - 1);
+    if(prevIndex !== State.frameIndex){
+      drawComposite(State.frames[prevIndex], State.onionAlpha);
+    }
+  }
+
+  // main
+  drawComposite(currentFrame(), 1);
+
+  // grid overlay
+  if(State.showGrid){
+    ctx.strokeStyle = "rgba(0,0,0,0.15)";
+    for(let i=0;i<=State.gridSize;i++){
+      const p = i*State.cell;
+      ctx.beginPath(); ctx.moveTo(p,0); ctx.lineTo(p,State.gridSize*State.cell); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,p); ctx.lineTo(State.gridSize*State.cell,p); ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+
+function drawComposite(frame, masterAlpha=1){
+  for(let li=0; li<frame.layers.length; li++){
+    const L = frame.layers[li];
+    if(!L.visible) continue;
+    const a = Math.max(0, Math.min(1, L.opacity * masterAlpha));
+    if(a <= 0) continue;
+
+    for(let y=0;y<State.gridSize;y++){
+      for(let x=0;x<State.gridSize;x++){
+        const c = L.pixels[y][x];
+        if(!c) continue;
+        const px = x*State.cell, py = y*State.cell;
+        ctx.fillStyle = hexToRgba(c, a);
+        ctx.fillRect(px,py,State.cell,State.cell);
+
+        if(State.brick && c){
+          ctx.strokeStyle = "rgba(0,0,0,0.12)";
+          ctx.strokeRect(px,py,State.cell,State.cell);
+          const r = State.cell*0.2, cx=px+State.cell/2, cy=py+State.cell/2;
+          const g = ctx.createRadialGradient(cx,cy,r*0.3,cx,cy,r);
+          g.addColorStop(0,"rgba(255,255,255,0.55)");
+          g.addColorStop(1,"rgba(0,0,0,0.25)");
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+        }
+      }
+    }
+  }
+}
+
+/* ---------- INPUT / COORDS ---------- */
+function getGridCoords(evt){
+  const rect = canvas.getBoundingClientRect();
+  const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+  const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+
+  const x = (clientX - rect.left - State.panX) / State.cell;
+  const y = (clientY - rect.top  - State.panY) / State.cell;
+
+  return { gx: Math.floor(x), gy: Math.floor(y) };
+}
+function inBounds(gx,gy){
+  return gx>=0 && gy>=0 && gx<State.gridSize && gy<State.gridSize;
+}
+
+/* ---------- DRAW OPS ---------- */
+function setPixel(gx,gy,color){
+  if(!inBounds(gx,gy)) return;
+  activeLayer().pixels[gy][gx] = color;
+}
+function getTopColorAt(gx,gy){
+  const fr = currentFrame();
+  for(let li=fr.layers.length-1; li>=0; li--){
+    const L = fr.layers[li];
+    if(!L.visible) continue;
+    const c = L.pixels[gy][gx];
+    if(c) return c;
+  }
+  return null;
+}
+
+function paintAt(gx,gy){
+  const isErase = (State.tool === "eraser");
+  const col = isErase ? null : State.color;
+  const size = Math.max(1, parseInt(State.brushSize,10)||1);
+
+  const half = Math.floor(size/2);
+  for(let yy=gy-half; yy<gy-half+size; yy++){
+    for(let xx=gx-half; xx<gx-half+size; xx++){
+      if(!inBounds(xx,yy)) continue;
+      setPixel(xx,yy,col);
+      if(State.mirror){
+        const mx = State.gridSize-1-xx;
+        if(inBounds(mx,yy)) setPixel(mx,yy,col);
+      }
+    }
+  }
+}
+
+function bucketFill(gx,gy){
+  if(!inBounds(gx,gy)) return;
+  const target = activeLayer().pixels[gy][gx];
+  const fill = State.color;
+  if(target === fill) return;
+
+  const stack = [[gx,gy]];
+  const visited = new Set();
+  while(stack.length){
+    const [x,y] = stack.pop();
+    const key = x+","+y;
+    if(visited.has(key)) continue;
+    visited.add(key);
+    if(!inBounds(x,y)) continue;
+    if(activeLayer().pixels[y][x] !== target) continue;
+    activeLayer().pixels[y][x] = fill;
+    stack.push([x+1,y],[x-1,y],[x,y+1],[x,y-1]);
+  }
+}
+
+function drawLine(x0,y0,x1,y1){
+  const dx = Math.abs(x1-x0), sx = x0<x1 ? 1 : -1;
+  const dy = -Math.abs(y1-y0), sy = y0<y1 ? 1 : -1;
+  let err = dx + dy;
+  while(true){
+    paintAt(x0,y0);
+    if(x0===x1 && y0===y1) break;
+    const e2 = 2*err;
+    if(e2 >= dy){ err += dy; x0 += sx; }
+    if(e2 <= dx){ err += dx; y0 += sy; }
+  }
+}
+function drawRect(x0,y0,x1,y1){
+  const minX = Math.min(x0,x1), maxX=Math.max(x0,x1);
+  const minY = Math.min(y0,y1), maxY=Math.max(y0,y1);
+  for(let x=minX;x<=maxX;x++){ paintAt(x,minY); paintAt(x,maxY); }
+  for(let y=minY;y<=maxY;y++){ paintAt(minX,y); paintAt(maxX,y); }
+}
+function drawCircle(cx,cy,rx,ry){
+  const a = Math.max(1, Math.abs(rx));
+  const b = Math.max(1, Math.abs(ry));
+  for(let t=0;t<Math.PI*2;t+=0.02){
+    const x = Math.round(cx + a*Math.cos(t));
+    const y = Math.round(cy + b*Math.sin(t));
+    if(inBounds(x,y)) paintAt(x,y);
+  }
+}
+
+/* ---------- CANVAS EVENTS ---------- */
+function onDown(e){
+  e.preventDefault();
+  const {gx,gy} = getGridCoords(e);
+  if(!inBounds(gx,gy)) return;
+
+  if((e.button===2) || (e.touches && e.touches.length===2)){
+    State.dragPan = true;
+    State.startX = (e.touches? e.touches[0].clientX : e.clientX);
+    State.startY = (e.touches? e.touches[0].clientY : e.clientY);
+    return;
+  }
+
+  pushHistory();
+  State.drawing = true;
+
+  if(State.tool === "bucket"){
+    bucketFill(gx,gy);
+    State.drawing = false;
+    renderAll();
+    return;
+  }
+
+  if(State.tool === "eye"){
+    const c = getTopColorAt(gx,gy);
+    if(c){ State.color = c; $("colorPicker").value = c; }
+    State.drawing = false;
+    renderAll();
+    return;
+  }
+
+  if(["line","rect","circ"].includes(State.tool)){
+    State.shapeStart = { gx, gy };
+    return;
+  }
+
+  paintAt(gx,gy);
+  renderAll();
+}
+function onMove(e){
+  e.preventDefault();
+
+  if(State.dragPan){
+    const cx = (e.touches? e.touches[0].clientX : e.clientX);
+    const cy = (e.touches? e.touches[0].clientY : e.clientY);
+    const dx = cx - State.startX;
+    const dy = cy - State.startY;
+    State.startX = cx; State.startY = cy;
+    State.panX += dx; State.panY += dy;
+    renderAll();
+    return;
+  }
+
+  if(!State.drawing) return;
+  if(["line","rect","circ"].includes(State.tool)) return;
+
+  const {gx,gy} = getGridCoords(e);
+  if(!inBounds(gx,gy)) return;
+  paintAt(gx,gy);
+  renderAll();
+}
+function onUp(e){
+  e.preventDefault();
+  if(State.dragPan){
+    State.dragPan = false;
+    return;
+  }
+  if(!State.drawing) return;
+
+  const {gx,gy} = getGridCoords(e);
+  if(State.shapeStart && inBounds(gx,gy)){
+    const s = State.shapeStart;
+    if(State.tool==="line") drawLine(s.gx,s.gy,gx,gy);
+    if(State.tool==="rect") drawRect(s.gx,s.gy,gx,gy);
+    if(State.tool==="circ") drawCircle(s.gx,s.gy,gx-s.gx,gy-s.gy);
+    State.shapeStart = null;
+    renderAll();
+  }
+  State.drawing = false;
+}
+canvas.addEventListener("contextmenu",(e)=>e.preventDefault());
+canvas.addEventListener("mousedown", onDown);
+canvas.addEventListener("mousemove", onMove);
+canvas.addEventListener("mouseup", onUp);
+canvas.addEventListener("mouseleave", ()=>{ State.drawing=false; State.dragPan=false; State.shapeStart=null; });
+canvas.addEventListener("touchstart", onDown, {passive:false});
+canvas.addEventListener("touchmove", onMove, {passive:false});
+canvas.addEventListener("touchend", onUp, {passive:false});
+
+// Drag & Drop image onto canvas (nice bonus)
+canvas.addEventListener("dragover", (e)=>{ e.preventDefault(); });
+canvas.addEventListener("drop", (e)=>{
+  e.preventDefault();
+  const file = e.dataTransfer?.files?.[0];
+  if(file && file.type && file.type.startsWith("image/")){
+    loadImageFromFile(file);
+  }
+});
+
+/* ---------- UI BINDINGS ---------- */
+function setActiveTool(btnId, toolName){
+  ["brushBtn","eraserBtn","bucketBtn","toolEyeBtn","toolLineBtn","toolRectBtn","toolCircBtn"].forEach(id=>{
+    const b=$(id); if(b) b.classList.remove("active");
+  });
+  const b = $(btnId); if(b) b.classList.add("active");
+  State.tool = toolName;
+}
+
+function bindUI(){
+  $("colorPicker").addEventListener("input",(e)=>{ State.color = e.target.value; });
+
+  $("brushBtn").onclick = ()=>setActiveTool("brushBtn","brush");
+  $("eraserBtn").onclick = ()=>setActiveTool("eraserBtn","eraser");
+  $("bucketBtn").onclick = ()=>setActiveTool("bucketBtn","bucket");
+  $("undoBtn").onclick = undo;
+  $("redoBtn").onclick = redo;
+  $("clearBtn").onclick = ()=>{ pushHistory(); activeLayer().pixels = makePixelGrid(State.gridSize); renderAll(); };
+
+  $("toggleGridBtn").onclick = ()=>{ State.showGrid = !State.showGrid; renderAll(); };
+  $("mirrorBtn").onclick = ()=>{ State.mirror = !State.mirror; toast(`Mirror: ${State.mirror ? "ON" : "OFF"}`); };
+  $("brickBtn").onclick  = ()=>{ State.brick = !State.brick; renderAll(); };
+
+  $("gridSizeSelect").onchange = (e)=>{
+    const size = parseInt(e.target.value,10);
+    State.gridSize = size;
+    for(const fr of State.frames){
+      for(const L of fr.layers){
+        L.pixels = resizeGrid(L.pixels, size);
+      }
+    }
+    State.cell = (State.canvasPx / State.gridSize) * State.zoom;
+    renderAll();
+    refreshPanels();
+  };
+
+  $("zoomInBtn").onclick = ()=>{ State.zoom = Math.min(6, State.zoom*1.15); State.cell = (State.canvasPx/State.gridSize)*State.zoom; renderAll(); };
+  $("zoomOutBtn").onclick = ()=>{ State.zoom = Math.max(0.5, State.zoom/1.15); State.cell = (State.canvasPx/State.gridSize)*State.zoom; renderAll(); };
+  $("centerBtn").onclick = centerView;
+
+  $("exportJpgBtn").onclick = exportJPG;
+  $("exportPngBtn").onclick = ()=>exportPNG({transparent:false});
+  $("exportPngTransBtn").onclick = ()=>requireDood(()=>exportPNG({transparent:true}));
+  $("exportSpriteBtn").onclick = ()=>requireDood(exportSpritesheet);
+  $("exportGifBtn").onclick = ()=>requireDood(exportGIF);
+  $("shareBtn").onclick = shareOnX;
+
+  $("tplBuildBtn").onclick = ()=>loadImageTemplate("https://i.ibb.co/yB60PRWs/build-a-dood.jpg");
+  $("tplSheepBtn").onclick = ()=>loadImageTemplate("https://i.ibb.co/7t1RBWG8/dood-pixel-art-34.jpg");
+
+  // Image Upload -> pixelize into grid (re-added)
+  $("uploadImgBtn").onclick = ()=> $("uploadImgFile").click();
+  $("uploadImgFile").addEventListener("change", (e)=>{
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    loadImageFromFile(file);
+    e.target.value = "";
+  });
+
+  $("saveNamedBtn").onclick = saveNamed;
+  $("deleteNamedBtn").onclick = deleteNamed;
+  $("savedList").addEventListener("change",(e)=>loadFromList(e.target.value));
+
+  $("bgWhiteBtn").onclick = ()=>{ State.bg="#ffffff"; renderAll(); };
+  $("bgDarkBtn").onclick = ()=>{ State.bg="#0d0d0d"; renderAll(); };
+
+  $("toolEyeBtn").onclick = ()=>requireDood(()=>setActiveTool("toolEyeBtn","eye"));
+  $("toolLineBtn").onclick = ()=>requireDood(()=>setActiveTool("toolLineBtn","line"));
+  $("toolRectBtn").onclick = ()=>requireDood(()=>setActiveTool("toolRectBtn","rect"));
+  $("toolCircBtn").onclick = ()=>requireDood(()=>setActiveTool("toolCircBtn","circ"));
+
+  $("brushSize").onchange = (e)=>{ State.brushSize = parseInt(e.target.value,10)||1; };
+
+  $("layerAddBtn").onclick = ()=>requireDood(addLayer);
+  $("layerDupBtn").onclick = ()=>requireDood(dupLayer);
+  $("layerDelBtn").onclick = ()=>requireDood(delLayer);
+
+  $("frameAddBtn").onclick = ()=>requireDood(addFrame);
+  $("frameDupBtn").onclick = ()=>requireDood(dupFrame);
+  $("frameDelBtn").onclick = ()=>requireDood(delFrame);
+
+  $("fpsSelect").onchange = (e)=>{ State.fps = parseInt(e.target.value,10)||8; };
+  $("onionSelect").onchange = (e)=>{ State.onionAlpha = parseFloat(e.target.value)||0; renderAll(); };
+  $("animPlayBtn").onclick = ()=>requireDood(startAnim);
+  $("animStopBtn").onclick = stopAnim;
+
+  $("flattenBtn").onclick = ()=>requireDood(flattenLayers);
+
+  $("exportProjectBtn").onclick = ()=>requireDood(exportProject);
+  $("importProjectBtn").onclick = ()=>requireDood(()=>$("importFile").click());
+  $("importFile").addEventListener("change", importProject);
+
+  $("doodLockedCover").onclick = ()=>openDoodModal();
+
+  refreshPanels();
+}
+
+/* ---------- RESIZE GRID HELP ---------- */
+function resizeGrid(oldGrid, newSize){
+  const g = makePixelGrid(newSize);
+  const min = Math.min(oldGrid.length, newSize);
+  for(let y=0;y<min;y++){
+    for(let x=0;x<min;x++){
+      g[y][x] = oldGrid[y][x];
+    }
+  }
+  return g;
+}
+
+/* ---------- LOCAL SAVE ---------- */
+function loadLocalList(){
+  const list = $("savedList");
+  list.innerHTML = '<option disabled selected>Select a saved design</option>';
+  Object.keys(localStorage)
+    .filter(k=>k.startsWith("doodNamed:"))
+    .forEach(k=>{
+      const name = k.replace("doodNamed:","");
+      const opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = "💾 " + name;
+      list.appendChild(opt);
+    });
+}
+function saveNamed(){
+  const name = $("saveName").value.trim();
+  if(!name) return alert("Enter a name to save.");
+  const flat = flattenToSingleGrid();
+  localStorage.setItem(`doodNamed:${name}`, JSON.stringify({ gridSize: State.gridSize, grid: flat }));
+  loadLocalList();
+  toast(`Saved: "${name}"`);
+}
+function deleteNamed(){
+  const name = $("saveName").value.trim();
+  if(!name) return;
+  localStorage.removeItem(`doodNamed:${name}`);
+  loadLocalList();
+  toast("Deleted.");
+}
+function loadFromList(name){
+  const data = localStorage.getItem(`doodNamed:${name}`);
+  if(!data) return;
+  const obj = JSON.parse(data);
+
+  pushHistory();
+  State.gridSize = obj.gridSize || State.gridSize;
+  $("gridSizeSelect").value = String(State.gridSize);
+
+  activeLayer().pixels = makePixelGrid(State.gridSize);
+  for(let y=0;y<State.gridSize;y++){
+    for(let x=0;x<State.gridSize;x++){
+      activeLayer().pixels[y][x] = obj.grid[y][x] || null;
+    }
+  }
+  State.cell = (State.canvasPx/State.gridSize)*State.zoom;
+  renderAll();
+  refreshPanels();
+  $("saveName").value = name;
+}
+
+/* ---------- IMAGE TEMPLATE LOADER (remote URLs) ---------- */
+function loadImageTemplate(url){
+  const img = new Image();
+  img.crossOrigin = "Anonymous";
+  img.src = url;
+  img.onload = ()=>applyImageToGrid(img);
+  img.onerror = ()=>alert("Failed to load template image.");
+}
+
+/* ---------- IMAGE UPLOAD (local files) ---------- */
+function loadImageFromFile(file){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.onload = () => applyImageToGrid(img);
+    img.onerror = () => alert("Could not read that image.");
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyImageToGrid(img){
+  pushHistory();
+
+  const tmp = document.createElement("canvas");
+  tmp.width = State.gridSize;
+  tmp.height = State.gridSize;
+  const tctx = tmp.getContext("2d", { willReadFrequently:true });
+
+  const fitMode = (document.getElementById("fitModeSelect")?.value || "contain");
+  tctx.clearRect(0,0,tmp.width,tmp.height);
+
+  const gw = State.gridSize, gh = State.gridSize;
+  const iw = img.naturalWidth || img.width;
+  const ih = img.naturalHeight || img.height;
+
+  let dx=0, dy=0, dw=gw, dh=gh;
+
+  if(fitMode !== "stretch"){
+    const imgRatio = iw/ih;
+    const gridRatio = gw/gh;
+
+    if(fitMode === "contain"){
+      if(imgRatio > gridRatio){
+        dw = gw; dh = Math.round(gw / imgRatio);
+        dx = 0; dy = Math.round((gh - dh)/2);
+      } else {
+        dh = gh; dw = Math.round(gh * imgRatio);
+        dy = 0; dx = Math.round((gw - dw)/2);
+      }
+    }
+
+    if(fitMode === "cover"){
+      if(imgRatio > gridRatio){
+        dh = gh; dw = Math.round(gh * imgRatio);
+        dy = 0; dx = Math.round((gw - dw)/2);
+      } else {
+        dw = gw; dh = Math.round(gw / imgRatio);
+        dx = 0; dy = Math.round((gh - dh)/2);
+      }
+    }
+  }
+
+  tctx.imageSmoothingEnabled = true;
+  tctx.drawImage(img, dx, dy, dw, dh);
+
+  const alphaCut = parseInt(document.getElementById("alphaCutSelect")?.value || "30", 10);
+  const d = tctx.getImageData(0,0,gw,gh).data;
+
+  activeLayer().pixels = makePixelGrid(State.gridSize);
+
+  for(let y=0; y<gh; y++){
+    for(let x=0; x<gw; x++){
+      const i = (y*gw + x)*4;
+      const r = d[i], g = d[i+1], b = d[i+2], a = d[i+3];
+      if(a <= alphaCut){
+        activeLayer().pixels[y][x] = null;
+        continue;
+      }
+      const hex = `#${[r,g,b].map(v=>v.toString(16).padStart(2,"0")).join("")}`;
+      activeLayer().pixels[y][x] = hex;
+    }
+  }
+
+  renderAll();
+  refreshPanels();
+  toast("Image loaded into grid.");
+}
+
+/* ---------- EXPORTS ---------- */
+function exportJPG(){
+  const link = document.createElement("a");
+  link.download = `dood-el-${Date.now()}.jpg`;
+  link.href = canvas.toDataURL("image/jpeg",0.95);
+  link.click();
+}
+function exportPNG({transparent}){
+  const outScale = 20;
+  const out = document.createElement("canvas");
+  out.width = State.gridSize*outScale;
+  out.height = State.gridSize*outScale;
+  const octx = out.getContext("2d", { alpha:true });
+
+  if(!transparent){
+    octx.fillStyle = State.bg;
+    octx.fillRect(0,0,out.width,out.height);
+  }
+
+  const fr = currentFrame();
+  for(let li=0; li<fr.layers.length; li++){
+    const L = fr.layers[li];
+    if(!L.visible) continue;
+    const a = Math.max(0,Math.min(1, L.opacity));
+    for(let y=0;y<State.gridSize;y++){
+      for(let x=0;x<State.gridSize;x++){
+        const c = L.pixels[y][x];
+        if(!c) continue;
+        octx.fillStyle = hexToRgba(c,a);
+        octx.fillRect(x*outScale,y*outScale,outScale,outScale);
+      }
+    }
+  }
+
+  const link = document.createElement("a");
+  link.download = `dood-el-${transparent?"transparent-":""}${Date.now()}.png`;
+  link.href = out.toDataURL("image/png");
+  link.click();
+}
+function exportSpritesheet(){
+  if(State.frames.length < 2){
+    toast("Add at least 2 frames for a spritesheet.");
+    return;
+  }
+  const scale = 20;
+  const out = document.createElement("canvas");
+  out.width = State.frames.length * State.gridSize * scale;
+  out.height = State.gridSize * scale;
+  const octx = out.getContext("2d", { alpha:true });
+
+  for(let fi=0; fi<State.frames.length; fi++){
+    const fr = State.frames[fi];
+    for(let li=0; li<fr.layers.length; li++){
+      const L = fr.layers[li];
+      if(!L.visible) continue;
+      const a = Math.max(0,Math.min(1, L.opacity));
+      for(let y=0;y<State.gridSize;y++){
+        for(let x=0;x<State.gridSize;x++){
+          const c = L.pixels[y][x];
+          if(!c) continue;
+          octx.fillStyle = hexToRgba(c,a);
+          octx.fillRect((fi*State.gridSize + x)*scale, y*scale, scale, scale);
+        }
+      }
+    }
+  }
+
+  const link = document.createElement("a");
+  link.download = `dood-el-spritesheet-${Date.now()}.png`;
+  link.href = out.toDataURL("image/png");
+  link.click();
+}
+function shareOnX(){
+  const text = encodeURIComponent("Made this in Dood-el… pixel by pixel. #XRPL #dOOd");
+  const url = "https://twitter.com/intent/tweet?text=" + text;
+  window.open(url,"_blank","noopener");
+}
+
+/* ---------- GIF EXPORT (DOOD MODE) ---------- */
+async function exportGIF(){
+  if(State.frames.length < 2){
+    toast("Add at least 2 frames to export a GIF.");
+    return;
+  }
+  if(typeof GIF === "undefined"){
+    alert("GIF encoder not loaded. Make sure gif.js is included.");
+    return;
+  }
+
+  toast("Rendering GIF…");
+
+  const scale = 20;
+  const w = State.gridSize * scale;
+  const h = State.gridSize * scale;
+
+  const out = document.createElement("canvas");
+  out.width = w;
+  out.height = h;
+  const octx = out.getContext("2d", { alpha:true });
+
+  const fps = Math.max(1, State.fps || 8);
+  const delay = Math.round(1000 / fps);
+
+  const gif = new GIF({
+    workers: 2,
+    quality: 10,
+    workerScript: "https://cdn.jsdelivr.net/npm/gif.js.optimized/dist/gif.worker.js",
+    width: w,
+    height: h,
+    transparent: null,
+    background: null
+  });
+
+  function drawFrameToOffscreen(frame){
+    octx.clearRect(0,0,w,h);
+    for(let li=0; li<frame.layers.length; li++){
+      const L = frame.layers[li];
+      if(!L.visible) continue;
+      const a = Math.max(0, Math.min(1, L.opacity));
+      if(a <= 0) continue;
+
+      for(let y=0; y<State.gridSize; y++){
+        for(let x=0; x<State.gridSize; x++){
+          const c = L.pixels[y][x];
+          if(!c) continue;
+          octx.fillStyle = hexToRgba(c, a);
+          octx.fillRect(x*scale, y*scale, scale, scale);
+        }
+      }
+    }
+  }
+
+  for(let i=0; i<State.frames.length; i++){
+    drawFrameToOffscreen(State.frames[i]);
+    gif.addFrame(octx, { copy:true, delay });
+  }
+
+  gif.on("progress", (p)=>{
+    const pct = Math.round(p*100);
+    const t = document.getElementById("toast");
+    if(t) t.textContent = `Rendering GIF… ${pct}%`;
+  });
+
+  gif.on("finished", (blob)=>{
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `dood-el-${State.gridSize}x${State.gridSize}-${Date.now()}.gif`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 1500);
+    toast("GIF exported.");
+  });
+
+  gif.render();
+}
+
+/* ---------- DOOD MODE: layers ---------- */
+function refreshPanels(){
+  const L = layers();
+  const list = $("layersList");
+  if(!list) return;
+  list.innerHTML = "";
+  for(let i=L.length-1;i>=0;i--){
+    const layer = L[i];
+    const isActive = (i === currentFrame().activeLayer);
+
+    const item = document.createElement("div");
+    item.className = "miniItem";
+    item.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <strong>${escapeHtml(layer.name)} ${isActive ? "⭐" : ""}</strong>
+        <span class="miniTag">opacity ${Math.round(layer.opacity*100)}%</span></div>
+      <div class="miniActions">
+        <button type="button" data-act="sel" data-i="${i}">Select</button>
+        <button type="button" data-act="vis" data-i="${i}">${layer.visible?"👁️":"🚫"}</button>
+        <button type="button" data-act="opd" data-i="${i}">-</button>
+        <button type="button" data-act="opu" data-i="${i}">+</button></div>
+    `;
+    list.appendChild(item);
+  }
+
+  list.querySelectorAll("button").forEach(btn=>{
+    btn.onclick = ()=>{
+      const i = parseInt(btn.dataset.i,10);
+      const act = btn.dataset.act;
+      if(act==="sel"){ currentFrame().activeLayer = i; }
+      if(act==="vis"){ layers()[i].visible = !layers()[i].visible; }
+      if(act==="opd"){ layers()[i].opacity = Math.max(0, +(layers()[i].opacity - 0.1).toFixed(2)); }
+      if(act==="opu"){ layers()[i].opacity = Math.min(1, +(layers()[i].opacity + 0.1).toFixed(2)); }
+      renderAll();
+      refreshPanels();
+    };
+  });
+
+  const fList = $("framesList");
+  fList.innerHTML = "";
+  for(let fi=0; fi<State.frames.length; fi++){
+    const fr = State.frames[fi];
+    const isHere = fi === State.frameIndex;
+    const item = document.createElement("div");
+    item.className = "miniItem";
+    item.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <strong>${escapeHtml(fr.name)} ${isHere ? "⭐" : ""}</strong>
+        <span class="miniTag">${fr.layers.length} layers</span></div>
+      <div class="miniActions">
+        <button type="button" data-act="go" data-fi="${fi}">Open</button></div>
+    `;
+    fList.appendChild(item);
+  }
+  fList.querySelectorAll("button").forEach(btn=>{
+    btn.onclick = ()=>{
+      const fi = parseInt(btn.dataset.fi,10);
+      State.frameIndex = fi;
+      renderAll();
+      refreshPanels();
+    };
+  });
+}
+
+function addLayer(){
+  pushHistory();
+  const n = layers().length + 1;
+  layers().push(makeLayer("Layer " + n));
+  currentFrame().activeLayer = layers().length-1;
+  renderAll();
+  refreshPanels();
+}
+function dupLayer(){
+  pushHistory();
+  const base = activeLayer();
+  const copy = JSON.parse(JSON.stringify(base));
+  copy.id = cryptoRandomId();
+  copy.name = base.name + " copy";
+  layers().push(copy);
+  currentFrame().activeLayer = layers().length-1;
+  renderAll();
+  refreshPanels();
+}
+function delLayer(){
+  if(layers().length <= 1){
+    toast("Keep at least one layer.");
+    return;
+  }
+  pushHistory();
+  const idx = currentFrame().activeLayer;
+  layers().splice(idx,1);
+  currentFrame().activeLayer = Math.max(0, idx-1);
+  renderAll();
+  refreshPanels();
+}
+function flattenLayers(){
+  pushHistory();
+  const flat = flattenToSingleGrid();
+  currentFrame().layers = [ { id: cryptoRandomId(), name:"Flattened", visible:true, opacity:1, pixels: flat } ];
+  currentFrame().activeLayer = 0;
+  renderAll();
+  refreshPanels();
+}
+function flattenToSingleGrid(){
+  const out = makePixelGrid(State.gridSize);
+  const fr = currentFrame();
+  for(let y=0;y<State.gridSize;y++){
+    for(let x=0;x<State.gridSize;x++){
+      let c = null;
+      for(let li=fr.layers.length-1; li>=0; li--){
+        const L = fr.layers[li];
+        if(!L.visible) continue;
+        if(L.pixels[y][x]){ c=L.pixels[y][x]; break; }
+      }
+      out[y][x] = c;
+    }
+  }
+  return out;
+}
+
+/* ---------- DOOD MODE: frames + animation ---------- */
+let animTimer = null;
+function addFrame(){
+  pushHistory();
+  const fr = cloneFrame(currentFrame());
+  fr.id = cryptoRandomId();
+  fr.name = "Frame " + (State.frames.length+1);
+  State.frames.push(fr);
+  State.frameIndex = State.frames.length-1;
+  renderAll(); refreshPanels();
+}
+function dupFrame(){
+  pushHistory();
+  const fr = cloneFrame(currentFrame());
+  fr.id = cryptoRandomId();
+  fr.name = currentFrame().name + " copy";
+  State.frames.splice(State.frameIndex+1, 0, fr);
+  State.frameIndex++;
+  renderAll(); refreshPanels();
+}
+function delFrame(){
+  if(State.frames.length<=1){
+    toast("Keep at least one frame.");
+    return;
+  }
+  pushHistory();
+  State.frames.splice(State.frameIndex,1);
+  State.frameIndex = Math.max(0, State.frameIndex-1);
+  renderAll(); refreshPanels();
+}
+function startAnim(){
+  stopAnim();
+  if(State.frames.length < 2){
+    toast("Add frames first.");
+    return;
+  }
+  let i = State.frameIndex;
+  const interval = Math.max(40, Math.floor(1000/State.fps));
+  animTimer = setInterval(()=>{
+    i = (i+1) % State.frames.length;
+    State.frameIndex = i;
+    renderAll();
+    refreshPanels();
+  }, interval);
+}
+function stopAnim(){
+  if(animTimer){ clearInterval(animTimer); animTimer=null; }
+}
+
+/* ---------- DOOD MODE: project file ---------- */
+function exportProject(){
+  const payload = {
+    v: 1,
+    gridSize: State.gridSize,
+    bg: State.bg,
+    frames: State.frames,
+    frameIndex: State.frameIndex
+  };
+  const blob = new Blob([JSON.stringify(payload)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `dood-el-project-${Date.now()}.dood`;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+function importProject(e){
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const data = JSON.parse(reader.result);
+      if(!data || !data.frames || !data.gridSize) throw new Error("Invalid project");
+      pushHistory();
+      State.gridSize = data.gridSize;
+      $("gridSizeSelect").value = String(State.gridSize);
+      State.bg = data.bg || State.bg;
+      State.frames = data.frames;
+      State.frameIndex = Math.max(0, Math.min(data.frameIndex||0, State.frames.length-1));
+      State.cell = (State.canvasPx/State.gridSize)*State.zoom;
+      renderAll();
+      refreshPanels();
+      toast("Project loaded.");
+    }catch(err){
+      alert("Failed to import project: " + err.message);
+    }finally{
+      $("importFile").value = "";
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ---------- Toast ---------- */
+let toastTimer=null;
+function toast(msg){
+  let el = document.getElementById("toast");
+  if(!el){
+    el = document.createElement("div");
+    el.id="toast";
+    el.style.position="fixed";
+    el.style.left="50%";
+    el.style.bottom="20px";
+    el.style.transform="translateX(-50%)";
+    el.style.background="rgba(0,0,0,.75)";
+    el.style.border="1px solid #2a2a2a";
+    el.style.padding="10px 14px";
+    el.style.borderRadius="999px";
+    el.style.fontWeight="900";
+    el.style.zIndex="2000";
+    el.style.color="#fff";
+    el.style.boxShadow="0 12px 40px rgba(0,0,0,.45)";
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.opacity="1";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ el.style.opacity="0"; }, 1400);
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[c]));
+}
+
+/* ---------- DOOD MODE lock helpers ---------- */
+function applyDoodLock(){
+  const panel = $("doodPanel");
+  const badge = $("doodLockBadge");
+  const pill = $("doodPill");
+
+  if(State.doodUnlocked){
+    panel.classList.remove("locked");
+    badge.textContent = "🔓 DOOD MODE";
+    pill.textContent = "Unlocked. Tools live.";
+  }else{
+    panel.classList.add("locked");
+    badge.textContent = "🔒 DOOD MODE";
+    pill.textContent = "Locked. Connect to verify.";
+  }
+  refreshPanels();
+}
+function requireDood(fn){
+  if(State.doodUnlocked) return fn();
+  openDoodModal();
+}
+function openDoodModal(){
+  $("doodModeModal").classList.add("show");
+}
+function closeDoodModal(){
+  $("doodModeModal").classList.remove("show");
+}
+
+/* expose for gate script */
+window.State = State;
+window.applyDoodLock = applyDoodLock;
+window.toast = toast;
+window.openDoodModal = openDoodModal;
+window.closeDoodModal = closeDoodModal;
+</script>
+
+<script>
+/* =========================================================
+   DOOD MODE GATE — shared Lab wallet (DoodLabGate)
+   ========================================================= */
+(function(){
+  const doodBtn = document.getElementById('doodModeBtn');
+  const doodModal = document.getElementById('doodModeModal');
+  const doodClose = document.getElementById('doodClose');
+  const doodClear = document.getElementById('doodClear');
+  const btnConnect = document.getElementById('doodConnect');
+  const btnEnter = document.getElementById('doodEnter');
+  const btnDisconnect = document.getElementById('doodDisconnect');
+  const statusEl = document.getElementById('doodModeStatus');
+  const titleEl = document.getElementById('doodModeTitle');
+
+  function openDoodModal(){ doodModal?.classList.add('show'); }
+  function closeDoodModal(){ doodModal?.classList.remove('show'); }
+
+  async function waitForLabGate(maxMs = 12000){
+    if (window.DoodLabGate) return window.DoodLabGate;
+    return new Promise((resolve)=>{
+      const t0 = Date.now();
+      (function tick(){
+        if (window.DoodLabGate) return resolve(window.DoodLabGate);
+        if (Date.now() - t0 > maxMs) return resolve(null);
+        setTimeout(tick, 50);
+      })();
+    });
+  }
+
+  function lockInPage(){
+    try{
+      if (window.State) window.State.doodUnlocked = false;
+      window.applyDoodLock?.();
+      if (titleEl) titleEl.textContent = 'DOOD MODE';
+      if (statusEl) statusEl.textContent = 'Connect your wallet to verify $dOOd holdings (≥ 1M).';
+    }catch{}
+  }
+  function unlockInPage(){
+    try{
+      if (window.State) window.State.doodUnlocked = true;
+      window.applyDoodLock?.();
+      window.toast?.('DOOD MODE unlocked.');
+      if (titleEl) titleEl.textContent = 'DOOD MODE — Unlocked';
+      if (statusEl) statusEl.textContent = 'Access granted. Welcome in.';
+      closeDoodModal();
+    }catch{}
+  }
+
+  async function ensureDoodAccess(){
+    const gate = await waitForLabGate();
+    if (!gate){ statusEl.textContent = 'Lab wallet module not loaded. Refresh and try again.'; return; }
+    try{
+      statusEl.textContent = 'Connecting wallet…';
+      if (!gate.connectedAccount) await gate.connect();
+      statusEl.textContent = 'Verifying $dOOd on XRPL…';
+      const result = await gate.verify();
+      if (result.ok) unlockInPage();
+      else statusEl.textContent = `Access denied. You hold ${Number(result.amount).toLocaleString(undefined,{maximumFractionDigits:2})} $dOOd (need ≥ ${gate.THRESHOLD.toLocaleString()}).`;
+    }catch(err){
+      console.error(err);
+      statusEl.textContent = err?.message || 'Authorization failed.';
+    }
+  }
+
+  async function disconnectAll(){
+    const gate = await waitForLabGate();
+    if (gate) await gate.disconnect();
+    lockInPage();
+  }
+
+  document.addEventListener('dood-lab-gate', (e)=>{
+    if (e.detail?.unlocked) unlockInPage();
+    else lockInPage();
+  });
+
+  doodBtn?.addEventListener('click', async ()=>{
+    const gate = await waitForLabGate();
+    if (gate?.connectedAccount && gate.loadGate(gate.connectedAccount)) unlockInPage();
+    else openDoodModal();
+  });
+  doodClose?.addEventListener('click', closeDoodModal);
+  doodModal?.addEventListener('click', (e)=>{ if(e.target === doodModal) closeDoodModal(); });
+  window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeDoodModal(); });
+
+  btnConnect?.addEventListener('click', ensureDoodAccess);
+  btnEnter?.addEventListener('click', ensureDoodAccess);
+  btnDisconnect?.addEventListener('click', disconnectAll);
+  doodClear?.addEventListener('click', disconnectAll);
+
+  (async ()=>{
+    const gate = await waitForLabGate();
+    if (gate?.connectedAccount && gate.loadGate(gate.connectedAccount)) unlockInPage();
+    else lockInPage();
+  })();
+})();
+</script>
+
+
+<!-- GoDaddy traffic script (single copy only) -->
+<script>
+'undefined'=== typeof _trfq || (window._trfq = []);
+'undefined'=== typeof _trfd && (window._trfd=[]),_trfd.push(
+  {'tccl.baseHost':'secureserver.net'},
+  {'ap':'cpsh-oh'},
+  {'server':'p3plzcpnl509316'},
+  {'dcenter':'p3'},
+  {'cp_id':'10478751'},
+  {'cp_cl':'8'}
+);
+</script>
+<script src='https://img1.wsimg.com/traffic-assets/js/tccl.min.js'></script>
+  <script type="module" src="/lab/js/creator-tool-lab.mjs"></script>
+
+<script id="dood-v54-portal-logo-component-js">
+(function () {
+  const logoUrl = "/assets/dood-portal-guide-v54.png?v=54";
+
+  function goHome(event) {
+    event.preventDefault();
+    window.location.href = "/";
+  }
+
+  function normalizeLogo(el) {
+    if (!el) return;
+    el.classList.add("dood-portal-logo", "is-alive");
+    el.setAttribute("role", "link");
+    el.setAttribute("aria-label", "Dood Labs Home");
+    el.setAttribute("title", "Dood Labs Home");
+    el.onclick = goHome;
+    el.innerHTML = '<img src="' + logoUrl + '" alt="Dood Labs Portal Guide">';
+  }
+
+  function initDoodPortalLogo() {
+    document.querySelectorAll(".brand .mark, .brand-mark, .logo-mark, .site-logo, .app-logo, .dood-portal-logo").forEach(normalizeLogo);
+
+    document.querySelectorAll("img").forEach(function(img) {
+      const src = (img.getAttribute("src") || "").toLowerCase();
+      if (src.includes("doodlogo") || src.includes("dood-logo") || src.includes("doodlabs-logo") || src.includes("portal-guide") || src.includes("logo.png")) {
+        img.setAttribute("src", logoUrl);
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initDoodPortalLogo);
+  } else {
+    initDoodPortalLogo();
+  }
+})();
+</script>
+
+
+<script id="dood-v56-theme-modes-js">
+(function(){
+  const modes = [
+    { id: "dood", label: "Dood Mode" },
+    { id: "doodette", label: "Doodette Mode" },
+    { id: "dark", label: "Dark Mode" }
+  ];
+
+  function applyTheme(mode){
+    const clean = modes.some(m => m.id === mode) ? mode : "dood";
+    document.body.classList.remove("theme-dood", "theme-doodette", "theme-dark");
+    document.body.classList.add("theme-" + clean);
+    localStorage.setItem("doodLabsThemeMode", clean);
+    document.querySelectorAll("[data-theme-mode]").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.themeMode === clean);
+    });
+  }
+
+  function addThemeSwitcher(){
+    if(document.getElementById("doodThemeSwitcher")) return;
+    const wrap = document.createElement("div");
+    wrap.id = "doodThemeSwitcher";
+    wrap.className = "theme-switcher";
+    wrap.setAttribute("aria-label", "Theme modes");
+    wrap.innerHTML = modes.map(m => `<button type="button" data-theme-mode="${m.id}">${m.label}</button>`).join("");
+
+    const nav = document.querySelector("header nav") || document.querySelector(".site-header nav") || document.querySelector("header");
+    if(nav) nav.appendChild(wrap);
+
+    wrap.querySelectorAll("[data-theme-mode]").forEach(btn => {
+      btn.addEventListener("click", () => applyTheme(btn.dataset.themeMode));
+    });
+  }
+
+  function initThemeModes(){
+    addThemeSwitcher();
+    applyTheme(localStorage.getItem("doodLabsThemeMode") || "dood");
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", initThemeModes);
+  } else {
+    initThemeModes();
+  }
+})();
+</script>
+
+
+<script id="dood-v59-auth-redirect-helper">
+(function(){
+  function showAuthReturnMessage(){
+    const hash = window.location.hash || "";
+    const search = window.location.search || "";
+    const looksLikeAuthReturn =
+      hash.includes("access_token") ||
+      hash.includes("refresh_token") ||
+      search.includes("code=") ||
+      search.includes("token_hash=");
+    if(!looksLikeAuthReturn) return;
+
+    setTimeout(function(){
+      const notice = document.getElementById("profileAuthNotice") || document.getElementById("profileNotice");
+      if(notice){
+        notice.textContent = "Email confirmed. You can now log in and save your profile.";
+        notice.classList.add("show");
+        notice.style.display = "block";
+      }
+      if(typeof showPage === "function"){
+        showPage("profilePage");
+      }
+    }, 700);
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", showAuthReturnMessage);
+  } else {
+    showAuthReturnMessage();
+  }
+})();
+</script>
+
+</body>
+</html>

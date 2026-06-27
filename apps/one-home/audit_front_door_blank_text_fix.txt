@@ -1,0 +1,22 @@
+ONE HOME FRONT DOOR — BLANK SMALL TEXT FIX
+
+Confirmed from the Admin recording:
+The Small Text fields were blank and Admin successfully saved the one_home
+record. The public Home page still showed default captions.
+
+Exact cause:
+The Front Door renderer treated the saved empty string ("") as a missing
+value and replaced it with the hard-coded fallback caption.
+
+Exact repair:
+Empty string is now respected as intentional. Only a truly missing value
+(undefined or null) gets the default caption.
+
+Result:
+Leave any Small Text field blank in:
+  Admin → Site → Home Page Editor
+Save Home Page Live, refresh One Home, and that card's small caption is gone.
+
+This complete package also retains the completed Front Door cleanup lock:
+old feeds/marquee/stabilizer are retired, and V227 remains the one renderer.
+No visual redesign was made.

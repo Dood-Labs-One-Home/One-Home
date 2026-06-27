@@ -1,0 +1,2371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dot-Dood | Bubble Pixel Draw (Layers + Templates + Animation)</title>
+  <link rel="icon" href="DOOD_HUGE.png" type="image/png" />
+  <style>
+    :root{
+      --bg:#0d0d0d; --panel:#111; --ui:#222; --border:#444; --acc:#00ff99; --txt:#fff; --muted:#bbb;
+    }
+    body{background:var(--bg);color:var(--txt);font-family:Arial,sans-serif;line-height:1.6;margin:0}
+    header{background:var(--panel);padding:10px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;border-bottom:1px solid #1a1a1a}
+    header img{height:50px}
+    nav a{color:#fff;margin:0 10px;text-decoration:none;font-weight:bold}
+    nav a:hover{color:var(--acc)}
+    section{padding:20px;max-width:1100px;margin:auto}
+    section h2{text-align:center;margin-bottom:10px;color:var(--acc)}
+    section p{text-align:center;max-width:900px;margin:0 auto 10px;color:#ccc}
+
+    .controls{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0;align-items:center}
+    input[type=color], select, button, input[type=text], input[type=range]{
+      height:36px;border-radius:6px;border:1px solid var(--border);padding:0 8px;background:var(--ui);color:#fff;font-size:14px;cursor:pointer
+    }
+    input[type=range]{width:160px}
+    button:hover{background:#3a3a3a}
+    button:active{transform:scale(0.97)}
+    .active{border:2px solid #ffd700;box-shadow:0 0 8px rgba(255,215,0,0.7)}
+    .mini{
+      font-size:12px;color:var(--muted);padding:0 10px;border:1px solid #333;border-radius:999px;height:28px;display:flex;align-items:center;background:#141414
+    }
+
+    #canvas{
+      display:block;margin:20px auto;border:2px solid #444;background:#000;width:640px;height:640px;max-width:90vw;touch-action:none
+    }
+
+    .grid2{
+      display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:1100px;margin:0 auto;
+    }
+    @media(max-width:900px){
+      .grid2{grid-template-columns:1fr}
+    }
+    .card{
+      background:#111;border:1px solid #222;border-radius:14px;padding:12px;box-shadow:0 12px 30px rgba(0,0,0,.25)
+    }
+    .card h3{margin:0 0 8px 0;font-size:14px;color:#eaeaea}
+    .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+    /* Templates previews */
+    .templates{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+    .tpl{
+      width:92px;border:1px solid #2a2a2a;border-radius:12px;background:#0f0f0f;padding:8px;cursor:pointer;
+      display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;
+    }
+    .tpl img{width:64px;height:64px;object-fit:contain;border-radius:10px;background:#000;border:1px solid #222}
+    .tpl span{font-size:11px;color:#cfcfcf;text-align:center;line-height:1.1}
+    .tpl:hover{border-color:var(--acc)}
+    .tpl .del{
+      position:absolute;top:6px;right:6px;border-radius:10px;height:22px;padding:0 6px;font-size:12px;
+      border:1px solid #333;background:#171717;color:#fff;opacity:.9
+    }
+    .tpl .del:hover{border-color:#ff6666}
+
+    /* Frames strip */
+    .frames{display:flex;gap:8px;overflow:auto;padding:6px}
+    .frameBtn{
+      min-width:44px;height:44px;border-radius:12px;border:1px solid #333;background:#1a1a1a;color:#fff;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+    }
+    .frameBtn.active{border:2px solid var(--acc);box-shadow:0 0 0 2px rgba(0,255,153,.12)}
+    .frameBtn:hover{background:#232323}
+
+    /* Layer thumbnails */
+    .layerThumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+    .layerTile{
+      border:1px solid #2a2a2a;border-radius:14px;background:#0f0f0f;padding:10px;cursor:pointer;
+      display:flex;flex-direction:column;gap:8px;align-items:center;
+    }
+    .layerTile.active{border-color:var(--acc);box-shadow:0 0 0 2px rgba(0,255,153,.10)}
+    .layerTile .title{font-size:12px;color:#ddd}
+    .layerTile canvas{width:72px;height:72px;border-radius:12px;border:1px solid #222;background:#000;image-rendering:pixelated}
+    .layerTile .tog{display:flex;gap:8px;align-items:center}
+    .layerTile label{font-size:11px;color:#bbb}
+    .layerTile input{transform:translateY(1px)}
+
+    [hidden]{display:none!important}
+    .toast{
+      position:fixed;left:50%;transform:translateX(-50%);bottom:24px;background:#222;color:#fff;border:1px solid #444;padding:10px 14px;border-radius:8px;
+      box-shadow:0 6px 20px rgba(0,0,0,.5);z-index:9999;font-size:14px
+    }
+
+    body.dood-mode header{box-shadow:0 0 20px rgba(0,255,153,.15)}
+
+    footer{background:#111;border-top:1px solid #222;margin-top:40px}
+    footer a{color:#fff;text-decoration:none;font-weight:bold}
+    footer a:hover{color:var(--acc)}
+  
+</style>
+  <link rel="icon" href="https://www.doodbrand.com/DOOD_HUGE.png" type="image/png" />
+  <script defer src="https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js?v=2.7.1"></script>
+  <script defer src="/lab/js/config.js?v=158"></script>
+  <link rel="stylesheet" href="/lab/css/lab-mobile.css?v=158" />
+  <link rel="stylesheet" href="/lab/css/creator-tools-lab.css?v=158" />
+  <link rel="stylesheet" href="../../shared/labs.css" />
+  <script src="../../shared/labs-session.js"></script>
+  <script defer src="/lab/js/config.js?v=158"></script>
+  <script src="https://unpkg.com/xrpl@2.13.0/build/xrpl-latest-min.js" defer></script>
+<style id="dood-brand-header-style">
+  .dood-return-header{position:sticky;top:0;z-index:99999;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 18px;background:#050806;border-bottom:1px solid rgba(85,255,154,.35);box-shadow:0 12px 30px rgba(0,0,0,.35);font-family:Arial,Helvetica,sans-serif}
+  .dood-brand{display:flex;align-items:center;gap:10px;color:#f6fff9;text-decoration:none;font-weight:950}
+  .dood-brand img{width:38px;height:38px;border-radius:999px;background:#fff;border:1px solid rgba(85,255,154,.5);object-fit:cover;box-shadow:0 0 18px rgba(85,255,154,.25)}
+  .dood-brand strong{font-size:18px;letter-spacing:.01em;color:#f6fff9}
+  .dood-return-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  .dood-return-actions a{color:#55ff9a;text-decoration:none;border:1px solid rgba(85,255,154,.45);border-radius:999px;padding:9px 12px;font-weight:950;background:rgba(85,255,154,.06)}
+  .dood-return-actions a:hover{background:rgba(85,255,154,.14)}
+  @media(max-width:640px){.dood-return-header{align-items:flex-start;flex-direction:column}.dood-return-actions{width:100%}.dood-return-actions a{width:100%;text-align:center}}
+</style>
+
+<style id="dood-single-header-cleanup">
+  #labGlobalHeader,
+  header#labGlobalHeader,
+  .appbar#labGlobalHeader,
+  .dood-v7-tool-bar,
+  .dood-hub-header {
+    display:none !important;
+    height:0 !important;
+    min-height:0 !important;
+    padding:0 !important;
+    margin:0 !important;
+    border:0 !important;
+    overflow:hidden !important;
+  }
+</style>
+
+
+<style id="dood-v53-force-logo">
+  .brand .mark,
+  .brand-mark,
+  .logo-mark,
+  .dood-logo,
+  .site-logo,
+  .app-logo {
+    background: transparent url('/assets/dood-portal-guide-v54.png?v=54') center/contain no-repeat !important;
+    color: transparent !important;
+    overflow: hidden !important;
+  }
+  .brand .mark::before,
+  .brand .mark::after,
+  .brand-mark::before,
+  .brand-mark::after,
+  .logo-mark::before,
+  .logo-mark::after {
+    content: none !important;
+    display: none !important;
+  }
+  .brand .mark img,
+  .brand-mark img,
+  .logo-mark img,
+  .dood-logo img,
+  .site-logo img,
+  .app-logo img {
+    content: url('/assets/dood-portal-guide-v54.png?v=54') !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    display: block !important;
+  }
+</style>
+
+
+<style id="dood-v54-portal-logo-component">
+  :root {
+    --dood-portal-logo-url: url('/assets/dood-portal-guide-v54.png?v=54');
+  }
+
+  .dood-portal-logo,
+  .brand .mark,
+  .brand-mark,
+  .logo-mark,
+  .site-logo,
+  .app-logo {
+    width: 46px !important;
+    height: 46px !important;
+    min-width: 46px !important;
+    border-radius: 999px !important;
+    border: 0 !important;
+    background: transparent var(--dood-portal-logo-url) center/contain no-repeat !important;
+    color: transparent !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    transition: transform .18s ease, filter .18s ease !important;
+    text-decoration: none !important;
+  }
+
+  .dood-portal-logo:hover,
+  .dood-portal-logo:focus-visible,
+  .brand .mark:hover,
+  .brand .mark:focus-visible,
+  .brand-mark:hover,
+  .brand-mark:focus-visible,
+  .logo-mark:hover,
+  .logo-mark:focus-visible,
+  .site-logo:hover,
+  .app-logo:hover {
+    transform: scale(1.05) !important;
+    filter: drop-shadow(0 0 10px rgba(85,255,154,.82)) drop-shadow(0 0 22px rgba(85,255,154,.32)) !important;
+  }
+
+  .dood-portal-logo img,
+  .brand .mark img,
+  .brand-mark img,
+  .logo-mark img,
+  .site-logo img,
+  .app-logo img {
+    content: url('/assets/dood-portal-guide-v54.png?v=54') !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    object-fit: contain !important;
+    pointer-events: none !important;
+  }
+
+  .brand .mark::before,
+  .brand .mark::after,
+  .brand-mark::before,
+  .brand-mark::after,
+  .logo-mark::before,
+  .logo-mark::after,
+  .dood-portal-logo::before,
+  .dood-portal-logo::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  @media (min-width: 821px) {
+    .dood-portal-logo,
+    .brand .mark,
+    .brand-mark,
+    .logo-mark,
+    .site-logo,
+    .app-logo {
+      width: 66px !important;
+      height: 66px !important;
+      min-width: 66px !important;
+    }
+  }
+
+  @media (max-width: 820px) {
+    .brand span,
+    .brand-name,
+    .logo-text {
+      display: none !important;
+    }
+    .dood-portal-logo,
+    .brand .mark,
+    .brand-mark,
+    .logo-mark,
+    .site-logo,
+    .app-logo {
+      width: 46px !important;
+      height: 46px !important;
+      min-width: 46px !important;
+    }
+  }
+
+  @keyframes doodPortalPulse {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(85,255,154,0)); }
+    50% { filter: drop-shadow(0 0 12px rgba(85,255,154,.36)); }
+  }
+
+  .dood-portal-logo.is-alive,
+  .brand .mark {
+    animation: doodPortalPulse 4.5s ease-in-out infinite !important;
+  }
+</style>
+
+
+<style id="dood-v56-theme-modes">
+  :root,
+  body.theme-dood {
+    --dood-accent: #55ff9a;
+    --dood-accent-2: #00d68f;
+    --dood-accent-soft: rgba(85,255,154,.14);
+    --dood-accent-line: rgba(85,255,154,.32);
+    --dood-accent-glow: rgba(85,255,154,.34);
+    --dood-bg-main: #020402;
+    --dood-bg-panel: rgba(5, 17, 8, .88);
+    --dood-text-main: #f6fff9;
+  }
+
+  body.theme-doodette {
+    --dood-accent: #ff4fd8;
+    --dood-accent-2: #ff149d;
+    --dood-accent-soft: rgba(255,79,216,.16);
+    --dood-accent-line: rgba(255,79,216,.38);
+    --dood-accent-glow: rgba(255,79,216,.38);
+    --dood-bg-main: #09020a;
+    --dood-bg-panel: rgba(22, 5, 20, .90);
+    --dood-text-main: #fff3fb;
+  }
+
+  body.theme-dark {
+    --dood-accent: #bfc7d5;
+    --dood-accent-2: #6f7a8d;
+    --dood-accent-soft: rgba(191,199,213,.12);
+    --dood-accent-line: rgba(191,199,213,.28);
+    --dood-accent-glow: rgba(191,199,213,.22);
+    --dood-bg-main: #020202;
+    --dood-bg-panel: rgba(10, 10, 12, .94);
+    --dood-text-main: #f4f6fb;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 12% 4%, var(--dood-accent-soft), transparent 24rem),
+      linear-gradient(180deg, var(--dood-bg-main), #050705) !important;
+    color: var(--dood-text-main) !important;
+  }
+
+  header,
+  .site-header,
+  .topbar,
+  .panel,
+  .hero,
+  .section,
+  .screen,
+  .builder-card,
+  .preview-card,
+  .item,
+  .profile-auth-card,
+  .card,
+  .district-card,
+  .game-card {
+    border-color: var(--dood-accent-line) !important;
+  }
+
+  .hero,
+  .section,
+  .panel,
+  .screen,
+  .builder-card,
+  .preview-card,
+  .item,
+  .profile-auth-card,
+  .card,
+  .district-card,
+  .game-card {
+    background: linear-gradient(135deg, var(--dood-accent-soft), rgba(255,255,255,.025)) !important;
+  }
+
+  .tagline,
+  .screen-title,
+  .world-feature b,
+  .status,
+  .brand-text,
+  .brand-name,
+  h2,
+  .tab.active,
+  .step-tab.active,
+  a,
+  .footer-links a {
+    color: var(--dood-accent) !important;
+  }
+
+  .btn.primary,
+  button.primary,
+  .primary {
+    background: linear-gradient(135deg, var(--dood-accent), var(--dood-accent-2)) !important;
+    border-color: transparent !important;
+    color: #031006 !important;
+    box-shadow: 0 0 18px var(--dood-accent-glow) !important;
+  }
+
+  .btn,
+  button,
+  input,
+  textarea,
+  select,
+  .step-tab,
+  .tab {
+    border-color: var(--dood-accent-line) !important;
+  }
+
+  .dood-portal-logo:hover,
+  .dood-portal-logo:focus-visible,
+  .brand .mark:hover,
+  .brand .mark:focus-visible,
+  .brand-mark:hover,
+  .brand-mark:focus-visible,
+  .logo-mark:hover,
+  .logo-mark:focus-visible,
+  .site-logo:hover,
+  .app-logo:hover {
+    filter: drop-shadow(0 0 10px var(--dood-accent)) drop-shadow(0 0 22px var(--dood-accent-glow)) !important;
+  }
+
+  .theme-switcher {
+    display: inline-flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    margin-left: 12px;
+  }
+
+  .theme-switcher button {
+    min-height: 34px !important;
+    padding: 7px 10px !important;
+    border-radius: 999px !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    background: rgba(0,0,0,.24) !important;
+    color: var(--dood-text-main) !important;
+  }
+
+  .theme-switcher button.active {
+    color: #031006 !important;
+    background: linear-gradient(135deg, var(--dood-accent), var(--dood-accent-2)) !important;
+    border-color: transparent !important;
+  }
+
+  @media(max-width: 820px) {
+    .theme-switcher {
+      width: 100%;
+      margin-left: 0;
+      justify-content: flex-start;
+    }
+    .theme-switcher button {
+      font-size: 11px !important;
+      padding: 7px 9px !important;
+    }
+  }
+</style>
+
+</head>
+
+<body class="creator-tool-page" data-lab-active="tools" data-lab-badge="Dot-Dood" data-lab-page="/lab/Dot-dood.html">
+
+<div class="dood-return-header">
+  <a class="dood-brand" href="../../index.html#districts" aria-label="Back to Dood Labs">
+    <img src="/assets/dood-portal-guide-v54.png?v=54" alt="Dood Labs logo">
+    <strong>Dood Labs</strong>
+  </a>
+  <div class="dood-return-actions">
+    <a href="../../index.html#districts">← Return to Dood Labs</a>
+    <a href="../../index.html#districts">Back to Districts</a></div></div>
+
+
+<script>
+(function(){
+  window.__DOOD_HUB_BACK = function(){
+    try { localStorage.setItem('doodLabsReturnTarget','districts'); } catch(e) {}
+    window.location.href = '../../index.html#districts';
+  };
+  if (!window.LabsSession) {
+    window.LabsSession = {
+      mountToolNav: function(){},
+      get: function(){ try { return JSON.parse(localStorage.getItem('doodLabsSession')||'null'); } catch(e){ return null; } },
+      set: function(v){ try { localStorage.setItem('doodLabsSession', JSON.stringify(v||{})); } catch(e){} },
+      clear: function(){ try { localStorage.removeItem('doodLabsSession'); } catch(e){} }
+    };
+  }
+})();
+</script>
+<div id="toastHost" aria-live="polite"></div>
+<main class="wrap">
+<section>
+  <div class="page-hero" style="text-align:center;margin-bottom:12px;">
+    <h2>🎨 Dot-a-Dood: Bubble Pixel Draw</h2>
+    <p>Now with templates, layers, animation, and creator upgrades… built for real artists.</p>
+    <div class="wallet-strip">
+      <span id="labWalletLine" class="pill-lab warn">Wallet: not connected</span>
+      <span id="labGatePill" class="pill-lab warn">Dood Mode: locked (1M $dOOd)</span></div>
+    <div class="cta-row" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:10px 0;">
+      <button id="doodModeBtn" class="dood-btn" type="button" style="padding:10px 16px;border-radius:999px;border:0;font-weight:900;cursor:pointer;background:linear-gradient(135deg,#00ccff,#00ff99);color:#0d0d0d;">🧠 Dood Mode (1M $dOOd)</button>
+      <button id="doodClear" type="button" style="padding:10px 14px;border-radius:12px;border:1px solid #2a2a2a;background:transparent;color:#eaeaea;font-weight:800;cursor:pointer;">Disconnect</button></div></div>
+
+  <canvas id="canvas" width="640" height="640"></canvas>
+
+  <!-- Core tools -->
+  <div class="controls">
+    <input type="color" id="colorPicker" value="#66ccff" title="Color" />
+    <button id="brushBtn" class="active" title="Brush (B)">🖌️</button>
+    <button id="eraserBtn" title="Eraser (E)">🧽</button>
+    <button id="pickerBtn" title="Eyedropper (I)">🎯</button>
+    <button id="bucketBtn" title="Fill (F)">🪣</button>
+    <button id="lineBtn" title="Line (L)">📏</button>
+    <button id="undoBtn" title="Undo (Ctrl/Cmd+Z)">↩️</button>
+    <button id="redoBtn" title="Redo (Ctrl/Cmd+Y)">↪️</button>
+    <button id="clearBtn" title="Clear">🧼 Clear</button>
+    <button id="toggleGridBtn" title="Toggle grid (G)">🔲</button>
+    <button id="symmetryBtn" title="Cycle symmetry">🪞</button></div>
+
+  <!-- Brush settings -->
+  <div class="controls">
+    <label>Size
+      <input id="brushSize" type="range" min="1" max="5" step="1" value="1" />
+      <span id="brushSizeReadout">1</span>
+    </label>
+    <label>Hardness
+      <input id="hardness" type="range" min="0" max="100" step="1" value="80" />
+      <span id="hardnessReadout">80%</span>
+    </label>
+    <label>Scatter
+      <input id="scatter" type="range" min="0" max="100" step="1" value="0" />
+      <span id="scatterReadout">0%</span>
+    </label>
+    <label>Bubble Style
+      <select id="bubbleStyle">
+        <option value="clean" selected>clean bubble</option>
+        <option value="foamy">foamy</option>
+        <option value="neon">neon gel</option>
+        <option value="matte">matte dot</option>
+        <option value="glitter">glitter speck</option>
+      </select>
+    </label></div>
+
+  <!-- Lighting + Autosave + Dood mode -->
+  <div class="controls">
+    <button id="threeDBtn" title="Toggle 3D shading">🫧 3D</button>
+    <label>Light
+      <input id="lightAngle" type="range" min="-180" max="180" step="1" value="-45" />
+      <span id="lightReadout">-45°</span>
+    </label>
+    <label>Opacity
+      <select id="alphaSelect">
+        <option value="1">100%</option>
+        <option value="0.75">75%</option>
+        <option value="0.5" selected>50%</option>
+        <option value="0.25">25%</option>
+      </select>
+    </label>
+    <label><input id="ditherToggle" type="checkbox" /> Dither (Bayer 4×4)</label>
+    <span id="autosaveBadge" class="mini">Autosave: —</span>
+    <button id="restoreAutosaveBtn" title="Restore the last autosave">🛟 Restore</button></div>
+
+  <div class="grid2">
+    <!-- Layers -->
+    <div class="card">
+      <h3>Layers</h3>
+
+      <div class="row" style="justify-content:center;">
+        <span class="mini">Active layer:</span>
+        <select id="activeLayerSelect"></select>
+        <label class="mini"><input id="exportBgToggle" type="checkbox" checked /> Export w/ background</label></div>
+
+      <div class="layerThumbs" id="layerThumbs"></div>
+
+      <div class="row" style="justify-content:center;margin-top:10px;">
+        <button id="layerUpBtn">⬆️</button>
+        <button id="layerDownBtn">⬇️</button>
+        <button id="mergeDownBtn">Merge Down</button></div>
+
+      <div class="row" style="justify-content:center;margin-top:10px;">
+        <span class="mini">Order: <span id="layerOrderReadout"></span></span></div></div>
+
+    <!-- Templates + Overlay PNG -->
+    <div class="card">
+      <h3>Templates · Start from…</h3>
+      <div class="row" style="justify-content:center;">
+        <select id="templateSelect" title="Select template"></select>
+        <button id="applyTemplateBtn">Apply</button>
+        <button id="loadImageBtn" title="Load image into active layer (file / drag-drop / paste)">🖼️ Load Image</button>
+        <input id="imgLoader" type="file" accept="image/*" hidden /></div>
+
+      <!-- NEW: Overlay PNG trace layer -->
+      <div class="row" style="justify-content:center;margin-top:8px;">
+        <button id="loadOverlayBtn" title="Load overlay PNG as trace layer (not exported)">🧻 Overlay PNG</button>
+        <input id="overlayLoader" type="file" accept="image/png,image/*" hidden />
+        <label class="mini">
+          <input id="overlayToggle" type="checkbox" checked />
+          Show overlay
+        </label>
+        <label class="mini">
+          Opacity
+          <input id="overlayOpacity" type="range" min="0.15" max="1" step="0.05" value="0.5" />
+        </label></div>
+
+      <div class="row" style="justify-content:center;margin-top:8px;">
+        <button id="saveTemplateBtn" title="Save a template from the current composite">💾 Save Template</button>
+        <button id="clearTemplatesBtn" title="Clear saved templates">🗑️ Clear Saved</button></div>
+
+      <div class="templates" id="templatePreviews" style="margin-top:10px;"></div></div>
+
+    <!-- Animation -->
+    <div class="card">
+      <h3>Animation Mode</h3>
+      <div class="row" style="justify-content:center;">
+        <label>Frames
+          <input id="frameCount" type="range" min="8" max="24" step="1" value="8" />
+          <span id="frameCountReadout">8</span>
+        </label>
+        <label>FPS
+          <input id="fps" type="range" min="2" max="18" step="1" value="8" />
+          <span id="fpsReadout">8</span>
+        </label>
+        <label class="mini"><input id="onionSkin" type="checkbox" checked /> Onion skin</label></div>
+      <div class="row" style="justify-content:center;margin-top:8px;">
+        <button id="prevFrameBtn">◀</button>
+        <button id="nextFrameBtn">▶</button>
+        <button id="dupFrameBtn">Duplicate</button>
+        <button id="clearFrameBtn">Clear Frame</button></div>
+      <div class="frames" id="frameStrip"></div>
+      <div class="row" style="justify-content:center;margin-top:8px;">
+        <button id="playBtn">▶ Play</button>
+        <button id="stopBtn" disabled>⏹ Stop</button>
+        <button id="exportGifBtn">🎞️ Export GIF</button></div></div>
+
+    <!-- Export -->
+    <div class="card">
+      <h3>Export</h3>
+      <div class="row" style="justify-content:center;">
+        <span class="mini">Export size:</span>
+        <select id="exportSize">
+          <option value="32">32×32</option>
+          <option value="320" selected>320×320</option>
+          <option value="1024">1024×1024</option>
+        </select>
+        <button id="savePngBtn">💾 PNG</button>
+        <button id="saveJpgBtn">📸 JPG</button>
+        <button id="copyPngBtn">📋 Copy PNG</button></div></div></div>
+</section>
+</main>
+
+<div id="doodModeModal" class="dood-modal" role="dialog" aria-modal="true" style="position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .18s;">
+  <div style="width:min(620px,92vw);background:#121212;border:1px solid #222;border-radius:16px;padding:18px;">
+    <h3 style="margin:0 0 8px;color:#00ccff;">Dood Mode</h3>
+    <p id="doodModeStatus">Connect your wallet to verify you hold ≥ 1,000,000 $dOOd.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:12px;">
+      <button id="doodConnect" type="button" style="padding:10px 16px;border-radius:12px;border:0;font-weight:900;background:linear-gradient(135deg,#00ccff,#00ff99);cursor:pointer;">Connect &amp; Verify</button>
+      <button id="doodEnter" type="button" style="padding:10px 14px;border-radius:12px;border:1px solid #2a2a2a;background:#161616;color:#fff;cursor:pointer;">Unlock</button>
+      <button id="doodDisconnect" type="button" style="padding:10px 14px;border-radius:12px;border:1px solid #2a2a2a;background:#161616;color:#fff;cursor:pointer;">Disconnect</button>
+      <button id="doodClose" type="button" style="padding:10px 14px;border-radius:12px;border:1px solid #2a2a2a;background:#161616;color:#fff;cursor:pointer;">Close</button></div></div></div>
+<style>.dood-modal.show{opacity:1!important;pointer-events:auto!important;}</style>
+
+<!-- gif.js for animation export -->
+<script src="https://cdn.jsdelivr.net/npm/gif.js.optimized/dist/gif.js"></script>
+
+<script>
+  // =================== Core model ==========================================
+  const canvas = document.getElementById('canvas');
+  const ctxMain = canvas.getContext('2d');
+
+  const size = 32;
+  const cellSize = canvas.width / size;
+
+  const defaultCell = () => ({ c:'#ffffff', s:'clean' });
+  const emptyLayer = () => Array.from({length:size}, () => Array.from({length:size}, defaultCell));
+
+  const layerDefs = [
+    { id:'bg',  name:'Background' },
+    { id:'art', name:'Art' },
+    { id:'ovr', name:'Overlay' }
+  ];
+
+  function newFrame(){
+    return { layers: { bg: emptyLayer(), art: emptyLayer(), ovr: emptyLayer() } };
+  }
+
+  let frames = Array.from({length:8}, newFrame);
+  let frameIndex = 0;
+
+  let layerOrder = ['bg','art','ovr'];
+  let layerVisible = { bg:true, art:true, ovr:true };
+  let activeLayerId = 'art';
+
+  let history = [], redoStack = [];
+  let isDrawing=false, mode='brush', showGrid=true, symmetry='none';
+  let anchor=null;
+  let activePointerId=null;
+
+  let brushSize = 1;
+  let hardness  = 80;
+  let scatter   = 0;
+  let currentStyle = 'clean';
+
+  let threeDMode = true;
+  let lightAngle = -45;
+  let userAlpha  = 0.5;
+  let ditherOn   = false;
+  let onionOn    = true;
+
+  // NEW: overlay PNG trace layer state
+  let overlayImage = null;
+  let overlayDataUrl = null;
+  let overlayOpacity = 0.5;
+  let overlayEnabled = true;
+
+  let doodMode = false;
+
+  let playing=false;
+  let playTimer=null;
+  let fps=8;
+
+  const AUTOSAVE_KEY = 'dotdood:autosave:v4';
+  let autosaveDirty=false;
+  let autosaveTimer=null;
+
+  const TPL_KEY = 'dotdood:templates:v1';
+  let savedTemplates = [];
+
+  const $ = (id)=>document.getElementById(id);
+
+  const toHex=(c)=>c.toString(16).padStart(2,'0');
+  const rgbToHex=(r,g,b)=>`#${toHex(r)}${toHex(g)}${toHex(b)}`;
+
+  function hexToRgb(hex){
+    hex=hex.replace('#','');
+    if(hex.length===3) hex=hex.split('').map(c=>c+c).join('');
+    return { r:parseInt(hex.slice(0,2),16), g:parseInt(hex.slice(2,4),16), b:parseInt(hex.slice(4,6),16) };
+  }
+  const lighten=(hex,p)=>{ const {r,g,b}=hexToRgb(hex); return rgbToHex(Math.round(r+(255-r)*p),Math.round(g+(255-g)*p),Math.round(b+(255-b)*p)); };
+  const darken=(hex,p)=>{ const {r,g,b}=hexToRgb(hex); return rgbToHex(Math.round(r*(1-p)),Math.round(g*(1-p)),Math.round(b*(1-p))); };
+
+  function toast(msg){
+    const t=document.createElement('div');
+    t.className='toast';
+    t.textContent=msg;
+    document.body.appendChild(t);
+    setTimeout(()=>t.remove(), 1400);
+  }
+
+  function nowStamp(){ return new Date().toLocaleString(); }
+  function setAutosaveBadge(text){ $('autosaveBadge').textContent = `Autosave: ${text}`; }
+
+  function clampInt(v,min,max){
+    v=parseInt(v,10);
+    if(Number.isNaN(v)) return min;
+    return Math.max(min, Math.min(max, v));
+  }
+  function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
+
+  function activeFrame(){ return frames[frameIndex]; }
+  function getLayerGrid(layerId){ return activeFrame().layers[layerId]; }
+  function getActiveGrid(){ return getLayerGrid(activeLayerId); }
+
+  // =================== Snapshot / Undo =====================================
+  function snapshotAll(){
+    const f = activeFrame();
+    const deepLayer = (g)=>g.map(row=>row.map(cell=>({c:cell.c,s:cell.s})));
+    return {
+      frameIndex,
+      frame: { layers:{ bg: deepLayer(f.layers.bg), art: deepLayer(f.layers.art), ovr: deepLayer(f.layers.ovr) } },
+      layerOrder:[...layerOrder],
+      layerVisible:{...layerVisible},
+      activeLayerId,
+      showGrid, symmetry,
+      threeDMode, lightAngle, userAlpha, ditherOn,
+      brushSize, hardness, scatter, currentStyle,
+      onionOn, fps,
+      doodMode,
+      overlay: {
+        dataUrl: overlayDataUrl,
+        opacity: overlayOpacity,
+        enabled: overlayEnabled
+      }
+    };
+  }
+
+  function applySnapshot(snap){
+    const deepLayer = (g)=>g.map(row=>row.map(cell=>({c:cell.c,s:cell.s})));
+    frames[frameIndex].layers.bg  = deepLayer(snap.frame.layers.bg);
+    frames[frameIndex].layers.art = deepLayer(snap.frame.layers.art);
+    frames[frameIndex].layers.ovr = deepLayer(snap.frame.layers.ovr);
+
+    layerOrder=[...snap.layerOrder];
+    layerVisible={...snap.layerVisible};
+    activeLayerId=snap.activeLayerId;
+
+    showGrid=!!snap.showGrid;
+    symmetry=snap.symmetry;
+
+    threeDMode=!!snap.threeDMode;
+    lightAngle=snap.lightAngle;
+    userAlpha=snap.userAlpha;
+    ditherOn=!!snap.ditherOn;
+
+    brushSize=snap.brushSize;
+    hardness=snap.hardness;
+    scatter=snap.scatter;
+    currentStyle=snap.currentStyle;
+
+    onionOn=!!snap.onionOn;
+    fps=snap.fps;
+    doodMode=!!snap.doodMode;
+
+    // restore overlay from snapshot if present
+    overlayImage = null;
+    overlayDataUrl = null;
+    overlayOpacity = 0.5;
+    overlayEnabled = true;
+    if(snap.overlay){
+      overlayDataUrl = snap.overlay.dataUrl || null;
+      overlayOpacity = typeof snap.overlay.opacity === 'number' ? snap.overlay.opacity : 0.5;
+      overlayEnabled = snap.overlay.enabled !== false;
+      if(overlayDataUrl){
+        overlayImage = new Image();
+        overlayImage.onload = ()=>{ draw(); };
+        overlayImage.src = overlayDataUrl;
+      }
+    }
+
+    syncUI();
+    draw();
+  }
+
+  // =================== Autosave ============================================
+  function markDirty(){ autosaveDirty=true; scheduleAutosave(); }
+  function scheduleAutosave(){
+    if(autosaveTimer) return;
+    autosaveTimer = setTimeout(()=>{
+      autosaveTimer=null;
+      if(autosaveDirty) doAutosave('timer');
+    }, 4000);
+  }
+  function doAutosave(reason='manual'){
+    try{
+      const payload = {
+        v:4,
+        ts:Date.now(),
+        stamp:nowStamp(),
+        frames,
+        frameIndex,
+        layerOrder,
+        layerVisible,
+        activeLayerId,
+        settings:{
+          showGrid, symmetry, threeDMode, lightAngle, userAlpha, ditherOn,
+          brushSize, hardness, scatter, currentStyle,
+          onionOn, fps,
+          doodMode
+        },
+        overlay:{
+          dataUrl: overlayDataUrl,
+          opacity: overlayOpacity,
+          enabled: overlayEnabled
+        },
+        reason
+      };
+      localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(payload));
+      autosaveDirty=false;
+      setAutosaveBadge(payload.stamp);
+    }catch(e){
+      console.warn('Autosave failed', e);
+    }
+  }
+
+  function restoreAutosave(silent=false){
+    try{
+      const raw = localStorage.getItem(AUTOSAVE_KEY);
+      if(!raw){ if(!silent) toast('No autosave found'); return; }
+      const p = JSON.parse(raw);
+      if(!p?.frames){ if(!silent) toast('Autosave invalid'); return; }
+
+      frames = p.frames;
+      frameIndex = Math.max(0, Math.min((p.frameIndex||0), frames.length-1));
+      layerOrder = p.layerOrder || ['bg','art','ovr'];
+      layerVisible = p.layerVisible || {bg:true,art:true,ovr:true};
+      activeLayerId = p.activeLayerId || 'art';
+
+      const s = p.settings || {};
+      showGrid = !!s.showGrid;
+      symmetry = s.symmetry || 'none';
+      threeDMode = !!s.threeDMode;
+      lightAngle = Number.isFinite(s.lightAngle) ? s.lightAngle : -45;
+      userAlpha = Number.isFinite(s.userAlpha) ? s.userAlpha : 0.5;
+      ditherOn = !!s.ditherOn;
+
+      brushSize = clampInt(s.brushSize ?? 1, 1, 5);
+      hardness  = clampInt(s.hardness ?? 80, 0, 100);
+      scatter   = clampInt(s.scatter ?? 0, 0, 100);
+      currentStyle = s.currentStyle || 'clean';
+      onionOn = !!s.onionOn;
+      fps = clampInt(s.fps ?? 8, 2, 18);
+      doodMode = !!s.doodMode;
+
+      // restore overlay
+      overlayImage = null;
+      overlayDataUrl = null;
+      overlayOpacity = 0.5;
+      overlayEnabled = true;
+      if(p.overlay){
+        overlayDataUrl = p.overlay.dataUrl || null;
+        overlayOpacity = typeof p.overlay.opacity === 'number' ? p.overlay.opacity : 0.5;
+        overlayEnabled = p.overlay.enabled !== false;
+        if(overlayDataUrl){
+          overlayImage = new Image();
+          overlayImage.onload = ()=>{ draw(); };
+          overlayImage.src = overlayDataUrl;
+        }
+      }
+
+      setAutosaveBadge(p.stamp || 'saved');
+      history=[]; redoStack=[];
+      syncUI();
+      rebuildFrameStrip();
+      draw();
+      if(!silent) toast('Restored autosave');
+    }catch(e){
+      console.warn('Restore failed', e);
+      if(!silent) toast('Restore failed');
+    }
+  }
+
+  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') doAutosave('hidden'); });
+  window.addEventListener('pagehide', ()=>doAutosave('pagehide'));
+  window.addEventListener('beforeunload', ()=>doAutosave('beforeunload'));
+  window.addEventListener('orientationchange', ()=>{ doAutosave('orientationchange'); setTimeout(draw, 60); });
+  window.addEventListener('resize', ()=>draw());
+
+  // =================== Dither ==============================================
+  const bayer4 = [
+    [0,  8, 2,10],
+    [12, 4,14, 6],
+    [3,11, 1, 9],
+    [15, 7,13, 5]
+  ];
+  function makeDitherPattern(outCtx, threshold){
+    const tile=4;
+    const off=document.createElement('canvas');
+    off.width=tile; off.height=tile;
+    const octx=off.getContext('2d');
+    octx.clearRect(0,0,tile,tile);
+    octx.fillStyle='#000';
+    for(let y=0;y<tile;y++){
+      for(let x=0;x<tile;x++){
+        if(bayer4[y][x] < threshold) octx.fillRect(x,y,1,1);
+      }
+    }
+    return outCtx.createPattern(off,'repeat');
+  }
+
+  // =================== Rendering ===========================================
+  function renderBubbleCore(outCtx, cx, cy, radius, color, style, alphaScale=1, allowDither=true){
+    if(style==='matte'){
+      outCtx.fillStyle=color;
+      outCtx.globalAlpha = userAlpha*alphaScale;
+      outCtx.beginPath(); outCtx.arc(cx,cy,radius*0.92,0,Math.PI*2); outCtx.fill();
+      outCtx.globalAlpha=1;
+      return;
+    }
+
+    if(threeDMode){
+      const a = lightAngle*Math.PI/180;
+      const dx=Math.cos(a)*radius*0.6;
+      const dy=Math.sin(a)*radius*0.6;
+      const grad = outCtx.createRadialGradient(cx-dx, cy-dy, radius*0.2, cx, cy, radius);
+      const lightBoost = (style==='neon')?0.35:0.25;
+      const darkBoost  = (style==='neon')?0.20:0.35;
+      grad.addColorStop(0, lighten(color, lightBoost));
+      grad.addColorStop(0.55, color);
+      grad.addColorStop(1, darken(color, darkBoost));
+      outCtx.fillStyle=grad;
+    } else {
+      outCtx.fillStyle=color;
+    }
+
+    if(style==='neon'){
+      outCtx.save();
+      outCtx.shadowBlur=14;
+      outCtx.shadowColor=color;
+      outCtx.globalAlpha=Math.min(0.9, userAlpha)*alphaScale;
+      outCtx.beginPath(); outCtx.arc(cx,cy,radius,0,Math.PI*2); outCtx.fill();
+      outCtx.restore();
+    } else {
+      outCtx.globalAlpha=userAlpha*alphaScale;
+      outCtx.beginPath(); outCtx.arc(cx,cy,radius,0,Math.PI*2); outCtx.fill();
+    }
+
+    if(threeDMode){
+      const a = lightAngle*Math.PI/180;
+      const dx=Math.cos(a)*radius*0.6;
+      const dy=Math.sin(a)*radius*0.6;
+      outCtx.save();
+      outCtx.globalAlpha=Math.min(0.25, userAlpha)*alphaScale;
+      outCtx.fillStyle='#fff';
+      outCtx.beginPath(); outCtx.arc(cx-dx*0.9, cy-dy*0.9, radius*0.18, 0, Math.PI*2); outCtx.fill();
+      outCtx.restore();
+    }
+
+    if(style==='foamy'){
+      outCtx.save();
+      outCtx.globalAlpha=Math.min(0.25, userAlpha)*alphaScale;
+      outCtx.fillStyle='#fff';
+      for(let i=0;i<4;i++){
+        const ang=(Math.PI*2)*(i/4)+0.4;
+        const rr=radius*0.14;
+        const px=cx+Math.cos(ang)*radius*0.35;
+        const py=cy+Math.sin(ang)*radius*0.35;
+        outCtx.beginPath(); outCtx.arc(px,py,rr,0,Math.PI*2); outCtx.fill();
+      }
+      outCtx.restore();
+    }
+
+    if(style==='glitter'){
+      outCtx.save();
+      outCtx.globalAlpha=Math.min(0.35, userAlpha)*alphaScale;
+      outCtx.fillStyle='#fff';
+      for(let i=0;i<5;i++){
+        const px=cx+(Math.random()*2-1)*radius*0.45;
+        const py=cy+(Math.random()*2-1)*radius*0.45;
+        outCtx.fillRect(px,py,1.2,1.2);
+      }
+      outCtx.restore();
+    }
+
+    if(allowDither && ditherOn && userAlpha < 1){
+      const thresholds = {0.75:4, 0.5:8, 0.25:12};
+      const t = thresholds[userAlpha] ?? 8;
+      const pat = makeDitherPattern(outCtx, t);
+      outCtx.save();
+      outCtx.globalAlpha=1;
+      outCtx.globalCompositeOperation='destination-out';
+      outCtx.fillStyle=pat;
+      outCtx.beginPath(); outCtx.arc(cx,cy,radius,0,Math.PI*2); outCtx.clip();
+      outCtx.fillRect(cx-radius, cy-radius, radius*2, radius*2);
+      outCtx.restore();
+    }
+
+    outCtx.globalAlpha=1;
+  }
+
+  function drawFrameToContext(frame, outCtx, opts={}){
+    const {
+      includeBg=true,
+      onionPrev=null,
+      onionAlpha=0.28,
+      onlyLayer=null,
+      allowDither=true,
+      withOverlay=false
+    } = opts;
+
+    const cs = outCtx.canvas.width/size;
+    const radiusBase = cs/2 - 1;
+
+    outCtx.clearRect(0,0,outCtx.canvas.width,outCtx.canvas.height);
+
+    // NEW: draw overlay PNG under bubbles (for main view only)
+    if(withOverlay && overlayImage && overlayEnabled && !onlyLayer){
+      outCtx.save();
+      outCtx.globalAlpha = overlayOpacity;
+      outCtx.imageSmoothingEnabled = false;
+      outCtx.drawImage(overlayImage, 0, 0, outCtx.canvas.width, outCtx.canvas.height);
+      outCtx.restore();
+    }
+
+    if(onionPrev && onionOn && !onlyLayer){
+      ['art','ovr'].forEach(layerId=>{
+        if(!layerVisible[layerId]) return;
+        const grid = onionPrev.layers[layerId];
+        for(let y=0;y<size;y++){
+          for(let x=0;x<size;x++){
+            const cell=grid[y][x];
+            const cx=x*cs+cs/2, cy=y*cs+cs/2;
+            renderBubbleCore(outCtx, cx, cy, radiusBase, cell.c, cell.s, onionAlpha, false);
+          }
+        }
+      });
+    }
+
+    const renderList = onlyLayer ? [onlyLayer] : layerOrder;
+
+    for(const layerId of renderList){
+      if(!layerVisible[layerId] && !onlyLayer) continue;
+      if(layerId==='bg' && !includeBg && !onlyLayer) continue;
+
+      const grid = frame.layers[layerId];
+      for(let y=0;y<size;y++){
+        for(let x=0;x<size;x++){
+          const cell=grid[y][x];
+          const cx=x*cs+cs/2, cy=y*cs+cs/2;
+          const ditherAllowed = allowDither && (outCtx !== ctxMain ? false : true);
+          renderBubbleCore(outCtx, cx, cy, radiusBase, cell.c, cell.s, 1, ditherAllowed);
+
+          if(showGrid && outCtx===ctxMain && !onlyLayer){
+            outCtx.strokeStyle='#222';
+            outCtx.beginPath(); outCtx.arc(cx,cy,radiusBase,0,Math.PI*2); outCtx.stroke();
+          }
+        }
+      }
+    }
+  }
+
+  function draw(){
+    const prev = (frameIndex>0) ? frames[frameIndex-1] : null;
+    drawFrameToContext(activeFrame(), ctxMain, { includeBg:true, onionPrev:prev, allowDither:true, withOverlay:true });
+    refreshLayerThumbs();
+  }
+
+  // =================== Brush logic =========================================
+  function currentColor(){ return (mode==='eraser') ? '#ffffff' : $('colorPicker').value; }
+  function currentBubbleStyle(){ return (mode==='eraser') ? 'clean' : currentStyle; }
+
+  function hardnessChance(dist, radius){
+    if(radius<=0) return 1;
+    const edge = dist / radius;
+    const h = hardness/100;
+    return Math.max(0, Math.min(1, h + (1-edge)*0.5));
+  }
+
+  function scatterJitter(){
+    if(scatter<=0) return {dx:0,dy:0};
+    const p=scatter/100;
+    const j=(Math.random()<p)?1:0;
+    if(!j) return {dx:0,dy:0};
+    return { dx:(Math.random()<0.5?-1:1), dy:(Math.random()<0.5?-1:1) };
+  }
+
+  function setCell(grid, x,y, col, sty){
+    if(x<0||y<0||x>=size||y>=size) return;
+    const cell = grid[y][x];
+    if(cell.c===col && cell.s===sty) return;
+    cell.c=col; cell.s=sty;
+  }
+
+  function applySymmetry(grid, x,y, col, sty){
+    const pts=new Set([`${x},${y}`]);
+    if(symmetry==='x'||symmetry==='quad') pts.add(`${size-1-x},${y}`);
+    if(symmetry==='y'||symmetry==='quad') pts.add(`${x},${size-1-y}`);
+    if(symmetry==='quad') pts.add(`${size-1-x},${size-1-y}`);
+    for(const p of pts){
+      const [px,py]=p.split(',').map(Number);
+      setCell(grid, px,py,col,sty);
+    }
+  }
+
+  function paintAt(x,y){
+    const grid = getActiveGrid();
+    const col=currentColor();
+    const sty=currentBubbleStyle();
+
+    if(brushSize===1){
+      applySymmetry(grid, x,y,col,sty);
+      return;
+    }
+    const r=brushSize-1;
+    for(let oy=-r; oy<=r; oy++){
+      for(let ox=-r; ox<=r; ox++){
+        const dist=Math.sqrt(ox*ox+oy*oy);
+        if(dist>r+0.001) continue;
+        if(Math.random()>hardnessChance(dist,r)) continue;
+        const jit=scatterJitter();
+        applySymmetry(grid, x+ox+jit.dx, y+oy+jit.dy, col,sty);
+      }
+    }
+  }
+
+  function floodFill(sx,sy){
+    const grid=getActiveGrid();
+    const target=grid[sy]?.[sx];
+    if(!target) return;
+    const newC=currentColor();
+    const newS=currentBubbleStyle();
+    if(target.c===newC && target.s===newS) return;
+
+    const q=[[sx,sy]];
+    const seen=new Set([`${sx},${sy}`]);
+    while(q.length){
+      const [x,y]=q.pop();
+      const c=grid[y]?.[x];
+      if(!c) continue;
+      if(c.c!==target.c || c.s!==target.s) continue;
+      applySymmetry(grid,x,y,newC,newS);
+      const nbr=[[x+1,y],[x-1,y],[x,y+1],[x,y-1]];
+      for(const [nx,ny] of nbr){
+        const k=`${nx},${ny}`;
+        const cc=grid[ny]?.[nx];
+        if(nx>=0&&ny>=0&&nx<size&&ny<size&&!seen.has(k) && cc && cc.c===target.c && cc.s===target.s){
+          seen.add(k); q.push([nx,ny]);
+        }
+      }
+    }
+  }
+
+  function drawLine(x0,y0,x1,y1){
+    const grid=getActiveGrid();
+    const col=currentColor();
+    const sty=currentBubbleStyle();
+    let dx=Math.abs(x1-x0), sx=x0<x1?1:-1;
+    let dy=-Math.abs(y1-y0), sy=y0<y1?1:-1;
+    let err=dx+dy;
+    while(true){
+      applySymmetry(grid,x0,y0,col,sty);
+      if(x0===x1 && y0===y1) break;
+      const e2=2*err;
+      if(e2>=dy){ err+=dy; x0+=sx; }
+      if(e2<=dx){ err+=dx; y0+=sy; }
+    }
+  }
+
+  // =================== Stroke sessions for Undo ============================
+  let strokeSnapshot=null;
+  function startStroke(){ strokeSnapshot = snapshotAll(); }
+  function endStrokeCommit(){
+    if(!strokeSnapshot) return;
+    history.push(strokeSnapshot);
+    redoStack=[];
+    strokeSnapshot=null;
+    markDirty();
+    doAutosave('stroke');
+  }
+
+  // =================== Input handling ======================================
+  function getCoords(e){
+    const rect=canvas.getBoundingClientRect();
+    const scaleX=canvas.width/rect.width;
+    const scaleY=canvas.height/rect.height;
+    const clientX=e.clientX!==undefined?e.clientX:(e.touches?e.touches[0].clientX:0);
+    const clientY=e.clientY!==undefined?e.clientY:(e.touches?e.touches[0].clientY:0);
+    const x=Math.floor(((clientX-rect.left)*scaleX)/cellSize);
+    const y=Math.floor(((clientY-rect.top)*scaleY)/cellSize);
+    return {x,y};
+  }
+
+  function handleDown(e){
+    e.preventDefault();
+    if(activePointerId!==null && e.pointerId!==activePointerId) return;
+    if(e.pointerId!=null){
+      activePointerId=e.pointerId;
+      canvas.setPointerCapture(activePointerId);
+    }
+    isDrawing=true;
+    const {x,y}=getCoords(e);
+
+    startStroke();
+
+    if(mode==='picker'){
+      const grid=getActiveGrid();
+      const cell=grid[y]?.[x];
+      if(cell){ $('colorPicker').value=cell.c; toast(`Picked ${cell.c}`); }
+      isDrawing=false;
+      strokeSnapshot=null;
+      return;
+    }
+
+    if(mode==='bucket'){
+      floodFill(x,y);
+      draw();
+      endStrokeCommit();
+      isDrawing=false;
+      return;
+    }
+
+    if(mode==='line'){
+      if(!anchor){
+        anchor={x,y};
+        toast('Line start set');
+        strokeSnapshot=null;
+      } else {
+        startStroke();
+        drawLine(anchor.x,anchor.y,x,y);
+        anchor=null;
+        draw();
+        endStrokeCommit();
+      }
+      return;
+    }
+
+    paintAt(x,y);
+    draw();
+  }
+
+  function handleMove(e){
+    if(!isDrawing) return;
+    e.preventDefault();
+    const {x,y}=getCoords(e);
+    if(mode==='brush' || mode==='eraser'){
+      paintAt(x,y);
+      draw();
+    }
+  }
+
+  function endPointer(e){
+    if(e.pointerId!=null && e.pointerId!==activePointerId) return;
+    isDrawing=false;
+    try{ if(activePointerId!=null) canvas.releasePointerCapture(activePointerId); }catch(_){}
+    activePointerId=null;
+
+    if(mode==='brush' || mode==='eraser'){
+      endStrokeCommit();
+    }
+  }
+
+  const usePointer = ('PointerEvent' in window);
+  if(usePointer){
+    canvas.addEventListener('pointerdown', handleDown, {passive:false});
+    canvas.addEventListener('pointermove', handleMove, {passive:false});
+    canvas.addEventListener('pointerup', endPointer);
+    canvas.addEventListener('pointercancel', endPointer);
+    canvas.addEventListener('pointerleave', endPointer);
+    canvas.addEventListener('pointerout', endPointer);
+  } else {
+    canvas.addEventListener('mousedown', (e)=>{ isDrawing=true; handleDown(e); });
+    canvas.addEventListener('mousemove', (e)=>{ if(isDrawing) handleMove(e); });
+    window.addEventListener('mouseup', endPointer);
+    canvas.addEventListener('touchstart', (e)=>handleDown(e), {passive:false});
+    canvas.addEventListener('touchmove', (e)=>handleMove(e), {passive:false});
+    canvas.addEventListener('touchend', endPointer);
+    canvas.addEventListener('touchcancel', endPointer);
+  }
+
+  // Drag-drop + paste images into ACTIVE layer (still works like before)
+  canvas.addEventListener('dragover', (e)=>e.preventDefault());
+  canvas.addEventListener('drop', (e)=>{ e.preventDefault(); handleFiles(e.dataTransfer.files); });
+  window.addEventListener('paste', (e)=>{
+    const items=e.clipboardData?.items;
+    if(!items) return;
+    for(const it of items){
+      if(it.type?.startsWith('image/')){ handleFiles([it.getAsFile()]); return; }
+    }
+  });
+
+  // =================== UI wiring ===========================================
+  function setMode(m){
+    mode=m;
+    ['brushBtn','eraserBtn','pickerBtn','bucketBtn','lineBtn'].forEach(id=>$(id).classList.remove('active'));
+    if(m==='brush') $('brushBtn').classList.add('active');
+    if(m==='eraser') $('eraserBtn').classList.add('active');
+    if(m==='picker') $('pickerBtn').classList.add('active');
+    if(m==='bucket') $('bucketBtn').classList.add('active');
+    if(m==='line') $('lineBtn').classList.add('active');
+    if(m!=='line') anchor=null;
+  }
+
+  $('brushBtn').onclick=()=>setMode('brush');
+  $('eraserBtn').onclick=()=>setMode('eraser');
+  $('pickerBtn').onclick=()=>setMode('picker');
+  $('bucketBtn').onclick=()=>setMode('bucket');
+  $('lineBtn').onclick=()=>setMode('line');
+
+  $('undoBtn').onclick=()=>{
+    const last = history.pop();
+    if(!last) return;
+    redoStack.push(snapshotAll());
+    applySnapshot(last);
+    markDirty(); doAutosave('undo');
+  };
+  $('redoBtn').onclick=()=>{
+    const last = redoStack.pop();
+    if(!last) return;
+    history.push(snapshotAll());
+    applySnapshot(last);
+    markDirty(); doAutosave('redo');
+  };
+
+  $('clearBtn').onclick=()=>{
+    if(doodMode){
+      if(!confirm('Clear ALL layers on this frame?')) return;
+    }
+    history.push(snapshotAll()); redoStack=[];
+    const f=activeFrame();
+    f.layers.bg = emptyLayer();
+    f.layers.art = emptyLayer();
+    f.layers.ovr = emptyLayer();
+    draw();
+    markDirty(); doAutosave('clear');
+  };
+
+  $('toggleGridBtn').onclick=()=>{ showGrid=!showGrid; draw(); markDirty(); doAutosave('grid'); };
+
+  $('symmetryBtn').onclick=()=>{
+    const order=['none','x','y','quad'];
+    const idx=order.indexOf(symmetry);
+    symmetry=order[(idx+1)%order.length];
+    $('symmetryBtn').textContent = symmetry==='none'?'🪞':symmetry==='x'?'🪞↔':symmetry==='y'?'🪞↕':'🪞✳';
+    toast(`Symmetry: ${symmetry}`);
+    markDirty(); doAutosave('sym');
+  };
+
+  $('brushSize').addEventListener('input', ()=>{
+    brushSize=clampInt($('brushSize').value,1,5);
+    $('brushSizeReadout').textContent=String(brushSize);
+    markDirty();
+  });
+  $('hardness').addEventListener('input', ()=>{
+    hardness=clampInt($('hardness').value,0,100);
+    $('hardnessReadout').textContent=`${hardness}%`;
+    markDirty();
+  });
+  $('scatter').addEventListener('input', ()=>{
+    scatter=clampInt($('scatter').value,0,100);
+    $('scatterReadout').textContent=`${scatter}%`;
+    markDirty();
+  });
+  $('bubbleStyle').addEventListener('change', ()=>{
+    currentStyle=$('bubbleStyle').value;
+    markDirty(); doAutosave('style');
+  });
+
+  $('threeDBtn').onclick=()=>{ threeDMode=!threeDMode; $('threeDBtn').classList.toggle('active', threeDMode); draw(); markDirty(); doAutosave('3d'); };
+  $('lightAngle').addEventListener('input', ()=>{
+    lightAngle=parseInt($('lightAngle').value,10)||0;
+    $('lightReadout').textContent=`${lightAngle}°`;
+    draw(); markDirty();
+  });
+  $('lightAngle').addEventListener('change', ()=>doAutosave('light'));
+
+  $('alphaSelect').addEventListener('change', ()=>{
+    userAlpha=parseFloat($('alphaSelect').value)||1;
+    draw(); markDirty(); doAutosave('alpha');
+  });
+  $('ditherToggle').addEventListener('change', ()=>{
+    ditherOn=$('ditherToggle').checked;
+    draw(); markDirty(); doAutosave('dither');
+  });
+
+  $('restoreAutosaveBtn').onclick=()=>restoreAutosave(false);
+
+  window.__applyDotDoodMode = function(on){
+    doodMode = !!on;
+    $('doodModeBtn').classList.toggle('active', doodMode);
+    applyDoodMode();
+    if (on) toast('Dood Mode unlocked');
+    markDirty();
+    doAutosave('doodMode');
+  };
+
+  function applyDoodMode(){
+    document.body.classList.toggle('dood-mode', doodMode);
+
+    $('scatter').disabled = !doodMode;
+    $('hardness').disabled = !doodMode;
+
+    const styleSelect = $('bubbleStyle');
+    [...styleSelect.options].forEach(opt=>{
+      if(['neon','glitter'].includes(opt.value)) opt.disabled = !doodMode;
+    });
+    if(!doodMode && ['neon','glitter'].includes(currentStyle)){
+      currentStyle='clean';
+      styleSelect.value='clean';
+    }
+
+    $('exportGifBtn').disabled = !doodMode;
+    $('frameCount').disabled = !doodMode;
+    $('fps').disabled = !doodMode;
+
+    $('mergeDownBtn').disabled = !doodMode;
+    $('clearFrameBtn').disabled = !doodMode;
+  }
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.target && ['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+    const k=e.key.toLowerCase();
+    if((e.ctrlKey||e.metaKey) && k==='z'){ $('undoBtn').click(); e.preventDefault(); }
+    else if((e.ctrlKey||e.metaKey) && (k==='y' || (e.shiftKey && k==='z'))){ $('redoBtn').click(); e.preventDefault(); }
+    else if(k==='b'){ setMode('brush'); }
+    else if(k==='e'){ setMode('eraser'); }
+    else if(k==='i'){ setMode('picker'); }
+    else if(k==='f'){ setMode('bucket'); }
+    else if(k==='l'){ setMode('line'); }
+    else if(k==='g'){ $('toggleGridBtn').click(); }
+    else if(k==='m'){ $('doodModeBtn').click(); }
+  });
+
+  // =================== Templates ===========================================
+  const BUILTIN_TEMPLATES = [
+    { key:'blank', name:'Blank', file:null, layer:'art', builtin:true },
+    { key:'noggin', name:'Noggin Head Base', file:'/templates/noggin-head-base.png', layer:'art', builtin:true },
+    { key:'doogle', name:'Doogle Base', file:'/templates/doogle-base.png', layer:'art', builtin:true },
+  ];
+
+  function loadSavedTemplates(){
+    try{
+      const raw=localStorage.getItem(TPL_KEY);
+      savedTemplates = raw ? JSON.parse(raw) : [];
+      if(!Array.isArray(savedTemplates)) savedTemplates=[];
+    }catch(e){ savedTemplates=[]; }
+  }
+  function persistSavedTemplates(){
+    try{ localStorage.setItem(TPL_KEY, JSON.stringify(savedTemplates)); }catch(e){}
+  }
+
+  function buildTemplateUI(){
+    const sel=$('templateSelect');
+    sel.innerHTML='';
+
+    for(const t of BUILTIN_TEMPLATES){
+      const opt=document.createElement('option');
+      opt.value=t.key;
+      opt.textContent=`${t.name}`;
+      sel.appendChild(opt);
+    }
+
+    if(savedTemplates.length){
+      const sep=document.createElement('option');
+      sep.disabled=true;
+      sep.textContent='──────── Saved ────────';
+      sel.appendChild(sep);
+
+      for(const t of savedTemplates){
+        const opt=document.createElement('option');
+        opt.value=`saved:${t.id}`;
+        opt.textContent=t.name;
+        sel.appendChild(opt);
+      }
+    }
+
+    sel.value='blank';
+    rebuildTemplatePreviews();
+  }
+
+  function rebuildTemplatePreviews(){
+    const wrap=$('templatePreviews');
+    wrap.innerHTML='';
+
+    for(const t of BUILTIN_TEMPLATES){
+      wrap.appendChild(makeTplCard({
+        name:t.name,
+        imgSrc: t.file ? t.file : 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
+          `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
+            <rect width="64" height="64" fill="#000"/>
+            <text x="32" y="36" font-size="11" fill="#00ff99" font-family="Arial" text-anchor="middle">Blank</text>
+          </svg>`
+        ),
+        onClick: ()=>{ $('templateSelect').value=t.key; applyTemplateByKey(t.key); },
+        canDelete:false
+      }));
+    }
+
+    for(const t of savedTemplates){
+      wrap.appendChild(makeTplCard({
+        name:t.name,
+        imgSrc:t.dataUrl,
+        onClick: ()=>{ $('templateSelect').value=`saved:${t.id}`; applyTemplateByKey(`saved:${t.id}`); },
+        canDelete:true,
+        onDelete: ()=>{
+          if(!confirm(`Delete template "${t.name}"?`)) return;
+          savedTemplates = savedTemplates.filter(x=>x.id!==t.id);
+          persistSavedTemplates();
+          buildTemplateUI();
+          toast('Template deleted');
+        }
+      }));
+    }
+  }
+
+  function makeTplCard({name,imgSrc,onClick,canDelete,onDelete}){
+    const div=document.createElement('div');
+    div.className='tpl';
+
+    const img=document.createElement('img');
+    img.alt=name;
+    img.src=imgSrc;
+
+    const span=document.createElement('span');
+    span.textContent=name;
+
+    div.onclick=onClick;
+
+    if(canDelete){
+      const del=document.createElement('button');
+      del.className='del';
+      del.textContent='×';
+      del.title='Delete';
+      del.onclick=(e)=>{ e.stopPropagation(); onDelete?.(); };
+      div.appendChild(del);
+    }
+
+    div.appendChild(img);
+    div.appendChild(span);
+    return div;
+  }
+
+  function applyTemplateByKey(key){
+    history.push(snapshotAll()); redoStack=[];
+
+    const t=BUILTIN_TEMPLATES.find(x=>x.key===key);
+    if(t){
+      if(!t.file){
+        activeLayerId='art';
+        getLayerGrid('art').forEach(row=>row.forEach(cell=>{ cell.c='#ffffff'; cell.s='clean'; }));
+        draw();
+        markDirty(); doAutosave('templateBlank');
+        toast('Blank loaded');
+        return;
+      }
+      return loadTemplateToLayer(t.file, t.layer || 'art');
+    }
+
+    if(key.startsWith('saved:')){
+      const id=key.split(':')[1];
+      const st=savedTemplates.find(x=>x.id===id);
+      if(!st) return toast('Saved template not found');
+      return loadDataUrlToLayer(st.dataUrl, activeLayerId);
+    }
+  }
+
+  function loadTemplateToLayer(url, layerId){
+    const img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=()=>{
+      imageToLayerGrid(img, layerId);
+      activeLayerId = layerId;
+      syncUI();
+      draw();
+      markDirty(); doAutosave('templateLoad');
+      toast(`Template applied to ${layerId.toUpperCase()}`);
+    };
+    img.onerror=()=>toast('Template failed to load (check /templates path)');
+    img.src=url;
+  }
+
+  function loadDataUrlToLayer(dataUrl, layerId){
+    const img=new Image();
+    img.onload=()=>{
+      imageToLayerGrid(img, layerId);
+      syncUI();
+      draw();
+      markDirty(); doAutosave('templateSavedApply');
+      toast('Saved template applied');
+    };
+    img.onerror=()=>toast('Saved template failed to load');
+    img.src=dataUrl;
+  }
+
+  function imageToLayerGrid(img, layerId){
+    const temp=document.createElement('canvas');
+    temp.width=size; temp.height=size;
+    const tctx=temp.getContext('2d');
+    tctx.clearRect(0,0,size,size);
+    tctx.drawImage(img,0,0,size,size);
+    const data=tctx.getImageData(0,0,size,size).data;
+
+    const grid=getLayerGrid(layerId);
+    for(let y=0;y<size;y++){
+      for(let x=0;x<size;x++){
+        const i=(y*size+x)*4;
+        const a=data[i+3];
+        if(a===0){
+          grid[y][x]={c:'#ffffff', s:'clean'};
+        } else {
+          grid[y][x]={c:rgbToHex(data[i],data[i+1],data[i+2]), s:'clean'};
+        }
+      }
+    }
+  }
+
+  $('applyTemplateBtn').onclick=()=>applyTemplateByKey($('templateSelect').value);
+
+  $('loadImageBtn').onclick=()=>$('imgLoader').click();
+  $('imgLoader').addEventListener('change',(e)=>handleFiles(e.target.files));
+
+  // Load image into ACTIVE layer (same as before)
+  function handleFiles(files){
+    const file=files && files[0];
+    if(!file) return;
+    const img=new Image();
+    img.onload=()=>{
+      history.push(snapshotAll()); redoStack=[];
+      imageToLayerGrid(img, activeLayerId);
+      draw();
+      markDirty(); doAutosave('imageLoad');
+      toast('Image loaded into active layer');
+    };
+    img.onerror=()=>toast('Failed to load image');
+    img.src=URL.createObjectURL(file);
+  }
+
+  // NEW: overlay PNG loader (trace image, not exported)
+  function handleOverlayFiles(files){
+    const file = files && files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      overlayDataUrl = ev.target.result;
+      const img = new Image();
+      img.onload = ()=>{
+        overlayImage = img;
+        draw();
+        markDirty();
+        doAutosave('overlayLoad');
+        toast('Overlay PNG loaded (trace layer)');
+      };
+      img.onerror = ()=>{
+        overlayImage = null;
+        overlayDataUrl = null;
+        toast('Failed to load overlay PNG');
+      };
+      img.src = overlayDataUrl;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function renderCompositeToDataUrl(includeBg){
+    const out=document.createElement('canvas');
+    out.width=320; out.height=320;
+    const octx=out.getContext('2d');
+    octx.imageSmoothingEnabled=false;
+    // NOTE: overlay is NOT included in exports
+    drawFrameToContext(activeFrame(), octx, { includeBg, onionPrev:null, allowDither:false, withOverlay:false });
+    return out.toDataURL('image/png');
+  }
+
+  $('saveTemplateBtn').onclick=()=>{
+    const name = prompt('Template name?');
+    if(!name) return;
+
+    const includeBg = $('exportBgToggle').checked;
+    const dataUrl = renderCompositeToDataUrl(includeBg);
+
+    savedTemplates.unshift({
+      id:uid(),
+      name:name.trim().slice(0,40),
+      dataUrl,
+      includeBg,
+      createdAt:Date.now()
+    });
+
+    if(savedTemplates.length>60) savedTemplates = savedTemplates.slice(0,60);
+
+    persistSavedTemplates();
+    buildTemplateUI();
+    toast('Template saved');
+  };
+
+  $('clearTemplatesBtn').onclick=()=>{
+    if(!savedTemplates.length) return toast('No saved templates');
+    if(!confirm('Clear ALL saved templates?')) return;
+    savedTemplates=[];
+    persistSavedTemplates();
+    buildTemplateUI();
+    toast('Saved templates cleared');
+  };
+
+  // NEW: wire overlay controls
+  $('loadOverlayBtn').onclick = ()=>$('overlayLoader').click();
+  $('overlayLoader').addEventListener('change', (e)=>handleOverlayFiles(e.target.files));
+
+  $('overlayToggle').addEventListener('change', ()=>{
+    overlayEnabled = $('overlayToggle').checked;
+    draw();
+    markDirty();
+    doAutosave('overlayToggle');
+  });
+
+  $('overlayOpacity').addEventListener('input', ()=>{
+    overlayOpacity = parseFloat($('overlayOpacity').value) || 0.5;
+    draw();
+    markDirty();
+  });
+  $('overlayOpacity').addEventListener('change', ()=>doAutosave('overlayOpacity'));
+
+  // =================== Layers UI ===========================================
+  function buildLayerUI(){
+    const sel=$('activeLayerSelect');
+    sel.innerHTML='';
+    for(const l of layerDefs){
+      const opt=document.createElement('option');
+      opt.value=l.id;
+      opt.textContent=l.name;
+      sel.appendChild(opt);
+    }
+    sel.value=activeLayerId;
+    sel.onchange=()=>{
+      activeLayerId=sel.value;
+      syncUI();
+      markDirty(); doAutosave('activeLayer');
+    };
+
+    $('layerUpBtn').onclick=()=>{
+      const idx=layerOrder.indexOf(activeLayerId);
+      if(idx<=0) return;
+      [layerOrder[idx-1], layerOrder[idx]] = [layerOrder[idx], layerOrder[idx-1]];
+      draw(); syncUI(); markDirty(); doAutosave('layerUp');
+    };
+    $('layerDownBtn').onclick=()=>{
+      const idx=layerOrder.indexOf(activeLayerId);
+      if(idx<0 || idx>=layerOrder.length-1) return;
+      [layerOrder[idx+1], layerOrder[idx]] = [layerOrder[idx], layerOrder[idx+1]];
+      draw(); syncUI(); markDirty(); doAutosave('layerDown');
+    };
+
+    $('mergeDownBtn').onclick=()=>{
+      if(!doodMode) return toast('Enable Dood Mode to merge layers');
+      if(!confirm('Merge this layer down?')) return;
+
+      const idx=layerOrder.indexOf(activeLayerId);
+      if(idx<=0) return toast('Nothing below to merge into');
+      const belowId=layerOrder[idx-1];
+
+      history.push(snapshotAll()); redoStack=[];
+
+      const src=getLayerGrid(activeLayerId);
+      const dst=getLayerGrid(belowId);
+
+      for(let y=0;y<size;y++){
+        for(let x=0;x<size;x++){
+          const s=src[y][x];
+          if(s.c && s.c.toLowerCase()!=='#ffffff'){
+            dst[y][x]={c:s.c, s:s.s};
+          }
+        }
+      }
+      src.forEach(row=>row.forEach(cell=>{ cell.c='#ffffff'; cell.s='clean'; }));
+      activeLayerId=belowId;
+      syncUI();
+      draw();
+      markDirty(); doAutosave('mergeDown');
+      toast('Merged down');
+    };
+
+    buildLayerThumbTiles();
+  }
+
+  function updateLayerOrderReadout(){
+    const map={bg:'BG', art:'ART', ovr:'OVR'};
+    $('layerOrderReadout').textContent = layerOrder.map(x=>map[x]||x).join(' → ');
+  }
+
+  function buildLayerThumbTiles(){
+    const wrap=$('layerThumbs');
+    wrap.innerHTML='';
+
+    for(const l of layerDefs){
+      const tile=document.createElement('div');
+      tile.className='layerTile';
+      tile.dataset.layer=l.id;
+
+      const title=document.createElement('div');
+      title.className='title';
+      title.textContent=l.name;
+
+      const thumb=document.createElement('canvas');
+      thumb.width=96; thumb.height=96;
+      thumb.dataset.layer=l.id;
+
+      const tog=document.createElement('div');
+      tog.className='tog';
+
+      const visLabel=document.createElement('label');
+      const vis=document.createElement('input');
+      vis.type='checkbox';
+      vis.checked=!!layerVisible[l.id];
+      vis.onchange=(e)=>{
+        layerVisible[l.id]=vis.checked;
+        draw();
+        markDirty(); doAutosave('layerVis');
+        e.stopPropagation();
+      };
+      visLabel.appendChild(vis);
+      visLabel.appendChild(document.createTextNode(' visible'));
+
+      tog.appendChild(visLabel);
+
+      tile.onclick=()=>{
+        activeLayerId=l.id;
+        $('activeLayerSelect').value=activeLayerId;
+        syncUI();
+        draw();
+        markDirty(); doAutosave('activeLayerClick');
+      };
+
+      tile.appendChild(title);
+      tile.appendChild(thumb);
+      tile.appendChild(tog);
+
+      wrap.appendChild(tile);
+    }
+  }
+
+  function refreshLayerThumbs(){
+    const tiles=document.querySelectorAll('.layerTile');
+    tiles.forEach(tile=>{
+      const layerId=tile.dataset.layer;
+      tile.classList.toggle('active', layerId===activeLayerId);
+
+      const cnv = tile.querySelector('canvas');
+      if(!cnv) return;
+      const cctx = cnv.getContext('2d');
+      drawFrameToContext(activeFrame(), cctx, { includeBg:true, onionPrev:null, onlyLayer:layerId, allowDither:false, withOverlay:false });
+    });
+  }
+
+  // =================== Animation UI ========================================
+  function rebuildFrameStrip(){
+    const strip=$('frameStrip');
+    strip.innerHTML='';
+    frames.forEach((_,i)=>{
+      const b=document.createElement('button');
+      b.className='frameBtn' + (i===frameIndex?' active':'');
+      b.textContent=String(i+1);
+      b.onclick=()=>setFrame(i);
+      strip.appendChild(b);
+    });
+  }
+
+  function setFrame(i){
+    frameIndex = Math.max(0, Math.min(i, frames.length-1));
+    rebuildFrameStrip();
+    draw();
+    markDirty(); doAutosave('setFrame');
+  }
+
+  $('frameCount').addEventListener('input', ()=>{
+    const n=clampInt($('frameCount').value,8,24);
+    $('frameCountReadout').textContent=String(n);
+    resizeFrames(n);
+  });
+
+  function resizeFrames(n){
+    const current=frames.length;
+    if(n===current) return;
+    history.push(snapshotAll()); redoStack=[];
+
+    if(n>current){
+      for(let i=current;i<n;i++) frames.push(newFrame());
+    } else {
+      frames = frames.slice(0,n);
+      frameIndex = Math.min(frameIndex, frames.length-1);
+    }
+    rebuildFrameStrip();
+    draw();
+    markDirty(); doAutosave('resizeFrames');
+  }
+
+  $('fps').addEventListener('input', ()=>{
+    fps=clampInt($('fps').value,2,18);
+    $('fpsReadout').textContent=String(fps);
+    markDirty();
+  });
+
+  $('onionSkin').addEventListener('change', ()=>{
+    onionOn=$('onionSkin').checked;
+    draw();
+    markDirty(); doAutosave('onion');
+  });
+
+  $('prevFrameBtn').onclick=()=>setFrame(frameIndex-1);
+  $('nextFrameBtn').onclick=()=>setFrame(frameIndex+1);
+
+  $('dupFrameBtn').onclick=()=>{
+    history.push(snapshotAll()); redoStack=[];
+    const src=activeFrame();
+    const deepLayer=(g)=>g.map(row=>row.map(c=>({c:c.c,s:c.s})));
+    const copy={ layers:{ bg:deepLayer(src.layers.bg), art:deepLayer(src.layers.art), ovr:deepLayer(src.layers.ovr) } };
+    frames.splice(frameIndex+1,0,copy);
+    if(frames.length>24) frames=frames.slice(0,24);
+    setFrame(Math.min(frameIndex+1, frames.length-1));
+    $('frameCount').value=String(frames.length);
+    $('frameCountReadout').textContent=String(frames.length);
+    markDirty(); doAutosave('dupFrame');
+  };
+
+  $('clearFrameBtn').onclick=()=>{
+    if(!doodMode) return toast('Enable Dood Mode to clear frames');
+    if(!confirm('Clear this frame?')) return;
+
+    history.push(snapshotAll()); redoStack=[];
+    const f=activeFrame();
+    f.layers.bg=emptyLayer(); f.layers.art=emptyLayer(); f.layers.ovr=emptyLayer();
+    draw();
+    markDirty(); doAutosave('clearFrame');
+  };
+
+  $('playBtn').onclick=()=>{
+    if(playing) return;
+    playing=true;
+    $('playBtn').disabled=true;
+    $('stopBtn').disabled=false;
+
+    playTimer=setInterval(()=>{
+      frameIndex = (frameIndex+1) % frames.length;
+      rebuildFrameStrip();
+      draw();
+    }, Math.round(1000/fps));
+  };
+
+  $('stopBtn').onclick=()=>{
+    playing=false;
+    $('playBtn').disabled=false;
+    $('stopBtn').disabled=true;
+    if(playTimer) clearInterval(playTimer);
+    playTimer=null;
+    doAutosave('stop');
+  };
+
+  $('exportGifBtn').onclick=async ()=>{
+    if(!doodMode) return toast('Enable Dood Mode to export GIF');
+    try{
+      if(typeof GIF === 'undefined') return toast('GIF encoder not loaded');
+      toast('Building GIF…');
+      const includeBg = $('exportBgToggle').checked;
+
+      const out=document.createElement('canvas');
+      out.width=320; out.height=320;
+      const octx=out.getContext('2d');
+      octx.imageSmoothingEnabled=false;
+
+      const gif = new GIF({
+        workers: 2,
+        quality: 10,
+        workerScript: 'https://cdn.jsdelivr.net/npm/gif.js.optimized/dist/gif.worker.js'
+      });
+
+      const delay = Math.round(1000/fps);
+
+      for(let i=0;i<frames.length;i++){
+        // overlay NOT included in GIF export
+        drawFrameToContext(frames[i], octx, { includeBg, onionPrev:null, allowDither:false, withOverlay:false });
+        gif.addFrame(octx, {copy:true, delay});
+      }
+
+      gif.on('finished', function(blob){
+        const a=document.createElement('a');
+        a.href=URL.createObjectURL(blob);
+        a.download='dot-dood.gif';
+        a.click();
+        toast('GIF exported');
+      });
+
+      gif.render();
+    }catch(e){
+      console.warn(e);
+      toast('GIF export failed');
+    }
+  };
+
+  // =================== Export ==============================================
+  function renderToExportCanvas(px, includeBg){
+    const out=document.createElement('canvas');
+    out.width=px; out.height=px;
+    const octx=out.getContext('2d');
+    octx.imageSmoothingEnabled = false;
+    // overlay NOT included in plain exports
+    drawFrameToContext(activeFrame(), octx, { includeBg, onionPrev:null, allowDither:false, withOverlay:false });
+    return out;
+  }
+
+  function downloadDataUrl(filename, dataUrl){
+    const a=document.createElement('a');
+    a.download=filename;
+    a.href=dataUrl;
+    a.click();
+  }
+
+  $('savePngBtn').onclick=()=>{
+    const px=parseInt($('exportSize').value,10)||320;
+    const includeBg=$('exportBgToggle').checked;
+    const out=renderToExportCanvas(px, includeBg);
+    downloadDataUrl(`dot-dood_${px}.png`, out.toDataURL('image/png'));
+  };
+
+  $('saveJpgBtn').onclick=()=>{
+    const px=parseInt($('exportSize').value,10)||320;
+    const includeBg=$('exportBgToggle').checked;
+    const out=renderToExportCanvas(px, includeBg);
+
+    const out2=document.createElement('canvas');
+    out2.width=px; out2.height=px;
+    const octx=out2.getContext('2d');
+    octx.fillStyle='#000';
+    octx.fillRect(0,0,px,px);
+    octx.drawImage(out,0,0);
+    downloadDataUrl(`dot-dood_${px}.jpg`, out2.toDataURL('image/jpeg', 0.92));
+  };
+
+  $('copyPngBtn').onclick=async ()=>{
+    try{
+      const px=parseInt($('exportSize').value,10)||320;
+      const includeBg=$('exportBgToggle').checked;
+      const out=renderToExportCanvas(px, includeBg);
+
+      if(!navigator.clipboard || !window.ClipboardItem){
+        const url=out.toDataURL('image/png');
+        await navigator.clipboard.writeText(url);
+        toast('Copied PNG data URL');
+        return;
+      }
+
+      const blob = await new Promise(res=>out.toBlob(res,'image/png'));
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      toast('Copied PNG to clipboard');
+    }catch(e){
+      console.warn(e);
+      toast('Copy failed (browser permissions)');
+    }
+  };
+
+  // =================== Sync UI =============================================
+  function syncUI(){
+    $('brushBtn').classList.toggle('active', mode==='brush');
+    $('eraserBtn').classList.toggle('active', mode==='eraser');
+    $('pickerBtn').classList.toggle('active', mode==='picker');
+    $('bucketBtn').classList.toggle('active', mode==='bucket');
+    $('lineBtn').classList.toggle('active', mode==='line');
+
+    $('threeDBtn').classList.toggle('active', threeDMode);
+    $('lightAngle').value=String(lightAngle);
+    $('lightReadout').textContent=`${lightAngle}°`;
+    $('alphaSelect').value=String(userAlpha);
+    $('ditherToggle').checked=ditherOn;
+
+    $('brushSize').value=String(brushSize);
+    $('brushSizeReadout').textContent=String(brushSize);
+    $('hardness').value=String(hardness);
+    $('hardnessReadout').textContent=`${hardness}%`;
+    $('scatter').value=String(scatter);
+    $('scatterReadout').textContent=`${scatter}%`;
+    $('bubbleStyle').value=currentStyle;
+
+    $('activeLayerSelect').value=activeLayerId;
+    updateLayerOrderReadout();
+
+    $('onionSkin').checked=onionOn;
+    $('fps').value=String(fps);
+    $('fpsReadout').textContent=String(fps);
+
+    $('frameCount').value=String(frames.length);
+    $('frameCountReadout').textContent=String(frames.length);
+
+    $('symmetryBtn').textContent = symmetry==='none'?'🪞':symmetry==='x'?'🪞↔':symmetry==='y'?'🪞↕':'🪞✳';
+
+    $('doodModeBtn').classList.toggle('active', doodMode);
+    applyDoodMode();
+
+    // overlay UI sync
+    if($('overlayToggle')){
+      $('overlayToggle').checked = overlayEnabled;
+    }
+    if($('overlayOpacity')){
+      $('overlayOpacity').value = String(overlayOpacity);
+    }
+
+    refreshLayerThumbs();
+  }
+
+  // =================== Init ================================================
+  function init(){
+    loadSavedTemplates();
+    buildTemplateUI();
+    buildLayerUI();
+
+    restoreAutosave(true);
+
+    syncUI();
+    rebuildFrameStrip();
+    draw();
+
+    doAutosave('init');
+  }
+  init();
+</script>
+
+<footer class="lab-footer">
+  <div style="max-width:1000px;margin:auto;padding:30px 20px;text-align:center;">
+    <p style="font-size:1.2rem;margin-bottom:10px;">
+      &copy; 2025 $dOOd • Built on XRPL • <a href="token.html">Token Info</a>
+    </p>
+    <p style="margin-bottom:20px;">
+      <a href="https://xrp.cafe/collection/noggins" target="_blank" rel="noreferrer">NFTs</a> •
+      <a href="../../index.html#shop">Merch</a> •
+      <a href="how-to-buy-dood.html">How to Buy</a> •
+      <a href="community.html">Community</a> •
+      <a href="https://dexscreener.com/xrpl/446f6f6400000000000000000000000000000000.rn5y9n8aptrc7pvqxdmjkg9qvfw7fwi4kc_xrp" target="_blank" rel="noreferrer">Live Chart</a>
+    </p>
+    <p style="margin-bottom:20px;">
+      <a href="https://twitter.com/doodxrpl" target="_blank" rel="noreferrer">🐦 Twitter/X</a> •
+      <a href="https://doodscord.com" target="_blank" rel="noreferrer">💬 Discord</a> •
+      <a href="mailto:info@doodbrand.com">📧 Contact</a>
+    </p>
+    <p style="color:#777;font-size:0.9rem;">
+      Memes with utility. NFTs with soul. Built by the people.
+    </p></div>
+</footer>
+
+<!-- Single analytics include (keep ONE) -->
+<script>
+  'undefined'=== typeof _trfq || (window._trfq = []);
+  'undefined'=== typeof _trfd && (window._trfd=[]),
+  _trfd.push(
+    {'tccl.baseHost':'secureserver.net'},
+    {'ap':'cpsh-oh'},
+    {'server':'p3plzcpnl509316'},
+    {'dcenter':'p3'},
+    {'cp_id':'10478751'},
+    {'cp_cl':'8'}
+  );
+</script>
+
+
+
+<script>
+(function(){
+  const doodModal = document.getElementById('doodModeModal');
+  const doodClose = document.getElementById('doodClose');
+  const doodClear = document.getElementById('doodClear');
+  const btnConnect = document.getElementById('doodConnect');
+  const btnEnter = document.getElementById('doodEnter');
+  const btnDisconnect = document.getElementById('doodDisconnect');
+  const statusEl = document.getElementById('doodModeStatus');
+  function openDoodModal(){ doodModal?.classList.add('show'); }
+  function closeDoodModal(){ doodModal?.classList.remove('show'); }
+  async function waitForLabGate(maxMs = 12000){
+    if (window.DoodLabGate) return window.DoodLabGate;
+    return new Promise((resolve)=>{
+      const t0 = Date.now();
+      (function tick(){
+        if (window.DoodLabGate) return resolve(window.DoodLabGate);
+        if (Date.now() - t0 > maxMs) return resolve(null);
+        setTimeout(tick, 50);
+      })();
+    });
+  }
+  window.setDotDoodGate = function(unlocked){
+    if (typeof window.__applyDotDoodMode === 'function') window.__applyDotDoodMode(!!unlocked);
+  };
+  async function ensureDoodAccess(){
+    const gate = await waitForLabGate();
+    if (!gate){ statusEl.textContent = 'Lab wallet not loaded. Refresh.'; return; }
+    try{
+      statusEl.textContent = 'Connecting wallet…';
+      if (!gate.connectedAccount) await gate.connect();
+      statusEl.textContent = 'Verifying $dOOd…';
+      const result = await gate.verify();
+      if (result.ok){ window.setDotDoodGate(true); closeDoodModal(); }
+      else statusEl.textContent = 'Need ≥ ' + gate.THRESHOLD.toLocaleString() + ' $dOOd.';
+    }catch(err){ statusEl.textContent = err?.message || 'Failed'; }
+  }
+  async function disconnectAll(){
+    const gate = await waitForLabGate();
+    if (gate) await gate.disconnect();
+    window.setDotDoodGate(false);
+    statusEl.textContent = 'Connect wallet to verify ≥ 1M $dOOd.';
+  }
+  document.addEventListener('dood-lab-gate', (e)=> window.setDotDoodGate(!!e.detail?.unlocked));
+  document.getElementById('doodModeBtn')?.addEventListener('click', async ()=>{
+    const gate = await waitForLabGate();
+    if (gate?.connectedAccount && gate.loadGate(gate.connectedAccount)) window.setDotDoodGate(true);
+    else openDoodModal();
+  });
+  doodClose?.addEventListener('click', closeDoodModal);
+  doodModal?.addEventListener('click', (e)=>{ if(e.target===doodModal) closeDoodModal(); });
+  btnConnect?.addEventListener('click', ensureDoodAccess);
+  btnEnter?.addEventListener('click', ensureDoodAccess);
+  btnDisconnect?.addEventListener('click', disconnectAll);
+  doodClear?.addEventListener('click', disconnectAll);
+  (async ()=>{
+    const gate = await waitForLabGate();
+    window.setDotDoodGate(!!(gate?.connectedAccount && gate.loadGate(gate.connectedAccount)));
+  })();
+})();
+</script>
+<script type="module" src="/lab/js/creator-tool-lab.mjs"></script>
+
+
+<script id="dood-v54-portal-logo-component-js">
+(function () {
+  const logoUrl = "/assets/dood-portal-guide-v54.png?v=54";
+
+  function goHome(event) {
+    event.preventDefault();
+    window.location.href = "/";
+  }
+
+  function normalizeLogo(el) {
+    if (!el) return;
+    el.classList.add("dood-portal-logo", "is-alive");
+    el.setAttribute("role", "link");
+    el.setAttribute("aria-label", "Dood Labs Home");
+    el.setAttribute("title", "Dood Labs Home");
+    el.onclick = goHome;
+    el.innerHTML = '<img src="' + logoUrl + '" alt="Dood Labs Portal Guide">';
+  }
+
+  function initDoodPortalLogo() {
+    document.querySelectorAll(".brand .mark, .brand-mark, .logo-mark, .site-logo, .app-logo, .dood-portal-logo").forEach(normalizeLogo);
+
+    document.querySelectorAll("img").forEach(function(img) {
+      const src = (img.getAttribute("src") || "").toLowerCase();
+      if (src.includes("doodlogo") || src.includes("dood-logo") || src.includes("doodlabs-logo") || src.includes("portal-guide") || src.includes("logo.png")) {
+        img.setAttribute("src", logoUrl);
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initDoodPortalLogo);
+  } else {
+    initDoodPortalLogo();
+  }
+})();
+</script>
+
+
+<script id="dood-v56-theme-modes-js">
+(function(){
+  const modes = [
+    { id: "dood", label: "Dood Mode" },
+    { id: "doodette", label: "Doodette Mode" },
+    { id: "dark", label: "Dark Mode" }
+  ];
+
+  function applyTheme(mode){
+    const clean = modes.some(m => m.id === mode) ? mode : "dood";
+    document.body.classList.remove("theme-dood", "theme-doodette", "theme-dark");
+    document.body.classList.add("theme-" + clean);
+    localStorage.setItem("doodLabsThemeMode", clean);
+    document.querySelectorAll("[data-theme-mode]").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.themeMode === clean);
+    });
+  }
+
+  function addThemeSwitcher(){
+    if(document.getElementById("doodThemeSwitcher")) return;
+    const wrap = document.createElement("div");
+    wrap.id = "doodThemeSwitcher";
+    wrap.className = "theme-switcher";
+    wrap.setAttribute("aria-label", "Theme modes");
+    wrap.innerHTML = modes.map(m => `<button type="button" data-theme-mode="${m.id}">${m.label}</button>`).join("");
+
+    const nav = document.querySelector("header nav") || document.querySelector(".site-header nav") || document.querySelector("header");
+    if(nav) nav.appendChild(wrap);
+
+    wrap.querySelectorAll("[data-theme-mode]").forEach(btn => {
+      btn.addEventListener("click", () => applyTheme(btn.dataset.themeMode));
+    });
+  }
+
+  function initThemeModes(){
+    addThemeSwitcher();
+    applyTheme(localStorage.getItem("doodLabsThemeMode") || "dood");
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", initThemeModes);
+  } else {
+    initThemeModes();
+  }
+})();
+</script>
+
+
+<script id="dood-v59-auth-redirect-helper">
+(function(){
+  function showAuthReturnMessage(){
+    const hash = window.location.hash || "";
+    const search = window.location.search || "";
+    const looksLikeAuthReturn =
+      hash.includes("access_token") ||
+      hash.includes("refresh_token") ||
+      search.includes("code=") ||
+      search.includes("token_hash=");
+    if(!looksLikeAuthReturn) return;
+
+    setTimeout(function(){
+      const notice = document.getElementById("profileAuthNotice") || document.getElementById("profileNotice");
+      if(notice){
+        notice.textContent = "Email confirmed. You can now log in and save your profile.";
+        notice.classList.add("show");
+        notice.style.display = "block";
+      }
+      if(typeof showPage === "function"){
+        showPage("profilePage");
+      }
+    }, 700);
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", showAuthReturnMessage);
+  } else {
+    showAuthReturnMessage();
+  }
+})();
+</script>
+
+</body>
+<script>'undefined'=== typeof _trfq || (window._trfq = []);'undefined'=== typeof _trfd && (window._trfd=[]),_trfd.push({'tccl.baseHost':'secureserver.net'},{'ap':'cpsh-oh'},{'server':'p3plzcpnl509316'},{'dcenter':'p3'},{'cp_id':'10478751'},{'cp_cl':'8'}) // Monitoring performance to make your website faster. If you want to opt-out, please contact web hosting support.</script><script src='https://img1.wsimg.com/traffic-assets/js/tccl.min.js'></script></html>

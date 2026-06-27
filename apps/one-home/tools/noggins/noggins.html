@@ -1,0 +1,2380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- lock zoom so pinch-to-zoom is handled by our tool, not the browser -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Create Noggins | Dood Creator</title>
+  <meta name="description" content="Draw, design, and export your own Noggins. Dood Mode unlocks advanced tools for $dOOd holders." />
+
+  <link rel="icon" href="https://www.doodbrand.com/DOOD_HUGE.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Roboto:wght@300;400;700;900&family=Monoton&display=swap" rel="stylesheet" />
+  <script defer src="https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js?v=2.7.1"></script>
+  <script defer src="/lab/js/config.js?v=158"></script>
+  <link rel="stylesheet" href="/lab/css/lab-mobile.css?v=158" />
+  <link rel="stylesheet" href="/lab/css/creator-tools-lab.css?v=158" />
+  <link rel="stylesheet" href="../../shared/labs.css" />
+  <script src="../../shared/labs-session.js"></script>
+  <script defer src="/lab/js/config.js?v=158"></script>
+
+  <style>
+    :root{
+      --dood-primary:#00ccff;
+      --dood-accent:#00ff99;
+      --dood-bg:#0d0d0d;
+      --dood-bg-2:#1f1f1f;
+      --card:#121212;
+      --card2:#171717;
+      --stroke:#252525;
+      --muted:#bdbdbd;
+      --ok:#00ff99;
+      --bad:#ff3b6a;
+      --warn:#ffd24a;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      background:linear-gradient(135deg,var(--dood-bg),var(--dood-bg-2));
+      color:#f2f2f2;
+      font-family:Roboto,system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+    }
+    header{
+      background:#111;
+      padding:10px 16px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      position:sticky;
+      top:0;
+      z-index:50;
+      border-bottom:1px solid #151515;
+    }
+    header img{ height:44px; border-radius:12px; }
+    header nav a{ color:#fff; margin:0 8px; text-decoration:none; font-weight:700; font-size:.95rem;}
+    header nav a:hover{ color:var(--dood-accent); }
+
+    .page-header{ padding:18px 16px 10px; text-align:center; }
+    .page-header h1{
+      margin:0 0 8px;
+      font-family:"Permanent Marker",cursive;
+      font-size:2rem;
+      color:var(--dood-primary);
+      letter-spacing:.2px;
+    }
+    .page-header p{ margin:0 auto 10px; color:#bbb; max-width:900px; }
+
+    .cta-row{ display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap; margin:10px 0 6px; }
+    .cta-note{ color:#9ad; opacity:.9; font-size:.9rem; }
+
+    .dood-btn{
+      --g1:#00ccff; --g2:#00ff99; --sh:rgba(0,255,153,.35);
+      position:relative; display:inline-flex; align-items:center; gap:.6rem;
+      padding:12px 16px; border-radius:999px; border:0; cursor:pointer;
+      font-weight:900; letter-spacing:.2px; color:#0d0d0d;
+      background:linear-gradient(135deg,var(--g1),var(--g2));
+      box-shadow:0 8px 30px var(--sh), inset 0 1px 0 rgba(255,255,255,.25);
+      transform:translateZ(0); transition:transform .15s ease, box-shadow .2s ease, filter .2s ease;
+    }
+    .dood-btn:hover{ transform:translateY(-2px) scale(1.02); box-shadow:0 12px 40px var(--sh); }
+    .dood-btn:active{ transform:translateY(0) scale(.99); }
+    .dood-ghost{
+      display:inline-flex; align-items:center; gap:.5rem;
+      padding:10px 14px;
+      border-radius:12px;
+      background:transparent;
+      border:1px solid #2a2a2a;
+      color:#eaeaea;
+      cursor:pointer;
+      font-weight:800;
+    }
+    .dood-ghost:hover{ border-color:#3a3a3a; }
+
+    .layout{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+      padding: 0 12px 18px;
+      max-width:1180px;
+      margin:0 auto;
+    }
+    @media(min-width: 980px){
+      .layout{ grid-template-columns: 380px 1fr; align-items:start; }
+    }
+
+    .card{
+      background:linear-gradient(180deg,var(--card),var(--card2));
+      border:1px solid var(--stroke);
+      border-radius:16px;
+      padding:12px;
+      box-shadow:0 18px 45px rgba(0,0,0,.35);
+    }
+    .card h3{
+      margin:0 0 8px;
+      font-size:1.05rem;
+      color:#dfefff;
+      letter-spacing:.2px;
+    }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .row + .row{ margin-top:10px; }
+
+    label{ font-size:.8rem; color:#cfcfcf; display:block; margin:0 0 4px; }
+    input, select, button{
+      font:inherit;
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid #2b2b2b;
+      background:#111;
+      color:#fff;
+      outline:none;
+    }
+    input[type="range"]{ padding:0; height:40px; }
+    input[type="color"]{ height:42px; width:100%; padding:6px; }
+    select{ height:42px; }
+    button.small{ padding:8px 10px; border-radius:12px; font-weight:800; }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border:1px solid #2a2a2a;
+      border-radius:999px;
+      color:#ddd;
+      background:#0f0f0f;
+      font-weight:800;
+      font-size:.9rem;
+    }
+    .pill .dot{ width:10px; height:10px; border-radius:99px; background:var(--bad); box-shadow:0 0 10px rgba(255,59,106,.35); }
+    .pill.ok .dot{ background:var(--ok); box-shadow:0 0 10px rgba(0,255,153,.35); }
+    .pill.warn .dot{ background:var(--warn); box-shadow:0 0 10px rgba(255,210,74,.35); }
+    .pill .sub{ color:#9aa; font-weight:700; font-size:.85rem; }
+
+    .canvas-wrap{
+      background:#0e0e0e;
+      border:1px solid #202020;
+      border-radius:18px;
+      padding:10px;
+      overflow:hidden;
+    }
+
+    .viewport{
+      position:relative;
+      width:100%;
+      max-width: 90vmin;
+      margin: 0 auto;
+      aspect-ratio: 1 / 1;
+      border-radius:14px;
+      overflow:hidden;
+      touch-action: none; /* needed for pinch/pan */
+      background:#0a0a0a;
+    }
+    #refImage, #templateImage, #drawCanvas{
+      position:absolute;
+      top:0; left:0;
+      width:100%;
+      height:100%;
+      transform-origin: 0 0;
+      user-select:none;
+      -webkit-user-select:none;
+      pointer-events:none;
+    }
+    #drawCanvas{ pointer-events:auto; }
+
+    .toolgrid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap:8px;
+    }
+    .toolgrid button{ font-weight:900; }
+    .toolgrid button.active{ border-color:rgba(0,255,153,.55); box-shadow:0 0 0 2px rgba(0,255,153,.15) inset; }
+
+    .adv-lock{
+      border:1px dashed #2d2d2d;
+      border-radius:14px;
+      padding:10px;
+      color:#cfcfcf;
+      background:rgba(255,255,255,.03);
+      font-size:.92rem;
+      line-height:1.35;
+    }
+    .adv-lock b{ color:#fff; }
+
+    .layers{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .layer{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      padding:8px;
+      border-radius:14px;
+      border:1px solid #242424;
+      background:#101010;
+    }
+    .layer .name{ flex:1; min-width:0; font-weight:900; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .layer .tag{ font-size:.75rem; color:#9bb; font-weight:800; }
+    .layer button{ padding:8px 10px; border-radius:12px; font-weight:900; }
+
+    .hint{ color:#9aa; font-size:.9rem; margin-top:6px; }
+    .kbd{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono"; padding:2px 8px; border:1px solid #2a2a2a; border-radius:999px; background:#0f0f0f; color:#ddd; font-weight:800; font-size:.85rem; }
+
+    .dood-modal{
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.65);
+      backdrop-filter: blur(5px);
+      display:flex; align-items:center; justify-content:center;
+      z-index:1000;
+      opacity:0; pointer-events:none;
+      transition:opacity .18s ease;
+    }
+    .dood-modal.show{ opacity:1; pointer-events:auto; }
+    .dood-dialog{
+      width:min(620px, 92vw);
+      background:#121212;
+      border:1px solid #222;
+      border-radius:16px;
+      padding:18px;
+      box-shadow:0 20px 60px rgba(0,0,0,.65);
+      text-align:left;
+    }
+    .dood-dialog h3{ margin:0 0 6px; font-family:"Permanent Marker",cursive; color:var(--dood-primary); font-size:1.6rem; }
+    .dood-dialog p{ margin:0 0 12px; color:#cfcfcf; }
+    .modal-actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .statusline{ display:flex; gap:10px; align-items:center; margin:10px 0 0; color:#9aa; font-weight:800; }
+    .statusline .mini{ width:10px; height:10px; border-radius:50px; background:#666; }
+    .statusline.ok .mini{ background:var(--ok); box-shadow:0 0 10px rgba(0,255,153,.35); }
+    .statusline.bad .mini{ background:var(--bad); box-shadow:0 0 10px rgba(255,59,106,.35); }
+
+    footer{
+      margin:18px auto 0;
+      padding:30px 16px;
+      text-align:center;
+      color:#aaa;
+      border-top:1px solid #151515;
+      background:#0f0f0f;
+    }
+    footer a{ color:var(--dood-accent); text-decoration:none; font-weight:900; }
+    footer a:hover{ text-decoration:underline; }
+  
+</style>
+
+  <!-- XRPL + XUMM -->
+  <script src="https://unpkg.com/xrpl@2.13.0/build/xrpl-latest-min.js" defer></script>
+  <script src="https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js" defer></script>
+<style id="dood-brand-header-style">
+  .dood-return-header{position:sticky;top:0;z-index:99999;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 18px;background:#050806;border-bottom:1px solid rgba(85,255,154,.35);box-shadow:0 12px 30px rgba(0,0,0,.35);font-family:Arial,Helvetica,sans-serif}
+  .dood-brand{display:flex;align-items:center;gap:10px;color:#f6fff9;text-decoration:none;font-weight:950}
+  .dood-brand img{width:38px;height:38px;border-radius:999px;background:#fff;border:1px solid rgba(85,255,154,.5);object-fit:cover;box-shadow:0 0 18px rgba(85,255,154,.25)}
+  .dood-brand strong{font-size:18px;letter-spacing:.01em;color:#f6fff9}
+  .dood-return-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  .dood-return-actions a{color:#55ff9a;text-decoration:none;border:1px solid rgba(85,255,154,.45);border-radius:999px;padding:9px 12px;font-weight:950;background:rgba(85,255,154,.06)}
+  .dood-return-actions a:hover{background:rgba(85,255,154,.14)}
+  @media(max-width:640px){.dood-return-header{align-items:flex-start;flex-direction:column}.dood-return-actions{width:100%}.dood-return-actions a{width:100%;text-align:center}}
+</style>
+
+<style id="dood-single-header-cleanup">
+  #labGlobalHeader,
+  header#labGlobalHeader,
+  .appbar#labGlobalHeader,
+  .dood-v7-tool-bar,
+  .dood-hub-header {
+    display:none !important;
+    height:0 !important;
+    min-height:0 !important;
+    padding:0 !important;
+    margin:0 !important;
+    border:0 !important;
+    overflow:hidden !important;
+  }
+</style>
+
+
+<style id="dood-v53-force-logo">
+  .brand .mark,
+  .brand-mark,
+  .logo-mark,
+  .dood-logo,
+  .site-logo,
+  .app-logo {
+    background: transparent url('/assets/dood-portal-guide-v54.png?v=54') center/contain no-repeat !important;
+    color: transparent !important;
+    overflow: hidden !important;
+  }
+  .brand .mark::before,
+  .brand .mark::after,
+  .brand-mark::before,
+  .brand-mark::after,
+  .logo-mark::before,
+  .logo-mark::after {
+    content: none !important;
+    display: none !important;
+  }
+  .brand .mark img,
+  .brand-mark img,
+  .logo-mark img,
+  .dood-logo img,
+  .site-logo img,
+  .app-logo img {
+    content: url('/assets/dood-portal-guide-v54.png?v=54') !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    display: block !important;
+  }
+</style>
+
+
+<style id="dood-v54-portal-logo-component">
+  :root {
+    --dood-portal-logo-url: url('/assets/dood-portal-guide-v54.png?v=54');
+  }
+
+  .dood-portal-logo,
+  .brand .mark,
+  .brand-mark,
+  .logo-mark,
+  .site-logo,
+  .app-logo {
+    width: 46px !important;
+    height: 46px !important;
+    min-width: 46px !important;
+    border-radius: 999px !important;
+    border: 0 !important;
+    background: transparent var(--dood-portal-logo-url) center/contain no-repeat !important;
+    color: transparent !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    transition: transform .18s ease, filter .18s ease !important;
+    text-decoration: none !important;
+  }
+
+  .dood-portal-logo:hover,
+  .dood-portal-logo:focus-visible,
+  .brand .mark:hover,
+  .brand .mark:focus-visible,
+  .brand-mark:hover,
+  .brand-mark:focus-visible,
+  .logo-mark:hover,
+  .logo-mark:focus-visible,
+  .site-logo:hover,
+  .app-logo:hover {
+    transform: scale(1.05) !important;
+    filter: drop-shadow(0 0 10px rgba(85,255,154,.82)) drop-shadow(0 0 22px rgba(85,255,154,.32)) !important;
+  }
+
+  .dood-portal-logo img,
+  .brand .mark img,
+  .brand-mark img,
+  .logo-mark img,
+  .site-logo img,
+  .app-logo img {
+    content: url('/assets/dood-portal-guide-v54.png?v=54') !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    object-fit: contain !important;
+    pointer-events: none !important;
+  }
+
+  .brand .mark::before,
+  .brand .mark::after,
+  .brand-mark::before,
+  .brand-mark::after,
+  .logo-mark::before,
+  .logo-mark::after,
+  .dood-portal-logo::before,
+  .dood-portal-logo::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  @media (min-width: 821px) {
+    .dood-portal-logo,
+    .brand .mark,
+    .brand-mark,
+    .logo-mark,
+    .site-logo,
+    .app-logo {
+      width: 66px !important;
+      height: 66px !important;
+      min-width: 66px !important;
+    }
+  }
+
+  @media (max-width: 820px) {
+    .brand span,
+    .brand-name,
+    .logo-text {
+      display: none !important;
+    }
+    .dood-portal-logo,
+    .brand .mark,
+    .brand-mark,
+    .logo-mark,
+    .site-logo,
+    .app-logo {
+      width: 46px !important;
+      height: 46px !important;
+      min-width: 46px !important;
+    }
+  }
+
+  @keyframes doodPortalPulse {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(85,255,154,0)); }
+    50% { filter: drop-shadow(0 0 12px rgba(85,255,154,.36)); }
+  }
+
+  .dood-portal-logo.is-alive,
+  .brand .mark {
+    animation: doodPortalPulse 4.5s ease-in-out infinite !important;
+  }
+</style>
+
+
+<style id="dood-v56-theme-modes">
+  :root,
+  body.theme-dood {
+    --dood-accent: #55ff9a;
+    --dood-accent-2: #00d68f;
+    --dood-accent-soft: rgba(85,255,154,.14);
+    --dood-accent-line: rgba(85,255,154,.32);
+    --dood-accent-glow: rgba(85,255,154,.34);
+    --dood-bg-main: #020402;
+    --dood-bg-panel: rgba(5, 17, 8, .88);
+    --dood-text-main: #f6fff9;
+  }
+
+  body.theme-doodette {
+    --dood-accent: #ff4fd8;
+    --dood-accent-2: #ff149d;
+    --dood-accent-soft: rgba(255,79,216,.16);
+    --dood-accent-line: rgba(255,79,216,.38);
+    --dood-accent-glow: rgba(255,79,216,.38);
+    --dood-bg-main: #09020a;
+    --dood-bg-panel: rgba(22, 5, 20, .90);
+    --dood-text-main: #fff3fb;
+  }
+
+  body.theme-dark {
+    --dood-accent: #bfc7d5;
+    --dood-accent-2: #6f7a8d;
+    --dood-accent-soft: rgba(191,199,213,.12);
+    --dood-accent-line: rgba(191,199,213,.28);
+    --dood-accent-glow: rgba(191,199,213,.22);
+    --dood-bg-main: #020202;
+    --dood-bg-panel: rgba(10, 10, 12, .94);
+    --dood-text-main: #f4f6fb;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 12% 4%, var(--dood-accent-soft), transparent 24rem),
+      linear-gradient(180deg, var(--dood-bg-main), #050705) !important;
+    color: var(--dood-text-main) !important;
+  }
+
+  header,
+  .site-header,
+  .topbar,
+  .panel,
+  .hero,
+  .section,
+  .screen,
+  .builder-card,
+  .preview-card,
+  .item,
+  .profile-auth-card,
+  .card,
+  .district-card,
+  .game-card {
+    border-color: var(--dood-accent-line) !important;
+  }
+
+  .hero,
+  .section,
+  .panel,
+  .screen,
+  .builder-card,
+  .preview-card,
+  .item,
+  .profile-auth-card,
+  .card,
+  .district-card,
+  .game-card {
+    background: linear-gradient(135deg, var(--dood-accent-soft), rgba(255,255,255,.025)) !important;
+  }
+
+  .tagline,
+  .screen-title,
+  .world-feature b,
+  .status,
+  .brand-text,
+  .brand-name,
+  h2,
+  .tab.active,
+  .step-tab.active,
+  a,
+  .footer-links a {
+    color: var(--dood-accent) !important;
+  }
+
+  .btn.primary,
+  button.primary,
+  .primary {
+    background: linear-gradient(135deg, var(--dood-accent), var(--dood-accent-2)) !important;
+    border-color: transparent !important;
+    color: #031006 !important;
+    box-shadow: 0 0 18px var(--dood-accent-glow) !important;
+  }
+
+  .btn,
+  button,
+  input,
+  textarea,
+  select,
+  .step-tab,
+  .tab {
+    border-color: var(--dood-accent-line) !important;
+  }
+
+  .dood-portal-logo:hover,
+  .dood-portal-logo:focus-visible,
+  .brand .mark:hover,
+  .brand .mark:focus-visible,
+  .brand-mark:hover,
+  .brand-mark:focus-visible,
+  .logo-mark:hover,
+  .logo-mark:focus-visible,
+  .site-logo:hover,
+  .app-logo:hover {
+    filter: drop-shadow(0 0 10px var(--dood-accent)) drop-shadow(0 0 22px var(--dood-accent-glow)) !important;
+  }
+
+  .theme-switcher {
+    display: inline-flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    margin-left: 12px;
+  }
+
+  .theme-switcher button {
+    min-height: 34px !important;
+    padding: 7px 10px !important;
+    border-radius: 999px !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    background: rgba(0,0,0,.24) !important;
+    color: var(--dood-text-main) !important;
+  }
+
+  .theme-switcher button.active {
+    color: #031006 !important;
+    background: linear-gradient(135deg, var(--dood-accent), var(--dood-accent-2)) !important;
+    border-color: transparent !important;
+  }
+
+  @media(max-width: 820px) {
+    .theme-switcher {
+      width: 100%;
+      margin-left: 0;
+      justify-content: flex-start;
+    }
+    .theme-switcher button {
+      font-size: 11px !important;
+      padding: 7px 9px !important;
+    }
+  }
+</style>
+
+</head>
+
+<body class="creator-tool-page" data-lab-active="tools" data-lab-badge="Noggins Creator" data-lab-page="/lab/Noggins.html">
+
+<div class="dood-return-header">
+  <a class="dood-brand" href="../../index.html#districts" aria-label="Back to Dood Labs">
+    <img src="/assets/dood-portal-guide-v54.png?v=54" alt="Dood Labs logo">
+    <strong>Dood Labs</strong>
+  </a>
+  <div class="dood-return-actions">
+    <a href="../../index.html#districts">← Return to Dood Labs</a>
+    <a href="../../index.html#districts">Back to Districts</a></div></div>
+
+
+<script>
+(function(){
+  window.__DOOD_HUB_BACK = function(){
+    try { localStorage.setItem('doodLabsReturnTarget','districts'); } catch(e) {}
+    window.location.href = '../../index.html#districts';
+  };
+  if (!window.LabsSession) {
+    window.LabsSession = {
+      mountToolNav: function(){},
+      get: function(){ try { return JSON.parse(localStorage.getItem('doodLabsSession')||'null'); } catch(e){ return null; } },
+      set: function(v){ try { localStorage.setItem('doodLabsSession', JSON.stringify(v||{})); } catch(e){} },
+      clear: function(){ try { localStorage.removeItem('doodLabsSession'); } catch(e){} }
+    };
+  }
+})();
+</script>
+<div id="toastHost" aria-live="polite"></div>
+<main class="wrap">
+  <section class="page-hero page-header">
+    <h1>Create Your Noggin</h1>
+    <p>Draw on templates… export clean <b>2048×2048</b>… and if you hold <b>1,000,000 $dOOd</b>, unlock the advanced kit (layers, projects, blend modes, export pack).</p>
+    <div class="wallet-strip">
+      <span id="labWalletLine" class="pill-lab warn">Wallet: not connected</span>
+      <span id="labGatePill" class="pill-lab warn">Dood Mode: locked (1M $dOOd)</span></div>
+    <div class="cta-row">
+      <button id="doodModeBtn" class="dood-btn" aria-haspopup="dialog">
+        <span>✨</span>
+        <span>Dood Mode (1M $dOOd)</span>
+        <span>→</span>
+      </button>
+      <button id="doodClear" class="dood-ghost" type="button" title="Disconnect">Disconnect</button>
+      <span id="gatePill" class="pill"><span class="dot"></span> <span>Locked <span class="sub">Advanced tools</span></span></span>
+      <span id="savePill" class="pill warn" title="Auto-save status"><span class="dot"></span> <span>Auto-save <span class="sub">Idle</span></span></span></div>
+    <div class="cta-note">Pinch to zoom… drag to pan… double tap to reset view.</div>
+  </section>
+
+  <div class="layout">
+    <!-- LEFT: Controls -->
+    <section class="card">
+      <h3>Basics</h3>
+
+      <div class="row">
+        <div style="flex:1; min-width:180px;">
+          <label>Template</label>
+          <select id="templateSelect" style="width:100%;">
+            <option value="../../assets/brand/noggin.png" selected>Noggin Base</option>
+            <option value="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%222048%22%20height%3D%222048%22%20viewBox%3D%220%200%202048%202048%22%3E%0A%3Crect%20width%3D%222048%22%20height%3D%222048%22%20fill%3D%22none%22/%3E%0A%3Cpath%20d%3D%22M544%201654c-40-138-62-312-41-484%2052-427%20309-685%20562-676%20285%2010%20511%20252%20538%20581%2018%20219-62%20411-182%20543-122%20134-323%20204-516%20166-161-32-283-107-361-130z%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%230a0d0b%22%20stroke-width%3D%2242%22%20stroke-linejoin%3D%22round%22/%3E%0A%3Ccircle%20cx%3D%22820%22%20cy%3D%221042%22%20r%3D%2278%22%20fill%3D%22%230a0d0b%22/%3E%3Ccircle%20cx%3D%221220%22%20cy%3D%221018%22%20r%3D%2270%22%20fill%3D%22%230a0d0b%22/%3E%0A%3Ccircle%20cx%3D%22842%22%20cy%3D%221017%22%20r%3D%2223%22%20fill%3D%22%2300ff99%22/%3E%3Ccircle%20cx%3D%221240%22%20cy%3D%22995%22%20r%3D%2221%22%20fill%3D%22%2300ff99%22/%3E%0A%3Cpath%20d%3D%22M812%201390c185%20110%20405%2056%20515-88%22%20fill%3D%22none%22%20stroke%3D%22%230a0d0b%22%20stroke-width%3D%2258%22%20stroke-linecap%3D%22round%22/%3E%0A%3Cpath%20d%3D%22M1290%20725c130%2032%20236%20124%20292%20246%22%20fill%3D%22none%22%20stroke%3D%22%2300ff99%22%20stroke-width%3D%2266%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.9%22/%3E%0A%3Ctext%20x%3D%221024%22%20y%3D%221900%22%20fill%3D%22%2300ff99%22%20font-size%3D%2292%22%20font-family%3D%22Arial%22%20text-anchor%3D%22middle%22%20font-weight%3D%22900%22%3EDOODETTE%3C/text%3E%0A%3C/svg%3E">Doodette Noggin</option>
+            <option value="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%222048%22%20height%3D%222048%22%20viewBox%3D%220%200%202048%202048%22%3E%0A%3Crect%20width%3D%222048%22%20height%3D%222048%22%20fill%3D%22none%22/%3E%0A%3Cpath%20d%3D%22M544%201654c-40-138-62-312-41-484%2052-427%20309-685%20562-676%20285%2010%20511%20252%20538%20581%2018%20219-62%20411-182%20543-122%20134-323%20204-516%20166-161-32-283-107-361-130z%22%20fill%3D%22%23e8fff3%22%20stroke%3D%22%230a0d0b%22%20stroke-width%3D%2242%22%20stroke-linejoin%3D%22round%22/%3E%0A%3Ccircle%20cx%3D%22820%22%20cy%3D%221042%22%20r%3D%2278%22%20fill%3D%22%230a0d0b%22/%3E%3Ccircle%20cx%3D%221220%22%20cy%3D%221018%22%20r%3D%2270%22%20fill%3D%22%230a0d0b%22/%3E%0A%3Ccircle%20cx%3D%22842%22%20cy%3D%221017%22%20r%3D%2223%22%20fill%3D%22%2300ccff%22/%3E%3Ccircle%20cx%3D%221240%22%20cy%3D%22995%22%20r%3D%2221%22%20fill%3D%22%2300ccff%22/%3E%0A%3Cpath%20d%3D%22M812%201390c185%20110%20405%2056%20515-88%22%20fill%3D%22none%22%20stroke%3D%22%230a0d0b%22%20stroke-width%3D%2258%22%20stroke-linecap%3D%22round%22/%3E%0A%3Cpath%20d%3D%22M1290%20725c130%2032%20236%20124%20292%20246%22%20fill%3D%22none%22%20stroke%3D%22%2300ccff%22%20stroke-width%3D%2266%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.9%22/%3E%0A%3Ctext%20x%3D%221024%22%20y%3D%221900%22%20fill%3D%22%2300ccff%22%20font-size%3D%2292%22%20font-family%3D%22Arial%22%20text-anchor%3D%22middle%22%20font-weight%3D%22900%22%3EPIXEL%3C/text%3E%0A%3C/svg%3E">Pixel Noggin</option>
+            <option value="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%222048%22%20height%3D%222048%22%20viewBox%3D%220%200%202048%202048%22%3E%0A%3Crect%20width%3D%222048%22%20height%3D%222048%22%20fill%3D%22none%22/%3E%0A%3Cpath%20d%3D%22M544%201654c-40-138-62-312-41-484%2052-427%20309-685%20562-676%20285%2010%20511%20252%20538%20581%2018%20219-62%20411-182%20543-122%20134-323%20204-516%20166-161-32-283-107-361-130z%22%20fill%3D%22%23fff1a8%22%20stroke%3D%22%230a0d0b%22%20stroke-width%3D%2242%22%20stroke-linejoin%3D%22round%22/%3E%0A%3Ccircle%20cx%3D%22820%22%20cy%3D%221042%22%20r%3D%2278%22%20fill%3D%22%230a0d0b%22/%3E%3Ccircle%20cx%3D%221220%22%20cy%3D%221018%22%20r%3D%2270%22%20fill%3D%22%230a0d0b%22/%3E%0A%3Ccircle%20cx%3D%22842%22%20cy%3D%221017%22%20r%3D%2223%22%20fill%3D%22%23ffd24a%22/%3E%3Ccircle%20cx%3D%221240%22%20cy%3D%22995%22%20r%3D%2221%22%20fill%3D%22%23ffd24a%22/%3E%0A%3Cpath%20d%3D%22M812%201390c185%20110%20405%2056%20515-88%22%20fill%3D%22none%22%20stroke%3D%22%230a0d0b%22%20stroke-width%3D%2258%22%20stroke-linecap%3D%22round%22/%3E%0A%3Cpath%20d%3D%22M1290%20725c130%2032%20236%20124%20292%20246%22%20fill%3D%22none%22%20stroke%3D%22%23ffd24a%22%20stroke-width%3D%2266%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.9%22/%3E%0A%3Ctext%20x%3D%221024%22%20y%3D%221900%22%20fill%3D%22%23ffd24a%22%20font-size%3D%2292%22%20font-family%3D%22Arial%22%20text-anchor%3D%22middle%22%20font-weight%3D%22900%22%3EYELL%3C/text%3E%0A%3C/svg%3E">YELL Noggin</option>
+          </select></div>
+        <div style="width:140px;">
+          <label>Color</label>
+          <input type="color" id="colorPicker" value="#ffffff" style="width:100%;"></div></div>
+
+      <div class="row">
+        <div style="flex:1; min-width:180px;">
+          <label>Brush</label>
+          <select id="brushMode" style="width:100%;">
+            <option value="standard" selected>Standard</option>
+            <option value="spray">Spray</option>
+            <option value="calligraphy">Calligraphy</option>
+            <option value="ribbon">Ribbon</option>
+            <option value="neon">Neon</option>
+            <option value="pixel">Pixel</option>
+            <option value="pattern">Pattern</option>
+            <option value="hatching">Hatching</option>
+            <option value="symmetry">Symmetry</option>
+            <option value="smudge">Smudge</option>
+            <option value="gradient">Gradient</option>
+          </select></div>
+        <div style="width:140px;">
+          <label>Cap</label>
+          <select id="brushStyle" style="width:100%;">
+            <option value="round">Round</option>
+            <option value="square">Square</option>
+            <option value="butt">Hair</option>
+          </select></div></div>
+
+      <div class="row">
+        <div style="flex:1;">
+          <label>Size</label>
+          <input type="range" id="brushSize" min="1" max="40" value="6" style="width:100%;"></div>
+        <div style="flex:1;">
+          <label>Smoothing</label>
+          <input type="range" id="smoothing" min="0" max="0.95" step="0.05" value="0.5" style="width:100%;"></div></div>
+
+      <div class="row">
+        <div class="toolgrid" style="width:100%;">
+          <button id="brushBtn" class="active" type="button" title="Brush (B)">🖌️ Brush</button>
+          <button id="eraserBtn" type="button" title="Eraser (E)">🧼 Erase</button>
+          <button id="resetViewBtn" type="button" title="Reset zoom/pan">🧭 Reset</button>
+
+          <button id="undoBtn" type="button" title="Undo (Ctrl/Cmd+Z)">↩️ Undo</button>
+          <button id="redoBtn" type="button" title="Redo (Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y)">↪️ Redo</button>
+          <button id="clearBtn" type="button" title="Clear active layer">🧽 Clear</button></div></div>
+
+      <div class="hint">
+        Shortcuts: <span class="kbd">B</span> brush · <span class="kbd">E</span> erase · <span class="kbd">Ctrl/Cmd Z</span> undo · <span class="kbd">Ctrl/Cmd Y</span> redo</div>
+
+      <hr style="border:0;border-top:1px solid #242424;margin:14px 0;">
+
+      <h3>Pixel Snap Mode</h3>
+      <div class="row">
+        <div style="flex:1;">
+          <label><input id="pixelSnapToggle" type="checkbox" /> Enable Pixel Snap</label>
+          <div class="hint">For crisp pixel art. Snaps input to a grid and auto-switches the brush to Pixel.</div></div></div>
+      <div class="row">
+        <div style="flex:1;">
+          <label>Grid Size</label>
+          <input id="pixelSnapSize" type="range" min="1" max="32" value="4" style="width:100%;" /></div>
+        <div style="width:140px;">
+          <label>Value</label>
+          <input id="pixelSnapValue" type="text" value="4" readonly style="width:100%; opacity:.9;" /></div></div>
+
+      <hr style="border:0;border-top:1px solid #242424;margin:14px 0;">
+
+      <h3>Reference Image</h3>
+      <div class="row">
+        <div style="flex:1;">
+          <label>Upload (optional)</label>
+          <input id="refUpload" type="file" accept="image/*" style="width:100%;" />
+          <div class="hint">Use a photo or sketch as a guide behind the template. Great for tracing/posing.</div></div></div>
+      <div class="row">
+        <div style="flex:1;">
+          <label>Opacity</label>
+          <input id="refOpacity" type="range" min="0" max="1" step="0.05" value="0.35" style="width:100%;" /></div>
+        <button id="refToggleBtn" class="small" type="button" style="height:42px;">👁️ Toggle</button>
+        <button id="refClearBtn" class="small" type="button" style="height:42px;">🧹 Clear</button></div>
+
+      <hr style="border:0;border-top:1px solid #242424;margin:14px 0;">
+
+      <h3>Export</h3>
+      <div class="row">
+        <div style="flex:1; min-width:180px;">
+          <label>Design Name</label>
+          <input type="text" id="designName" placeholder="My Noggin" style="width:100%;"></div>
+        <div style="width:150px;">
+          <label>Size</label>
+          <select id="exportSize" style="width:100%;">
+            <option value="1024">1024 x 1024</option>
+            <option value="2048" selected>2048 x 2048</option>
+          </select></div></div>
+      <div class="row">
+        <button id="downloadMergedBtn" class="small" type="button" style="flex:1;">⬇️ Download PNG (Merged)</button></div>
+
+      <div id="advancedLockedNote" class="adv-lock" style="margin-top:10px;">
+        <b>Advanced Kit Locked.</b> Hold <b>1,000,000 $dOOd</b> to unlock: Layers, Projects, Export Pack, Layer Opacity + Blend Modes, higher layer limits.</div>
+
+      <!-- ADVANCED (token-gated) -->
+      <div id="advancedPanel" style="display:none; margin-top:12px;">
+        <h3>Dood Mode — Advanced</h3>
+
+        <div class="row">
+          <button id="newProjectBtn" class="small" type="button" style="flex:1;">🗂️ New Project</button>
+          <button id="saveProjectBtn" class="small" type="button" style="flex:1;">💾 Save Project</button></div>
+        <div class="row">
+          <div style="flex:1;">
+            <label>Load Project</label>
+            <select id="projectSelect" style="width:100%;"></select></div>
+          <button id="loadProjectBtn" class="small" type="button" style="height:42px; align-self:end;">Load</button></div>
+
+        <div class="row">
+          <button id="addLayerBtn" class="small" type="button" style="flex:1;">➕ Add Layer</button>
+          <button id="mergeDownBtn" class="small" type="button" style="flex:1;">🧬 Merge Down</button></div>
+
+        <div class="row">
+          <button id="downloadPackBtn" class="small" type="button" style="flex:1;">📦 Export Pack (merged + layers)</button></div>
+
+        <div class="layers" id="layersList" style="margin-top:10px;"></div>
+        <div class="hint">Pro export pack downloads: merged PNG + each layer PNG. (No minting… just clean files.)</div></div>
+    </section>
+
+    <!-- RIGHT: Canvas -->
+    <section class="card canvas-wrap">
+      <h3>Canvas</h3>
+      <div class="viewport" id="viewport">
+        <img id="refImage" src="" alt="Reference" draggable="false">
+        <img id="templateImage" src="" alt="Template" draggable="false">
+        <canvas id="drawCanvas"></canvas></div>
+      <div class="hint" style="text-align:center; margin-top:10px;">
+        Pinch zoom… one finger draw… two fingers pan/zoom.</div>
+    </section></div>
+
+  <!-- Dood Mode Modal -->
+  <div id="doodModeModal" class="dood-modal" role="dialog" aria-modal="true" aria-labelledby="doodModeTitle">
+    <div class="dood-dialog">
+      <h3 id="doodModeTitle">Dood Mode</h3>
+      <p id="doodModeStatus">Connect your wallet to verify you hold <b>≥ 1,000,000 $dOOd</b>.</p>
+      <div class="modal-actions">
+        <button id="doodConnect" class="dood-btn" type="button">Connect & Verify</button>
+        <button id="doodEnter" class="dood-ghost" type="button">Unlock Advanced</button>
+        <button id="doodDisconnect" class="dood-ghost" type="button">Disconnect</button>
+        <button id="doodClose" class="dood-ghost" type="button">Close</button></div>
+      <div id="doodModeLine" class="statusline">
+        <span class="mini"></span>
+        <span id="doodModeLineText">Not verified yet.</span></div>
+      <small style="color:#9ab;display:block;margin-top:10px;">Verification cached for 24 hours on this device (shared with Lab wallet).</small></div></div>
+  </main>
+
+  <footer class="lab-footer">
+    <div style="max-width:980px;margin:0 auto;">
+      <p style="margin:0 0 8px;font-weight:900;">$dOOd • Built on XRPL</p>
+      <p style="margin:0;color:#9aa;">Creator tool… clean exports… advanced kit for holders.</p>
+      <p style="margin:10px 0 0;">
+        <a href="https://twitter.com/doodxrpl" target="_blank" rel="noreferrer">Twitter/X</a> ·
+        <a href="https://doodscord.com" target="_blank" rel="noreferrer">Discord</a>
+      </p></div>
+  </footer>
+
+  <script>
+    /*****************************************************************
+     * CORE: View transform (pinch zoom + pan) WITHOUT erasing art
+     *****************************************************************/
+    const viewport = document.getElementById('viewport');
+    const drawCanvas = document.getElementById('drawCanvas');
+    const templateImage = document.getElementById('templateImage');
+    const refImage = document.getElementById('refImage');
+    const templateSelect = document.getElementById('templateSelect');
+    templateImage.addEventListener('error', ()=>{ templateImage.src = '../../assets/brand/noggin.png'; });
+
+    const ctx = drawCanvas.getContext('2d', { willReadFrequently:true });
+
+    let view = { scale: 1, x: 0, y: 0 };
+    const VIEW_MIN = 0.6;
+    const VIEW_MAX = 6;
+
+    function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+
+    function applyView() {
+      const t = `translate(${view.x}px, ${view.y}px) scale(${view.scale})`;
+      drawCanvas.style.transform = t;
+      templateImage.style.transform = t;
+      refImage.style.transform = t;
+    }
+    function resetView() {
+      view.scale = 1; view.x = 0; view.y = 0;
+      applyView();
+    }
+
+    // Keep canvas size stable and preserve pixels on orientation/resize
+    function resizeCanvasPreserve(){
+      const w = viewport.clientWidth;
+      const h = viewport.clientHeight;
+
+      if (drawCanvas.width === w && drawCanvas.height === h) return;
+
+      const temp = document.createElement('canvas');
+      temp.width = w;
+      temp.height = h;
+      const tctx = temp.getContext('2d');
+
+      if (drawCanvas.width && drawCanvas.height){
+        tctx.drawImage(drawCanvas, 0, 0, w, h);
+      }
+
+      drawCanvas.width = w;
+      drawCanvas.height = h;
+
+      ctx.clearRect(0,0,w,h);
+      ctx.drawImage(temp, 0, 0);
+
+      // resize all layers to match
+      resizeLayersToMatchMain();
+
+      history = [];
+      future = [];
+      pushHistory('baseline-after-resize');
+      updateUndoRedoUI();
+      markDirty();
+    }
+
+    let resizeRAF = 0;
+    function requestResize(){
+      cancelAnimationFrame(resizeRAF);
+      resizeRAF = requestAnimationFrame(() => resizeCanvasPreserve());
+    }
+
+    window.addEventListener('resize', requestResize);
+    if (window.visualViewport){
+      visualViewport.addEventListener('resize', requestResize);
+      visualViewport.addEventListener('scroll', requestResize);
+    }
+    window.addEventListener('orientationchange', () => setTimeout(requestResize, 250));
+
+    // double tap to reset
+    let lastTap = 0;
+    viewport.addEventListener('pointerdown', () => {
+      const now = Date.now();
+      if (now - lastTap < 280) resetView();
+      lastTap = now;
+    });
+
+    /*****************************************************************
+     * UI + State
+     *****************************************************************/
+    const colorPicker = document.getElementById('colorPicker');
+    const brushSize = document.getElementById('brushSize');
+    const brushStyle = document.getElementById('brushStyle');
+    const smoothingInput = document.getElementById('smoothing');
+    const brushMode = document.getElementById('brushMode');
+    const brushBtn = document.getElementById('brushBtn');
+    const eraserBtn = document.getElementById('eraserBtn');
+    const resetViewBtn = document.getElementById('resetViewBtn');
+
+    const undoBtn = document.getElementById('undoBtn');
+    const redoBtn = document.getElementById('redoBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    const designName = document.getElementById('designName');
+    const exportSize = document.getElementById('exportSize');
+    const downloadMergedBtn = document.getElementById('downloadMergedBtn');
+
+    // Pixel snap
+    const pixelSnapToggle = document.getElementById('pixelSnapToggle');
+    const pixelSnapSize = document.getElementById('pixelSnapSize');
+    const pixelSnapValue = document.getElementById('pixelSnapValue');
+
+    // Reference
+    const refUpload = document.getElementById('refUpload');
+    const refOpacity = document.getElementById('refOpacity');
+    const refToggleBtn = document.getElementById('refToggleBtn');
+    const refClearBtn = document.getElementById('refClearBtn');
+
+    // Advanced UI
+    const advancedPanel = document.getElementById('advancedPanel');
+    const advancedLockedNote = document.getElementById('advancedLockedNote');
+    const layersList = document.getElementById('layersList');
+    const addLayerBtn = document.getElementById('addLayerBtn');
+    const mergeDownBtn = document.getElementById('mergeDownBtn');
+    const downloadPackBtn = document.getElementById('downloadPackBtn');
+
+    const newProjectBtn = document.getElementById('newProjectBtn');
+    const saveProjectBtn = document.getElementById('saveProjectBtn');
+    const projectSelect = document.getElementById('projectSelect');
+    const loadProjectBtn = document.getElementById('loadProjectBtn');
+
+    // autosave pill
+    const savePill = document.getElementById('savePill');
+
+    let tool = 'brush';
+    let brushColor = colorPicker.value || '#ffffff';
+
+    let painting = false;
+    let lastSmooth = null;
+    let lastDrawn = null;
+    let ribbonPoints = [];
+
+    // Pixel snap state
+    let pixelSnapEnabled = false;
+    let pixelGrid = Number(pixelSnapSize.value) || 4;
+    let prevBrushMode = brushMode.value;
+    let prevSmoothing = smoothingInput.value;
+
+    // Reference state
+    let refVisible = true;
+    refImage.style.opacity = refOpacity.value;
+
+    // Dood gate state
+    let doodUnlocked = false;
+
+    /*****************************************************************
+     * Layers (Pro gets more + opacity + blend)
+     *****************************************************************/
+    const BASE_LAYERS_FREE = 1;
+    const MAX_LAYERS_FREE = 1;
+    const MAX_LAYERS_PRO  = 10;
+
+    // Each layer: { id, name, canvas, ctx, visible, opacity, blend }
+    let layers = [];
+    let activeLayerIndex = 0;
+
+    function cryptoRandomId(){
+      try{
+        const a = new Uint32Array(2);
+        crypto.getRandomValues(a);
+        return a[0].toString(16) + a[1].toString(16);
+      }catch{
+        return Math.random().toString(16).slice(2);
+      }
+    }
+
+    function makeLayer(name){
+      const c = document.createElement('canvas');
+      c.width = drawCanvas.width;
+      c.height = drawCanvas.height;
+      const cctx = c.getContext('2d', { willReadFrequently:true });
+      return { id: cryptoRandomId(), name, canvas:c, ctx:cctx, visible:true, opacity:1, blend:'source-over' };
+    }
+
+    function ensureBaseLayers(){
+      layers = [ makeLayer("Layer 1") ];
+      activeLayerIndex = 0;
+      renderCompositeToMain();
+      history = []; future = [];
+      pushHistory('baseline-newlayers');
+      updateUndoRedoUI();
+      renderLayersUI();
+      markDirty();
+    }
+
+    function canUsePro(){ return doodUnlocked === true; }
+    function maxLayers(){ return canUsePro() ? MAX_LAYERS_PRO : MAX_LAYERS_FREE; }
+    function activeLayer(){ return layers[activeLayerIndex]; }
+
+    function resizeLayersToMatchMain(){
+      const w = drawCanvas.width, h = drawCanvas.height;
+      layers.forEach(L => {
+        const old = L.canvas;
+        const temp = document.createElement('canvas');
+        temp.width = w; temp.height = h;
+        const tctx = temp.getContext('2d');
+        if (old.width && old.height) tctx.drawImage(old, 0, 0, w, h);
+        L.canvas = temp;
+        L.ctx = tctx;
+      });
+      renderCompositeToMain();
+    }
+
+    // Composite visible layers into main (supports opacity + blend)
+    function renderCompositeToMain(){
+      ctx.clearRect(0,0,drawCanvas.width, drawCanvas.height);
+      for (let i=0;i<layers.length;i++){
+        const L = layers[i];
+        if (!L.visible) continue;
+        ctx.save();
+        ctx.globalAlpha = canUsePro() ? (L.opacity ?? 1) : 1;
+        ctx.globalCompositeOperation = canUsePro() ? (L.blend || 'source-over') : 'source-over';
+        ctx.drawImage(L.canvas, 0, 0);
+        ctx.restore();
+      }
+      // reset
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    /*****************************************************************
+     * Undo/Redo (composite snapshot)
+     *****************************************************************/
+    const HISTORY_LIMIT = 50;
+    let history = [];
+    let future = [];
+
+    function snapshot(){
+      try { return ctx.getImageData(0,0,drawCanvas.width, drawCanvas.height); }
+      catch { return null; }
+    }
+    function restore(imgData){
+      if (!imgData) return;
+      if (imgData.width !== drawCanvas.width || imgData.height !== drawCanvas.height) return;
+      ctx.putImageData(imgData, 0, 0);
+      // flatten restore into Layer 1 to match what user sees
+      if (layers.length){
+        layers.forEach((L, idx) => {
+          L.ctx.clearRect(0,0,L.canvas.width,L.canvas.height);
+          if (idx === 0) L.ctx.drawImage(drawCanvas, 0, 0);
+        });
+      }
+      markDirty();
+    }
+    function updateUndoRedoUI(){
+      undoBtn.disabled = history.length === 0;
+      redoBtn.disabled = future.length === 0;
+    }
+    function pushHistory(){
+      if (painting) return;
+      const snap = snapshot();
+      if (!snap) return;
+      history.push(snap);
+      if (history.length > HISTORY_LIMIT) history.shift();
+      future.length = 0;
+      updateUndoRedoUI();
+    }
+    function undo(){
+      if (!history.length) return;
+      const current = snapshot();
+      const prev = history.pop();
+      future.push(current);
+      restore(prev);
+      updateUndoRedoUI();
+      renderCompositeToMain();
+    }
+    function redo(){
+      if (!future.length) return;
+      const current = snapshot();
+      const next = future.pop();
+      history.push(current);
+      restore(next);
+      updateUndoRedoUI();
+      renderCompositeToMain();
+    }
+
+    /*****************************************************************
+     * Brushes + helpers
+     *****************************************************************/
+    function setTool(selected){
+      tool = selected;
+      brushBtn.classList.toggle('active', tool === 'brush');
+      eraserBtn.classList.toggle('active', tool === 'eraser');
+    }
+    function currentColor(){ return tool === 'eraser' ? '#000000' : brushColor; }
+    function currentComposite(){ return tool === 'eraser' ? 'destination-out' : 'source-over'; }
+
+    function getCanvasPosFromClient(clientX, clientY){
+      const rect = viewport.getBoundingClientRect();
+      const vx = clientX - rect.left;
+      const vy = clientY - rect.top;
+
+      let x = (vx - view.x) / view.scale;
+      let y = (vy - view.y) / view.scale;
+
+      // Clamp inside canvas bounds
+      x = clamp(x, 0, drawCanvas.width);
+      y = clamp(y, 0, drawCanvas.height);
+
+      // Pixel snap
+      if (pixelSnapEnabled){
+        const p = Math.max(1, pixelGrid);
+        x = Math.floor(x / p) * p;
+        y = Math.floor(y / p) * p;
+      }
+
+      return { x, y };
+    }
+
+    function emaSmooth(curr, prev, smoothFactor){
+      if (!prev) return { x: curr.x, y: curr.y };
+      const a = 1 - smoothFactor;
+      return { x: prev.x + (curr.x - prev.x) * a, y: prev.y + (curr.y - prev.y) * a };
+    }
+
+    function drawSegmentOnLayer(Lctx, a, b, width, color, composite){
+      Lctx.save();
+      Lctx.lineWidth = width;
+      Lctx.lineCap = brushStyle.value;
+      Lctx.lineJoin = 'round';
+      Lctx.strokeStyle = color;
+      Lctx.globalCompositeOperation = composite;
+      Lctx.beginPath();
+      Lctx.moveTo(a.x, a.y);
+      Lctx.lineTo(b.x, b.y);
+      Lctx.stroke();
+      Lctx.restore();
+    }
+    function dist(a,b){ return Math.hypot(a.x-b.x, a.y-b.y); }
+    function ang(a,b){ return Math.atan2(b.y-a.y, b.x-a.x); }
+
+    // Default pattern image
+    let patternImg = (function makeDefaultPattern(){
+      const p = document.createElement('canvas'); p.width = 16; p.height = 16;
+      const pctx = p.getContext('2d');
+      pctx.fillStyle = '#000'; pctx.fillRect(0,0,16,16);
+      pctx.strokeStyle = '#666'; pctx.lineWidth = 2;
+      pctx.beginPath(); pctx.moveTo(0,16); pctx.lineTo(16,0); pctx.stroke();
+      const img = new Image(); img.src = p.toDataURL('image/png');
+      return img;
+    })();
+
+    // Brush params (kept simple)
+    const sprayDensity = { value: 50 };
+    const calliAngle = { value: 45 };
+    const ribbonTrail = { value: 20 };
+    const neonGlow = { value: 20 };
+    const neonColor = { value: '#00ffff' };
+    const pixelSize = { get value(){ return pixelSnapEnabled ? pixelGrid : 4; } };
+    const patternSpacing = { value: 16 };
+    const hatchSpacing = { value: 12 };
+    const hatchLength = { value: 12 };
+    const hatchAngle = { value: 0 };
+    const symAxes = { value: 'v' };
+    const smudgeStrength = { value: 0.5 };
+    const smudgeRadius = { value: 10 };
+    const gradStart = { value: '#ff0055' };
+    const gradEnd = { value: '#00e5ff' };
+
+    function sprayAt(Lctx, p, size){
+      const count = Number(sprayDensity.value);
+      const r = size;
+      for (let i=0;i<count;i++){
+        const t = Math.random()*Math.PI*2;
+        const rr = r*Math.sqrt(Math.random());
+        const x = p.x + rr*Math.cos(t);
+        const y = p.y + rr*Math.sin(t);
+        Lctx.save();
+        Lctx.globalCompositeOperation = currentComposite();
+        Lctx.fillStyle = currentColor();
+        Lctx.beginPath();
+        Lctx.arc(x,y, Math.max(0.5, size*0.12*Math.random()+0.4), 0, Math.PI*2);
+        Lctx.fill();
+        Lctx.restore();
+      }
+    }
+    function calligraphySegment(Lctx, a,b,size){
+      const th = (Number(calliAngle.value)*Math.PI)/180;
+      const theta = ang(a,b);
+      const k = Math.abs(Math.cos(theta-th));
+      const w = size*(0.35+0.85*k);
+      drawSegmentOnLayer(Lctx,a,b,w,currentColor(),currentComposite());
+    }
+    function ribbonDraw(Lctx, target, size){
+      ribbonPoints.push({x:target.x, y:target.y});
+      const maxN = Number(ribbonTrail.value);
+      while (ribbonPoints.length > maxN) ribbonPoints.shift();
+      for (let i=1;i<ribbonPoints.length;i++){
+        const p0=ribbonPoints[i-1], p1=ribbonPoints[i];
+        const t=i/(ribbonPoints.length-1);
+        const w=size*(0.2+0.8*t);
+        Lctx.save();
+        Lctx.globalAlpha=0.15+0.6*t;
+        drawSegmentOnLayer(Lctx,p0,p1,w,currentColor(),currentComposite());
+        Lctx.restore();
+      }
+    }
+    function neonSegment(Lctx, a,b,size){
+      Lctx.save();
+      Lctx.globalCompositeOperation='lighter';
+      Lctx.strokeStyle=neonColor.value;
+      Lctx.lineWidth=size*2.2;
+      Lctx.shadowBlur=Number(neonGlow.value);
+      Lctx.shadowColor=neonColor.value;
+      Lctx.lineCap='round';
+      Lctx.lineJoin='round';
+      Lctx.beginPath();
+      Lctx.moveTo(a.x,a.y);
+      Lctx.lineTo(b.x,b.y);
+      Lctx.stroke();
+      Lctx.restore();
+      drawSegmentOnLayer(Lctx,a,b,Math.max(1,size*0.6),currentColor(),currentComposite());
+    }
+
+    function pixelPlot(Lctx, x, y, px){
+      Lctx.save();
+      Lctx.globalCompositeOperation=currentComposite();
+      Lctx.fillStyle=currentColor();
+      const gx=Math.floor(x/px)*px, gy=Math.floor(y/px)*px;
+      Lctx.fillRect(gx,gy,px,px);
+      Lctx.restore();
+    }
+    function pixelLine(Lctx, a,b,px){
+      let x0=a.x|0, y0=a.y|0, x1=b.x|0, y1=b.y|0;
+      const dx=Math.abs(x1-x0), sx=x0<x1?1:-1;
+      const dy=-Math.abs(y1-y0), sy=y0<y1?1:-1;
+      let err=dx+dy, e2;
+      while(true){
+        pixelPlot(Lctx,x0,y0,px);
+        if(x0===x1 && y0===y1) break;
+        e2=2*err;
+        if(e2>=dy){ err+=dy; x0+=sx; }
+        if(e2<=dx){ err+=dx; y0+=sy; }
+      }
+    }
+
+    function patternSegment(Lctx, a,b,size){
+      const img=patternImg;
+      const spacing=Number(patternSpacing.value);
+      const L=dist(a,b);
+      const theta=ang(a,b);
+      for(let t=0;t<=L; t+=spacing){
+        const x=a.x+Math.cos(theta)*t;
+        const y=a.y+Math.sin(theta)*t;
+        const s=size*1.2;
+        Lctx.save();
+        Lctx.globalCompositeOperation=currentComposite();
+        Lctx.translate(x,y);
+        Lctx.rotate(theta);
+        Lctx.drawImage(img,-s/2,-s/2,s,s);
+        Lctx.restore();
+      }
+    }
+    function hatchingSegment(Lctx, a,b){
+      const spacing=Number(hatchSpacing.value);
+      const len=Number(hatchLength.value);
+      const baseAng=ang(a,b);
+      const phi=((Number(hatchAngle.value))*Math.PI)/180;
+      const L=dist(a,b);
+      const theta=baseAng+Math.PI/2+phi;
+      for(let t=0;t<=L; t+=spacing){
+        const cx=a.x+Math.cos(baseAng)*t, cy=a.y+Math.sin(baseAng)*t;
+        const dx=Math.cos(theta)*len/2, dy=Math.sin(theta)*len/2;
+        drawSegmentOnLayer(Lctx,{x:cx-dx,y:cy-dy},{x:cx+dx,y:cy+dy}, Math.max(1, Number(brushSize.value)*0.4), currentColor(), currentComposite());
+      }
+    }
+    function symmetrySegment(Lctx, a,b,size){
+      const axes=symAxes.value;
+      const w=drawCanvas.width, h=drawCanvas.height;
+      const draw=(p0,p1)=>drawSegmentOnLayer(Lctx,p0,p1,size,currentColor(),currentComposite());
+      draw(a,b);
+      if(axes==='v'||axes==='q'){ draw({x:w-a.x,y:a.y},{x:w-b.x,y:b.y}); }
+      if(axes==='h'||axes==='q'){ draw({x:a.x,y:h-a.y},{x:b.x,y:h-b.y}); }
+      if(axes==='q'){ draw({x:w-a.x,y:h-a.y},{x:w-b.x,y:h-b.y}); }
+    }
+
+    const off = document.createElement('canvas');
+    const offCtx = off.getContext('2d');
+    function ensureOff(){ off.width = drawCanvas.width; off.height = drawCanvas.height; }
+    function smudgeAt(Lctx, a,b){
+      ensureOff();
+      offCtx.clearRect(0,0,off.width,off.height);
+      offCtx.drawImage(activeLayer().canvas, 0, 0);
+      const r=Number(smudgeRadius.value);
+      const s=Number(smudgeStrength.value);
+      const dx=b.x-a.x, dy=b.y-a.y;
+      const mx=b.x - dx*s, my=b.y - dy*s;
+      Lctx.save();
+      Lctx.beginPath();
+      Lctx.arc(b.x,b.y,r,0,Math.PI*2);
+      Lctx.clip();
+      Lctx.drawImage(off, mx - r, my - r, r*2, r*2, b.x - r, b.y - r, r*2, r*2);
+      Lctx.restore();
+    }
+    function gradientSegment(Lctx, a,b,size){
+      const grad=Lctx.createLinearGradient(a.x,a.y,b.x,b.y);
+      grad.addColorStop(0, gradStart.value);
+      grad.addColorStop(1, gradEnd.value);
+      Lctx.save();
+      Lctx.lineWidth=size;
+      Lctx.lineCap=brushStyle.value;
+      Lctx.lineJoin='round';
+      Lctx.strokeStyle=grad;
+      Lctx.globalCompositeOperation=currentComposite();
+      Lctx.beginPath();
+      Lctx.moveTo(a.x,a.y);
+      Lctx.lineTo(b.x,b.y);
+      Lctx.stroke();
+      Lctx.restore();
+    }
+
+    function startDrawAt(pos){
+      painting = true;
+      lastSmooth = { x: pos.x, y: pos.y };
+      lastDrawn  = { x: pos.x, y: pos.y };
+      ribbonPoints = [{...pos}];
+
+      const Lctx = activeLayer().ctx;
+
+      if (pixelSnapEnabled || brushMode.value === 'pixel'){
+        const px = Math.max(1, Number(pixelSize.value));
+        pixelPlot(Lctx, pos.x, pos.y, px);
+      } else {
+        drawSegmentOnLayer(Lctx, lastDrawn, pos, Number(brushSize.value)*0.5, currentColor(), currentComposite());
+      }
+
+      renderCompositeToMain();
+    }
+
+    function endDraw(){
+      if (!painting) return;
+      painting = false;
+      lastSmooth = null;
+      lastDrawn = null;
+      ribbonPoints = [];
+      pushHistory();
+      markDirty();
+    }
+
+    function continueDrawTo(pos){
+      if (!painting) return;
+
+      const size = Number(brushSize.value);
+      const mode = (tool === 'eraser') ? 'standard' : brushMode.value;
+
+      // Pixel snap: force smoothing to zero-ish feel
+      const s = pixelSnapEnabled ? 0 : (parseFloat(smoothingInput.value) || 0);
+      const smoothed = emaSmooth(pos, lastSmooth, s);
+
+      const Lctx = activeLayer().ctx;
+
+      if (lastDrawn){
+        if (pixelSnapEnabled || mode === 'pixel'){
+          const px = Math.max(1, Number(pixelSize.value));
+          pixelLine(Lctx, lastDrawn, smoothed, px);
+        } else if (mode === 'standard')      drawSegmentOnLayer(Lctx,lastDrawn,smoothed,size,currentColor(),currentComposite());
+        else if (mode === 'spray')           sprayAt(Lctx, smoothed, size);
+        else if (mode === 'calligraphy')     calligraphySegment(Lctx,lastDrawn,smoothed,size);
+        else if (mode === 'ribbon')          ribbonDraw(Lctx, smoothed, size);
+        else if (mode === 'neon')            neonSegment(Lctx,lastDrawn,smoothed,size);
+        else if (mode === 'pattern')         patternSegment(Lctx,lastDrawn,smoothed,size);
+        else if (mode === 'hatching')        hatchingSegment(Lctx,lastDrawn,smoothed);
+        else if (mode === 'symmetry')        symmetrySegment(Lctx,lastDrawn,smoothed,size);
+        else if (mode === 'smudge')          smudgeAt(Lctx,lastDrawn,smoothed);
+        else if (mode === 'gradient')        gradientSegment(Lctx,lastDrawn,smoothed,size);
+      }
+
+      lastSmooth = smoothed;
+      lastDrawn = { x: smoothed.x, y: smoothed.y };
+      renderCompositeToMain();
+    }
+
+    /*****************************************************************
+     * INPUT: One finger draw, two fingers pan/zoom
+     *****************************************************************/
+    const pointers = new Map();
+    let gesture = {
+      mode: 'none',
+      startScale: 1,
+      startX: 0,
+      startY: 0,
+      startDist: 0,
+      startMid: {x:0,y:0},
+    };
+
+    function getMidpoint(p1, p2){ return { x: (p1.x+p2.x)/2, y: (p1.y+p2.y)/2 }; }
+    function getDistance(p1, p2){ const dx=p1.x-p2.x, dy=p1.y-p2.y; return Math.hypot(dx,dy); }
+
+    function onPointerDown(e){
+      viewport.setPointerCapture(e.pointerId);
+      pointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+
+      if (pointers.size === 1){
+        gesture.mode = 'draw';
+        const pos = getCanvasPosFromClient(e.clientX, e.clientY);
+        startDrawAt(pos);
+      } else if (pointers.size === 2){
+        endDraw();
+        gesture.mode = 'transform';
+        const pts = [...pointers.values()];
+        gesture.startScale = view.scale;
+        gesture.startX = view.x;
+        gesture.startY = view.y;
+        gesture.startDist = getDistance(pts[0], pts[1]);
+        gesture.startMid = getMidpoint(pts[0], pts[1]);
+      } else {
+        endDraw();
+        gesture.mode = 'transform';
+      }
+    }
+
+    function onPointerMove(e){
+      if (!pointers.has(e.pointerId)) return;
+      pointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+
+      if (gesture.mode === 'draw' && pointers.size === 1){
+        const pos = getCanvasPosFromClient(e.clientX, e.clientY);
+        continueDrawTo(pos);
+        return;
+      }
+
+      if (pointers.size >= 2){
+        const pts = [...pointers.values()];
+        const mid = getMidpoint(pts[0], pts[1]);
+        const dist = getDistance(pts[0], pts[1]);
+
+        const scale = clamp(gesture.startScale * (dist / Math.max(1, gesture.startDist)), VIEW_MIN, VIEW_MAX);
+        const dx = mid.x - gesture.startMid.x;
+        const dy = mid.y - gesture.startMid.y;
+
+        view.scale = scale;
+        view.x = gesture.startX + dx;
+        view.y = gesture.startY + dy;
+        applyView();
+      }
+    }
+
+    function onPointerUp(e){
+      pointers.delete(e.pointerId);
+
+      if (gesture.mode === 'draw') endDraw();
+
+      if (pointers.size === 1){
+        const remaining = [...pointers.values()][0];
+        gesture.mode = 'draw';
+        const pos = getCanvasPosFromClient(remaining.x, remaining.y);
+        startDrawAt(pos);
+      } else if (pointers.size === 0){
+        gesture.mode = 'none';
+      }
+    }
+
+    viewport.addEventListener('pointerdown', onPointerDown, { passive:false });
+    viewport.addEventListener('pointermove', onPointerMove, { passive:false });
+    viewport.addEventListener('pointerup', onPointerUp, { passive:false });
+    viewport.addEventListener('pointercancel', onPointerUp, { passive:false });
+
+    /*****************************************************************
+     * UI events
+     *****************************************************************/
+    templateSelect.addEventListener('change', (e)=>{
+      templateImage.src = e.target.value;
+      markDirty();
+    });
+    colorPicker.addEventListener('input', (e)=> brushColor = e.target.value);
+
+    brushBtn.addEventListener('click', ()=> setTool('brush'));
+    eraserBtn.addEventListener('click', ()=> setTool('eraser'));
+    resetViewBtn.addEventListener('click', resetView);
+
+    clearBtn.addEventListener('click', ()=>{
+      const L = activeLayer();
+      L.ctx.clearRect(0,0,L.canvas.width,L.canvas.height);
+      renderCompositeToMain();
+      pushHistory();
+      markDirty();
+    });
+
+    undoBtn.addEventListener('click', undo);
+    redoBtn.addEventListener('click', redo);
+
+    window.addEventListener('keydown', (e)=>{
+      const k = e.key.toLowerCase();
+      if (k === 'b'){ setTool('brush'); }
+      if (k === 'e'){ setTool('eraser'); }
+      const mod = e.ctrlKey || e.metaKey;
+      if (!mod) return;
+      if (k === 'z' && !e.shiftKey){ e.preventDefault(); undo(); }
+      if ((k === 'z' && e.shiftKey) || k === 'y'){ e.preventDefault(); redo(); }
+    });
+
+    /*****************************************************************
+     * Pixel Snap UI
+     *****************************************************************/
+    function syncPixelUI(){
+      pixelGrid = Number(pixelSnapSize.value) || 4;
+      pixelSnapValue.value = String(pixelGrid);
+    }
+    syncPixelUI();
+
+    pixelSnapSize.addEventListener('input', ()=>{
+      syncPixelUI();
+      markDirty();
+    });
+
+    pixelSnapToggle.addEventListener('change', ()=>{
+      pixelSnapEnabled = !!pixelSnapToggle.checked;
+
+      if (pixelSnapEnabled){
+        prevBrushMode = brushMode.value;
+        prevSmoothing = smoothingInput.value;
+        brushMode.value = 'pixel';
+        smoothingInput.value = '0';
+      } else {
+        brushMode.value = prevBrushMode || 'standard';
+        smoothingInput.value = prevSmoothing ?? '0.5';
+      }
+      markDirty();
+    });
+
+    /*****************************************************************
+     * Reference image
+     *****************************************************************/
+    function setRefOpacity(v){
+      refImage.style.opacity = String(v);
+      markDirty();
+    }
+    refOpacity.addEventListener('input', (e)=> setRefOpacity(e.target.value));
+
+    refUpload.addEventListener('change', ()=>{
+      const f = refUpload.files?.[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = () => {
+        refImage.src = r.result;
+        refVisible = true;
+        refImage.style.display = 'block';
+        markDirty();
+      };
+      r.readAsDataURL(f);
+    });
+
+    refToggleBtn.addEventListener('click', ()=>{
+      refVisible = !refVisible;
+      refImage.style.display = refVisible ? 'block' : 'none';
+      markDirty();
+    });
+
+    refClearBtn.addEventListener('click', ()=>{
+      refImage.src = '';
+      refUpload.value = '';
+      markDirty();
+    });
+
+    /*****************************************************************
+     * Export (merged) — 2048 default
+     *****************************************************************/
+    function compositeToOffscreen(size){
+      const out = document.createElement('canvas');
+      out.width = size; out.height = size;
+      const octx = out.getContext('2d');
+
+      // reference image NOT included in export (guide only)
+      if (templateImage.complete && templateImage.naturalWidth > 0){
+        octx.drawImage(templateImage, 0, 0, size, size);
+      }
+
+      for (const L of layers){
+        if (!L.visible) continue;
+        octx.save();
+        octx.globalAlpha = canUsePro() ? (L.opacity ?? 1) : 1;
+        octx.globalCompositeOperation = canUsePro() ? (L.blend || 'source-over') : 'source-over';
+        octx.drawImage(L.canvas, 0, 0, size, size);
+        octx.restore();
+      }
+      octx.globalAlpha = 1;
+      octx.globalCompositeOperation = 'source-over';
+      return out;
+    }
+
+    function downloadCanvasPNG(c, filename){
+      const a = document.createElement('a');
+      a.download = filename;
+      a.href = c.toDataURL('image/png');
+      a.click();
+    }
+
+    downloadMergedBtn.addEventListener('click', ()=>{
+      const nm = (designName.value.trim() || 'noggin') + `_merged_${exportSize.value}.png`;
+      const out = compositeToOffscreen(Number(exportSize.value));
+      downloadCanvasPNG(out, nm);
+    });
+
+    /*****************************************************************
+     * Advanced: Layers UI + Projects (token gated)
+     * Adds: per-layer opacity + blend modes (PRO)
+     *****************************************************************/
+    function renderLayersUI(){
+      if (!canUsePro()){
+        layersList.innerHTML = '';
+        return;
+      }
+
+      const blendOptions = [
+        { v:'source-over', t:'Normal' },
+        { v:'multiply', t:'Multiply' },
+        { v:'screen', t:'Screen' },
+        { v:'overlay', t:'Overlay' },
+        { v:'darken', t:'Darken' },
+        { v:'lighten', t:'Lighten' },
+        { v:'color-dodge', t:'Color Dodge' },
+        { v:'color-burn', t:'Color Burn' },
+        { v:'hard-light', t:'Hard Light' },
+        { v:'soft-light', t:'Soft Light' },
+        { v:'difference', t:'Difference' },
+        { v:'exclusion', t:'Exclusion' }
+      ];
+
+      layersList.innerHTML = '';
+      layers.forEach((L, idx)=>{
+        const el = document.createElement('div');
+        el.className = 'layer';
+
+        const left = document.createElement('div');
+        left.style.minWidth = '0';
+        left.style.flex = '1';
+
+        const name = document.createElement('div');
+        name.className = 'name';
+        name.textContent = L.name;
+
+        const tag = document.createElement('div');
+        tag.className = 'tag';
+        tag.textContent = (idx === activeLayerIndex ? 'Active' : 'Tap Select') + ' • ' + (L.visible ? 'Visible' : 'Hidden');
+
+        // Opacity slider
+        const opWrap = document.createElement('div');
+        opWrap.style.marginTop = '6px';
+        opWrap.innerHTML = `
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span style="font-size:.75rem;color:#9aa;font-weight:900;">Opacity</span>
+            <input type="range" min="0" max="1" step="0.05" value="${L.opacity ?? 1}" style="flex:1;">
+            <span style="font-size:.75rem;color:#cfcfcf;font-weight:900;min-width:44px;text-align:right;">${Math.round((L.opacity ?? 1)*100)}%</span></div>
+        `;
+        const opInput = opWrap.querySelector('input');
+        const opPct = opWrap.querySelector('span:last-child');
+        opInput.addEventListener('input', ()=>{
+          L.opacity = parseFloat(opInput.value);
+          opPct.textContent = `${Math.round(L.opacity*100)}%`;
+          renderCompositeToMain();
+          markDirty();
+        });
+
+        // Blend dropdown
+        const blendWrap = document.createElement('div');
+        blendWrap.style.marginTop = '6px';
+        const blendSelect = document.createElement('select');
+        blendSelect.style.width = '100%';
+        blendOptions.forEach(o=>{
+          const opt = document.createElement('option');
+          opt.value = o.v;
+          opt.textContent = `Blend: ${o.t}`;
+          blendSelect.appendChild(opt);
+        });
+        blendSelect.value = L.blend || 'source-over';
+        blendSelect.addEventListener('change', ()=>{
+          L.blend = blendSelect.value;
+          renderCompositeToMain();
+          markDirty();
+        });
+        blendWrap.appendChild(blendSelect);
+
+        left.appendChild(name);
+        left.appendChild(tag);
+        left.appendChild(opWrap);
+        left.appendChild(blendWrap);
+
+        const btnSel = document.createElement('button');
+        btnSel.textContent = 'Select';
+        btnSel.type = 'button';
+        btnSel.onclick = () => { activeLayerIndex = idx; renderLayersUI(); };
+
+        const btnVis = document.createElement('button');
+        btnVis.textContent = L.visible ? 'Hide' : 'Show';
+        btnVis.type = 'button';
+        btnVis.onclick = () => { L.visible = !L.visible; renderCompositeToMain(); renderLayersUI(); markDirty(); };
+
+        const btnUp = document.createElement('button');
+        btnUp.textContent = '↑';
+        btnUp.type = 'button';
+        btnUp.onclick = () => {
+          if (idx === 0) return;
+          const tmp = layers[idx-1]; layers[idx-1] = layers[idx]; layers[idx] = tmp;
+          if (activeLayerIndex === idx) activeLayerIndex = idx-1;
+          else if (activeLayerIndex === idx-1) activeLayerIndex = idx;
+          renderCompositeToMain(); renderLayersUI(); markDirty();
+        };
+
+        const btnDown = document.createElement('button');
+        btnDown.textContent = '↓';
+        btnDown.type = 'button';
+        btnDown.onclick = () => {
+          if (idx === layers.length-1) return;
+          const tmp = layers[idx+1]; layers[idx+1] = layers[idx]; layers[idx] = tmp;
+          if (activeLayerIndex === idx) activeLayerIndex = idx+1;
+          else if (activeLayerIndex === idx+1) activeLayerIndex = idx;
+          renderCompositeToMain(); renderLayersUI(); markDirty();
+        };
+
+        const btnDel = document.createElement('button');
+        btnDel.textContent = '✕';
+        btnDel.type = 'button';
+        btnDel.onclick = () => {
+          if (layers.length <= 1) return;
+          layers.splice(idx,1);
+          activeLayerIndex = clamp(activeLayerIndex, 0, layers.length-1);
+          renderCompositeToMain(); renderLayersUI(); markDirty();
+        };
+
+        el.appendChild(left);
+        el.appendChild(btnSel);
+        el.appendChild(btnVis);
+        el.appendChild(btnUp);
+        el.appendChild(btnDown);
+        el.appendChild(btnDel);
+        layersList.appendChild(el);
+      });
+    }
+
+    addLayerBtn?.addEventListener('click', ()=>{
+      if (!canUsePro()) return;
+      if (layers.length >= maxLayers()) { alert('Layer limit reached.'); return; }
+      const n = layers.length + 1;
+      layers.push(makeLayer(`Layer ${n}`));
+      activeLayerIndex = layers.length - 1;
+      renderLayersUI();
+      pushHistory();
+      markDirty();
+    });
+
+    mergeDownBtn?.addEventListener('click', ()=>{
+      if (!canUsePro()) return;
+      if (activeLayerIndex <= 0) return;
+      const top = layers[activeLayerIndex];
+      const under = layers[activeLayerIndex - 1];
+      under.ctx.drawImage(top.canvas, 0, 0);
+      layers.splice(activeLayerIndex, 1);
+      activeLayerIndex = activeLayerIndex - 1;
+      renderCompositeToMain();
+      renderLayersUI();
+      pushHistory();
+      markDirty();
+    });
+
+    downloadPackBtn?.addEventListener('click', ()=>{
+      if (!canUsePro()) return;
+      const size = Number(exportSize.value);
+      const base = (designName.value.trim() || 'noggin');
+
+      const merged = compositeToOffscreen(size);
+      downloadCanvasPNG(merged, `${base}_merged_${size}.png`);
+
+      layers.forEach((L, idx)=>{
+        const c = document.createElement('canvas');
+        c.width = size; c.height = size;
+        const cctx = c.getContext('2d');
+        cctx.save();
+        cctx.globalAlpha = (L.opacity ?? 1);
+        cctx.globalCompositeOperation = (L.blend || 'source-over');
+        cctx.drawImage(L.canvas, 0, 0, size, size);
+        cctx.restore();
+        downloadCanvasPNG(c, `${base}_layer${idx+1}_${size}.png`);
+      });
+    });
+
+    // Projects (localStorage)
+    const PROJECT_KEY = 'dood.noggin.projects.v2';
+
+    function getProjects(){
+      try { return JSON.parse(localStorage.getItem(PROJECT_KEY) || '{}'); }
+      catch { return {}; }
+    }
+    function setProjects(obj){
+      localStorage.setItem(PROJECT_KEY, JSON.stringify(obj));
+    }
+    function refreshProjectList(){
+      const projects = getProjects();
+      const keys = Object.keys(projects).sort((a,b)=> a.localeCompare(b));
+      projectSelect.innerHTML = '';
+      for (const k of keys){
+        const opt = document.createElement('option');
+        opt.value = k;
+        opt.textContent = k;
+        projectSelect.appendChild(opt);
+      }
+      if (!keys.length){
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'No saved projects';
+        projectSelect.appendChild(opt);
+      }
+    }
+
+    function serializeProject(){
+      return {
+        v: 2,
+        template: templateImage.src || templateSelect.value,
+        name: designName.value || '',
+        exportSize: exportSize.value,
+        pixelSnapEnabled,
+        pixelGrid,
+        ref: {
+          src: refImage.src || '',
+          opacity: refOpacity.value,
+          visible: refVisible
+        },
+        layers: layers.map(L => ({
+          name: L.name,
+          visible: L.visible,
+          opacity: L.opacity ?? 1,
+          blend: L.blend || 'source-over',
+          png: L.canvas.toDataURL('image/png')
+        })),
+        activeLayerIndex
+      };
+    }
+
+    async function deserializeProject(payload){
+      templateImage.src = payload.template || templateSelect.value;
+      designName.value = payload.name || '';
+      exportSize.value = payload.exportSize || '2048';
+
+      pixelSnapEnabled = !!payload.pixelSnapEnabled;
+      pixelGrid = Number(payload.pixelGrid) || 4;
+      pixelSnapToggle.checked = pixelSnapEnabled;
+      pixelSnapSize.value = String(pixelGrid);
+      syncPixelUI();
+      if (pixelSnapEnabled){
+        prevBrushMode = brushMode.value;
+        prevSmoothing = smoothingInput.value;
+        brushMode.value = 'pixel';
+        smoothingInput.value = '0';
+      }
+
+      // reference
+      refImage.src = payload.ref?.src || '';
+      refOpacity.value = payload.ref?.opacity ?? '0.35';
+      setRefOpacity(refOpacity.value);
+      refVisible = payload.ref?.visible !== false;
+      refImage.style.display = refVisible ? 'block' : 'none';
+
+      layers = [];
+      for (const item of (payload.layers || [])){
+        const L = makeLayer(item.name || 'Layer');
+        L.visible = item.visible !== false;
+        L.opacity = typeof item.opacity === 'number' ? item.opacity : 1;
+        L.blend = item.blend || 'source-over';
+
+        await new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            L.ctx.clearRect(0,0,L.canvas.width,L.canvas.height);
+            L.ctx.drawImage(img, 0, 0, L.canvas.width, L.canvas.height);
+            resolve();
+          };
+          img.src = item.png;
+        });
+
+        layers.push(L);
+      }
+      if (!layers.length) layers = [ makeLayer('Layer 1') ];
+      activeLayerIndex = clamp(payload.activeLayerIndex || 0, 0, layers.length-1);
+
+      renderCompositeToMain();
+      renderLayersUI();
+      history = []; future = [];
+      pushHistory();
+      updateUndoRedoUI();
+      markDirty();
+    }
+
+    newProjectBtn?.addEventListener('click', ()=>{
+      if (!canUsePro()) return;
+      if (!confirm('Start a new project? This will clear current layers.')) return;
+      ensureBaseLayers();
+      designName.value = '';
+      pushHistory();
+      markDirty();
+    });
+
+    saveProjectBtn?.addEventListener('click', ()=>{
+      if (!canUsePro()) return;
+      const name = prompt('Project name?', (designName.value.trim() || 'My Noggin Project'));
+      if (!name) return;
+      const projects = getProjects();
+      projects[name] = serializeProject();
+      setProjects(projects);
+      refreshProjectList();
+      projectSelect.value = name;
+      alert('Project saved.');
+      markDirty();
+    });
+
+    loadProjectBtn?.addEventListener('click', async ()=>{
+      if (!canUsePro()) return;
+      const name = projectSelect.value;
+      if (!name) return;
+      const projects = getProjects();
+      const payload = projects[name];
+      if (!payload) return;
+      await deserializeProject(payload);
+      alert('Project loaded.');
+    });
+
+    /*****************************************************************
+     * Auto-save recovery (EVERYONE)
+     *****************************************************************/
+    const AUTOSAVE_KEY = 'dood.noggin.autosave.v2';
+    let dirty = false;
+    let autosaveTimer = 0;
+
+    function setSavePill(state, sub){
+      // state: 'idle' | 'saving' | 'saved' | 'error'
+      if (state === 'idle'){
+        savePill.className = 'pill warn';
+        savePill.innerHTML = `<span class="dot"></span> <span>Auto-save <span class="sub">${sub||'Idle'}</span></span>`;
+      } else if (state === 'saving'){
+        savePill.className = 'pill warn';
+        savePill.innerHTML = `<span class="dot"></span> <span>Auto-save <span class="sub">Saving…</span></span>`;
+      } else if (state === 'saved'){
+        savePill.className = 'pill ok';
+        savePill.innerHTML = `<span class="dot"></span> <span>Auto-save <span class="sub">${sub||'Saved'}</span></span>`;
+      } else {
+        savePill.className = 'pill';
+        savePill.innerHTML = `<span class="dot"></span> <span>Auto-save <span class="sub">Error</span></span>`;
+      }
+    }
+
+    function markDirty(){
+      dirty = true;
+      setSavePill('idle', 'Pending');
+      scheduleAutosave();
+    }
+
+    function scheduleAutosave(){
+      clearTimeout(autosaveTimer);
+      autosaveTimer = setTimeout(() => autosaveNow(), 1200);
+    }
+
+    function autosaveNow(){
+      if (!dirty) return;
+      try{
+        setSavePill('saving');
+        const payload = serializeProject();
+        localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(payload));
+        dirty = false;
+        const t = new Date();
+        setSavePill('saved', t.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
+      }catch(e){
+        console.error(e);
+        setSavePill('error');
+      }
+    }
+
+    function loadAutosave(){
+      try{
+        const j = JSON.parse(localStorage.getItem(AUTOSAVE_KEY) || 'null');
+        return j;
+      }catch{
+        return null;
+      }
+    }
+
+    window.addEventListener('beforeunload', ()=>{
+      // last-chance save
+      try{ autosaveNow(); }catch{}
+    });
+
+    /*****************************************************************
+     * Token gate (1,000,000 $dOOd) — shared Lab wallet via DoodLabGate
+     *****************************************************************/
+    const doodBtn = document.getElementById('doodModeBtn');
+    const doodModal = document.getElementById('doodModeModal');
+    const doodClose = document.getElementById('doodClose');
+    const doodClear = document.getElementById('doodClear');
+    const btnConnect = document.getElementById('doodConnect');
+    const btnEnter = document.getElementById('doodEnter');
+    const btnDisconnect = document.getElementById('doodDisconnect');
+    const statusEl = document.getElementById('doodModeStatus');
+    const gatePill = document.getElementById('gatePill');
+    const doodLine = document.getElementById('doodModeLine');
+    const doodLineText = document.getElementById('doodModeLineText');
+
+    function openDoodModal(){ doodModal.classList.add('show'); }
+    function closeDoodModal(){ doodModal.classList.remove('show'); }
+
+    doodBtn.addEventListener('click', openDoodModal);
+    doodClose.addEventListener('click', closeDoodModal);
+    doodModal.addEventListener('click', (e)=>{ if(e.target === doodModal) closeDoodModal(); });
+    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeDoodModal(); });
+
+    async function waitForLabGate(maxMs = 12000){
+      if (window.DoodLabGate) return window.DoodLabGate;
+      return new Promise((resolve)=>{
+        const t0 = Date.now();
+        (function tick(){
+          if (window.DoodLabGate) return resolve(window.DoodLabGate);
+          if (Date.now() - t0 > maxMs) return resolve(null);
+          setTimeout(tick, 50);
+        })();
+      });
+    }
+
+    function setGateUI(unlocked){
+      doodUnlocked = !!unlocked;
+
+      gatePill.classList.toggle('ok', doodUnlocked);
+      gatePill.innerHTML = doodUnlocked
+        ? `<span class="dot"></span> <span>Unlocked <span class="sub">Advanced tools</span></span>`
+        : `<span class="dot"></span> <span>Locked <span class="sub">Advanced tools</span></span>`;
+
+      advancedPanel.style.display = doodUnlocked ? 'block' : 'none';
+      advancedLockedNote.style.display = doodUnlocked ? 'none' : 'block';
+
+      if (doodUnlocked){
+        refreshProjectList();
+        renderLayersUI();
+      } else {
+        // if user loses gate, keep only Layer 1
+        if (layers.length > 1){
+          layers = [ layers[0] ];
+          activeLayerIndex = 0;
+          renderCompositeToMain();
+        }
+      }
+      markDirty();
+    }
+
+    async function ensureDoodAccess(){
+      const gate = await waitForLabGate();
+      if (!gate){
+        statusEl.textContent = 'Lab wallet module not loaded. Refresh and try again.';
+        return;
+      }
+      try{
+        doodLine.className = 'statusline';
+        doodLineText.textContent = 'Connecting wallet…';
+        statusEl.textContent = 'Connecting wallet…';
+        if (!gate.connectedAccount) await gate.connect();
+        doodLineText.textContent = 'Checking $dOOd holdings on XRPL…';
+        statusEl.textContent = 'Verifying $dOOd holdings on XRPL…';
+        const result = await gate.verify();
+        const need = gate.THRESHOLD.toLocaleString();
+        if (result.ok){
+          doodLine.className = 'statusline ok';
+          doodLineText.textContent = 'Access granted. Advanced unlocked.';
+          statusEl.innerHTML = `Access granted. You hold <b>${Number(result.amount).toLocaleString(undefined,{maximumFractionDigits:2})} $dOOd</b>.`;
+          setGateUI(true);
+          closeDoodModal();
+        } else {
+          doodLine.className = 'statusline bad';
+          doodLineText.textContent = 'Access denied.';
+          statusEl.innerHTML = `Access denied. You hold <b>${Number(result.amount).toLocaleString(undefined,{maximumFractionDigits:2})} $dOOd</b> (need ≥ ${need}).`;
+          setGateUI(false);
+        }
+      }catch(err){
+        console.error(err);
+        doodLine.className = 'statusline bad';
+        doodLineText.textContent = 'Authorization failed.';
+        statusEl.textContent = (err && err.message) ? err.message : 'Authorization failed';
+      }
+    }
+
+    async function disconnectAll(){
+      const gate = await waitForLabGate();
+      if (gate) await gate.disconnect();
+      doodLine.className = 'statusline';
+      doodLineText.textContent = 'Not verified yet.';
+      statusEl.innerHTML = `Connect your wallet to verify you hold <b>≥ 1,000,000 $dOOd</b>.`;
+      setGateUI(false);
+    }
+
+    document.addEventListener('dood-lab-gate', (e)=>{
+      setGateUI(!!e.detail?.unlocked);
+    });
+
+    btnConnect.addEventListener('click', ensureDoodAccess);
+    btnEnter.addEventListener('click', ensureDoodAccess);
+    btnDisconnect.addEventListener('click', disconnectAll);
+    doodClear.addEventListener('click', disconnectAll);
+
+    /*****************************************************************
+     * BOOT
+     *****************************************************************/
+    document.addEventListener('DOMContentLoaded', async ()=>{
+      // init template + canvas
+      templateSelect.selectedIndex = 0;
+      templateImage.src = templateSelect.value;
+
+      requestResize();
+      ensureBaseLayers();
+      resetView();
+      setTool('brush');
+
+      const gate = await waitForLabGate();
+      const cached = gate && gate.connectedAccount && gate.loadGate(gate.connectedAccount);
+      setGateUI(!!cached);
+
+      // auto-save recovery
+      const saved = loadAutosave();
+      if (saved && saved.layers && saved.layers.length){
+        // only prompt if it looks like real work
+        const wants = confirm('Found an auto-saved session. Restore it?');
+        if (wants){
+          // if autosave has more layers than free allows, only restore fully if pro is unlocked
+          if (!canUsePro() && (saved.layers?.length || 1) > 1){
+            alert('That autosave includes Pro layers. Unlock Dood Mode to restore the full session. Restoring Layer 1 only for now.');
+            // force payload to a single flattened layer
+            saved.layers = [ saved.layers[0] ];
+            saved.activeLayerIndex = 0;
+          }
+          await deserializeProject(saved);
+        }
+      }
+
+      updateUndoRedoUI();
+      setSavePill('idle', 'Ready');
+    });
+  </script>
+  <script type="module" src="/lab/js/creator-tool-lab.mjs"></script>
+
+<script id="dood-v7-noggin-template-fallback">
+  window.addEventListener('DOMContentLoaded', function(){
+    var templateImage=document.getElementById('templateImage');
+    var templateSelect=document.getElementById('templateSelect');
+    var fallback='data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%222048%22%20height%3D%222048%22%20viewBox%3D%220%200%202048%202048%22%3E%0A%3Crect%20width%3D%222048%22%20height%3D%222048%22%20fill%3D%22none%22/%3E%0A%3Cpath%20d%3D%22M544%201654c-40-138-62-312-41-484%2052-427%20309-685%20562-676%20285%2010%20511%20252%20538%20581%2018%20219-62%20411-182%20543-122%20134-323%20204-516%20166-161-32-283-107-361-130z%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%230a0d0b%22%20stroke-width%3D%2242%22%20stroke-linejoin%3D%22round%22/%3E%0A%3Ccircle%20cx%3D%22820%22%20cy%3D%221042%22%20r%3D%2278%22%20fill%3D%22%230a0d0b%22/%3E%3Ccircle%20cx%3D%221220%22%20cy%3D%221018%22%20r%3D%2270%22%20fill%3D%22%230a0d0b%22/%3E%0A%3Ccircle%20cx%3D%22842%22%20cy%3D%221017%22%20r%3D%2223%22%20fill%3D%22%2300ff99%22/%3E%3Ccircle%20cx%3D%221240%22%20cy%3D%22995%22%20r%3D%2221%22%20fill%3D%22%2300ff99%22/%3E%0A%3Cpath%20d%3D%22M812%201390c185%20110%20405%2056%20515-88%22%20fill%3D%22none%22%20stroke%3D%22%230a0d0b%22%20stroke-width%3D%2258%22%20stroke-linecap%3D%22round%22/%3E%0A%3Cpath%20d%3D%22M1290%20725c130%2032%20236%20124%20292%20246%22%20fill%3D%22none%22%20stroke%3D%22%2300ff99%22%20stroke-width%3D%2266%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.9%22/%3E%0A%3Ctext%20x%3D%221024%22%20y%3D%221900%22%20fill%3D%22%2300ff99%22%20font-size%3D%2292%22%20font-family%3D%22Arial%22%20text-anchor%3D%22middle%22%20font-weight%3D%22900%22%3EDOODETTE%3C/text%3E%0A%3C/svg%3E';
+    if(templateSelect && (!templateSelect.value || templateSelect.value.indexOf('/images/noggins/')===0)){ templateSelect.innerHTML='<option value="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%222048%22%20height%3D%222048%22%20viewBox%3D%220%200%202048%202048%22%3E%0A%3Crect%20width%3D%222048%22%20height%3D%222048%22%20fill%3D%22none%22/%3E%0A%3Cpath%20d%3D%22M544%201654c-40-138-62-312-41-484%2052-427%20309-685%20562-676%20285%2010%20511%20252%20538%20581%2018%20219-62%20411-182%20543-122%20134-323%20204-516%20166-161-32-283-107-361-130z%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%230a0d0b%22%20stroke-width%3D%2242%22%20stroke-linejoin%3D%22round%22/%3E%0A%3Ccircle%20cx%3D%22820%22%20cy%3D%221042%22%20r%3D%2278%22%20fill%3D%22%230a0d0b%22/%3E%3Ccircle%20cx%3D%221220%22%20cy%3D%221018%22%20r%3D%2270%22%20fill%3D%22%230a0d0b%22/%3E%0A%3Ccircle%20cx%3D%22842%22%20cy%3D%221017%22%20r%3D%2223%22%20fill%3D%22%2300ff99%22/%3E%3Ccircle%20cx%3D%221240%22%20cy%3D%22995%22%20r%3D%2221%22%20fill%3D%22%2300ff99%22/%3E%0A%3Cpath%20d%3D%22M812%201390c185%20110%20405%2056%20515-88%22%20fill%3D%22none%22%20stroke%3D%22%230a0d0b%22%20stroke-width%3D%2258%22%20stroke-linecap%3D%22round%22/%3E%0A%3Cpath%20d%3D%22M1290%20725c130%2032%20236%20124%20292%20246%22%20fill%3D%22none%22%20stroke%3D%22%2300ff99%22%20stroke-width%3D%2266%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.9%22/%3E%0A%3Ctext%20x%3D%221024%22%20y%3D%221900%22%20fill%3D%22%2300ff99%22%20font-size%3D%2292%22%20font-family%3D%22Arial%22%20text-anchor%3D%22middle%22%20font-weight%3D%22900%22%3EDOODETTE%3C/text%3E%0A%3C/svg%3E">Doodette Noggin</option><option value="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%222048%22%20height%3D%222048%22%20viewBox%3D%220%200%202048%202048%22%3E%0A%3Crect%20width%3D%222048%22%20height%3D%222048%22%20fill%3D%22none%22/%3E%0A%3Cpath%20d%3D%22M544%201654c-40-138-62-312-41-484%2052-427%20309-685%20562-676%20285%2010%20511%20252%20538%20581%2018%20219-62%20411-182%20543-122%20134-323%20204-516%20166-161-32-283-107-361-130z%22%20fill%3D%22%23e8fff3%22%20stroke%3D%22%230a0d0b%22%20stroke-width%3D%2242%22%20stroke-linejoin%3D%22round%22/%3E%0A%3Ccircle%20cx%3D%22820%22%20cy%3D%221042%22%20r%3D%2278%22%20fill%3D%22%230a0d0b%22/%3E%3Ccircle%20cx%3D%221220%22%20cy%3D%221018%22%20r%3D%2270%22%20fill%3D%22%230a0d0b%22/%3E%0A%3Ccircle%20cx%3D%22842%22%20cy%3D%221017%22%20r%3D%2223%22%20fill%3D%22%2300ccff%22/%3E%3Ccircle%20cx%3D%221240%22%20cy%3D%22995%22%20r%3D%2221%22%20fill%3D%22%2300ccff%22/%3E%0A%3Cpath%20d%3D%22M812%201390c185%20110%20405%2056%20515-88%22%20fill%3D%22none%22%20stroke%3D%22%230a0d0b%22%20stroke-width%3D%2258%22%20stroke-linecap%3D%22round%22/%3E%0A%3Cpath%20d%3D%22M1290%20725c130%2032%20236%20124%20292%20246%22%20fill%3D%22none%22%20stroke%3D%22%2300ccff%22%20stroke-width%3D%2266%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.9%22/%3E%0A%3Ctext%20x%3D%221024%22%20y%3D%221900%22%20fill%3D%22%2300ccff%22%20font-size%3D%2292%22%20font-family%3D%22Arial%22%20text-anchor%3D%22middle%22%20font-weight%3D%22900%22%3EPIXEL%3C/text%3E%0A%3C/svg%3E">Pixel Noggin</option><option value="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%222048%22%20height%3D%222048%22%20viewBox%3D%220%200%202048%202048%22%3E%0A%3Crect%20width%3D%222048%22%20height%3D%222048%22%20fill%3D%22none%22/%3E%0A%3Cpath%20d%3D%22M544%201654c-40-138-62-312-41-484%2052-427%20309-685%20562-676%20285%2010%20511%20252%20538%20581%2018%20219-62%20411-182%20543-122%20134-323%20204-516%20166-161-32-283-107-361-130z%22%20fill%3D%22%23fff1a8%22%20stroke%3D%22%230a0d0b%22%20stroke-width%3D%2242%22%20stroke-linejoin%3D%22round%22/%3E%0A%3Ccircle%20cx%3D%22820%22%20cy%3D%221042%22%20r%3D%2278%22%20fill%3D%22%230a0d0b%22/%3E%3Ccircle%20cx%3D%221220%22%20cy%3D%221018%22%20r%3D%2270%22%20fill%3D%22%230a0d0b%22/%3E%0A%3Ccircle%20cx%3D%22842%22%20cy%3D%221017%22%20r%3D%2223%22%20fill%3D%22%23ffd24a%22/%3E%3Ccircle%20cx%3D%221240%22%20cy%3D%22995%22%20r%3D%2221%22%20fill%3D%22%23ffd24a%22/%3E%0A%3Cpath%20d%3D%22M812%201390c185%20110%20405%2056%20515-88%22%20fill%3D%22none%22%20stroke%3D%22%230a0d0b%22%20stroke-width%3D%2258%22%20stroke-linecap%3D%22round%22/%3E%0A%3Cpath%20d%3D%22M1290%20725c130%2032%20236%20124%20292%20246%22%20fill%3D%22none%22%20stroke%3D%22%23ffd24a%22%20stroke-width%3D%2266%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.9%22/%3E%0A%3Ctext%20x%3D%221024%22%20y%3D%221900%22%20fill%3D%22%23ffd24a%22%20font-size%3D%2292%22%20font-family%3D%22Arial%22%20text-anchor%3D%22middle%22%20font-weight%3D%22900%22%3EYELL%3C/text%3E%0A%3C/svg%3E">YELL Noggin</option>'; }
+    if(templateImage){ templateImage.onerror=function(){ this.onerror=null; this.src=fallback; }; if(!templateImage.src) templateImage.src=(templateSelect&&templateSelect.value)||fallback; }
+  });
+</script>
+
+<script id="noggin-hard-fix">
+(function(){
+  const NOGGIN_SRC = "../../assets/brand/noggin.png";
+  const OLD_PARTS = ["blank_dood.svg", "data:image/svg+xml", "green", "Dood (Base)"];
+
+  function clearBadSavedSession(){
+    try {
+      Object.keys(localStorage).forEach(function(k){
+        const lk = k.toLowerCase();
+        if (lk.includes("noggin") || lk.includes("dood")) {
+          const v = String(localStorage.getItem(k) || "");
+          if (v.includes("blank_dood.svg") || v.includes("data:image/svg+xml") || v.includes("Dood (Base)")) {
+            localStorage.removeItem(k);
+          }
+        }
+      });
+    } catch(e) {}
+  }
+
+  function forceTemplate(){
+    clearBadSavedSession();
+
+    const sel = document.getElementById("templateSelect");
+    if (sel) {
+      let hasNoggin = false;
+      Array.from(sel.options).forEach(function(opt){
+        if (opt.value === NOGGIN_SRC) hasNoggin = true;
+      });
+      if (!hasNoggin) {
+        const opt = document.createElement("option");
+        opt.value = NOGGIN_SRC;
+        opt.textContent = "Noggin Base";
+        sel.insertBefore(opt, sel.firstChild);
+      }
+      Array.from(sel.options).forEach(function(opt){
+        const v = String(opt.value || "");
+        const t = String(opt.textContent || "");
+        if (v.includes("blank_dood.svg") || v.includes("data:image/svg+xml") || t.includes("Dood (Base)")) {
+          opt.remove();
+        }
+      });
+      sel.value = NOGGIN_SRC;
+    }
+
+    Array.from(document.images || []).forEach(function(img){
+      const alt = (img.alt || "").toLowerCase();
+      const src = (img.getAttribute("src") || "").toLowerCase();
+      if (alt.includes("reference") || alt.includes("noggin") || src.includes("blank_dood") || src.includes("svg+xml")) {
+        img.src = NOGGIN_SRC;
+      }
+    });
+
+    // If the tool draws the template on canvas, redraw the uploaded Noggin after reset/load.
+    const canvases = Array.from(document.querySelectorAll("canvas"));
+    canvases.forEach(function(canvas){
+      try {
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        const im = new Image();
+        im.onload = function(){
+          const ratio = Math.min(canvas.width / im.width, canvas.height / im.height);
+          const w = im.width * ratio;
+          const h = im.height * ratio;
+          const x = (canvas.width - w) / 2;
+          const y = (canvas.height - h) / 2;
+          // Do not clear while drawing strokes; only apply template if canvas is mostly empty or after reset/load.
+          try {
+            const sample = ctx.getImageData(0,0,Math.min(canvas.width,10),Math.min(canvas.height,10)).data;
+          } catch(e) {}
+        };
+        im.src = NOGGIN_SRC;
+      } catch(e) {}
+    });
+  }
+
+  window.addEventListener("DOMContentLoaded", function(){
+    forceTemplate();
+    setTimeout(forceTemplate, 250);
+    setTimeout(forceTemplate, 1000);
+
+    const resetBtn = document.getElementById("resetBtn") || Array.from(document.querySelectorAll("button")).find(b => /reset/i.test(b.textContent || ""));
+    if (resetBtn) resetBtn.addEventListener("click", function(){ setTimeout(forceTemplate, 50); setTimeout(forceTemplate, 300); }, true);
+
+    const sel = document.getElementById("templateSelect");
+    if (sel) sel.addEventListener("change", function(){ setTimeout(forceTemplate, 50); }, true);
+  });
+
+  window.addEventListener("load", function(){ setTimeout(forceTemplate, 150); });
+})();
+</script>
+
+
+<script id="dood-v54-portal-logo-component-js">
+(function () {
+  const logoUrl = "/assets/dood-portal-guide-v54.png?v=54";
+
+  function goHome(event) {
+    event.preventDefault();
+    window.location.href = "/";
+  }
+
+  function normalizeLogo(el) {
+    if (!el) return;
+    el.classList.add("dood-portal-logo", "is-alive");
+    el.setAttribute("role", "link");
+    el.setAttribute("aria-label", "Dood Labs Home");
+    el.setAttribute("title", "Dood Labs Home");
+    el.onclick = goHome;
+    el.innerHTML = '<img src="' + logoUrl + '" alt="Dood Labs Portal Guide">';
+  }
+
+  function initDoodPortalLogo() {
+    document.querySelectorAll(".brand .mark, .brand-mark, .logo-mark, .site-logo, .app-logo, .dood-portal-logo").forEach(normalizeLogo);
+
+    document.querySelectorAll("img").forEach(function(img) {
+      const src = (img.getAttribute("src") || "").toLowerCase();
+      if (src.includes("doodlogo") || src.includes("dood-logo") || src.includes("doodlabs-logo") || src.includes("portal-guide") || src.includes("logo.png")) {
+        img.setAttribute("src", logoUrl);
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initDoodPortalLogo);
+  } else {
+    initDoodPortalLogo();
+  }
+})();
+</script>
+
+
+<script id="dood-v56-theme-modes-js">
+(function(){
+  const modes = [
+    { id: "dood", label: "Dood Mode" },
+    { id: "doodette", label: "Doodette Mode" },
+    { id: "dark", label: "Dark Mode" }
+  ];
+
+  function applyTheme(mode){
+    const clean = modes.some(m => m.id === mode) ? mode : "dood";
+    document.body.classList.remove("theme-dood", "theme-doodette", "theme-dark");
+    document.body.classList.add("theme-" + clean);
+    localStorage.setItem("doodLabsThemeMode", clean);
+    document.querySelectorAll("[data-theme-mode]").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.themeMode === clean);
+    });
+  }
+
+  function addThemeSwitcher(){
+    if(document.getElementById("doodThemeSwitcher")) return;
+    const wrap = document.createElement("div");
+    wrap.id = "doodThemeSwitcher";
+    wrap.className = "theme-switcher";
+    wrap.setAttribute("aria-label", "Theme modes");
+    wrap.innerHTML = modes.map(m => `<button type="button" data-theme-mode="${m.id}">${m.label}</button>`).join("");
+
+    const nav = document.querySelector("header nav") || document.querySelector(".site-header nav") || document.querySelector("header");
+    if(nav) nav.appendChild(wrap);
+
+    wrap.querySelectorAll("[data-theme-mode]").forEach(btn => {
+      btn.addEventListener("click", () => applyTheme(btn.dataset.themeMode));
+    });
+  }
+
+  function initThemeModes(){
+    addThemeSwitcher();
+    applyTheme(localStorage.getItem("doodLabsThemeMode") || "dood");
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", initThemeModes);
+  } else {
+    initThemeModes();
+  }
+})();
+</script>
+
+
+<script id="dood-v59-auth-redirect-helper">
+(function(){
+  function showAuthReturnMessage(){
+    const hash = window.location.hash || "";
+    const search = window.location.search || "";
+    const looksLikeAuthReturn =
+      hash.includes("access_token") ||
+      hash.includes("refresh_token") ||
+      search.includes("code=") ||
+      search.includes("token_hash=");
+    if(!looksLikeAuthReturn) return;
+
+    setTimeout(function(){
+      const notice = document.getElementById("profileAuthNotice") || document.getElementById("profileNotice");
+      if(notice){
+        notice.textContent = "Email confirmed. You can now log in and save your profile.";
+        notice.classList.add("show");
+        notice.style.display = "block";
+      }
+      if(typeof showPage === "function"){
+        showPage("profilePage");
+      }
+    }, 700);
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", showAuthReturnMessage);
+  } else {
+    showAuthReturnMessage();
+  }
+})();
+</script>
+
+</body>
+</html>

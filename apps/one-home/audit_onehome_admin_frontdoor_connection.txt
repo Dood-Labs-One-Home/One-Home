@@ -1,0 +1,52 @@
+ONE HOME ADMIN + FRONT DOOR CONNECTION AUDIT
+Package: DoodLabs_Full_Site_Admin_FrontDoor_Connection_Clean
+
+Scope requested:
+- Trace actual Admin save/read paths.
+- Remove duplicate competing renderers.
+- No public design change.
+
+REAL LIVE PATH AFTER THIS CLEANUP
+1. Admin → Site → Home Page Editor
+2. Admin reads: public.game_runtime_config where game_key = "one_home"
+3. Admin saves: public.game_runtime_config via upsert on game_key = "one_home"
+4. Public One Home reads the same record directly:
+   /rest/v1/game_runtime_config?game_key=eq.one_home&select=config,updated_at
+5. Public renderer: onehome-v227-front-door-js
+6. Public renderer applies config only to #onehomeV227FrontDoor
+
+REMOVED / ISOLATED
+- Removed 1 duplicate V225 dashboard stylesheet block(s).
+- Removed 1 duplicate V225 dashboard script block(s).
+  These were hidden by the V227 Front Door CSS yet still injected another Home child.
+- Legacy site_text_overrides remains available for non-Front-Door legacy pages,
+  but it now skips #onehomeV227FrontDoor completely.
+- Removed old V188 Home Page Mirror injection.
+- Removed old V191 Home Page Editor injection.
+- Moved all Admin late scripts back inside one valid HTML document.
+- Replaced dynamic/injected Home Page Editor navigation with a real static
+  Site → Home Page Editor menu item.
+- Removed the unused Ember top-left label field. "YOUR HOST" remains gone.
+
+INTENTIONALLY LEFT IN PLACE
+- One Home V223 brand layer: this still handles older public wording outside the
+  Front Door. It no longer owns Front Door configuration.
+- Legacy Text Controls: retained for legacy pages only, but not used by the
+  visible Front Door.
+- Existing wallet, identity, profiles, projects, Rollies, assets, redirects,
+  headers, shared folder, and tools were not redesigned or removed.
+
+VALIDATION
+- Public index contains exactly one V227 Front Door renderer.
+- Public index contains no V225 Shared Dashboard renderer.
+- Admin has exactly one real Home Page Editor module.
+- Admin has one closing </html> and all late scripts are inside the document.
+
+NEXT TEST
+1. Deploy this full zip.
+2. Open /admin.
+3. Site → Home Page Editor must appear immediately in the menu.
+4. Change only Welcome Title to a temporary test phrase.
+5. Save Home Page Live.
+6. Refresh the public Home page.
+7. Restore the wording after verification.

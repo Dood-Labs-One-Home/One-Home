@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dood Atlas • XRPL</title>
+  <meta name="description" content="Collaborative pixel art on a live world map. Sign in with XUMM or Google." />
+  <link rel="icon" href="data:,">
+
+  <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" href="/shared/labs.css" />
+  <script src="/shared/firebase-client-config.js"></script>
+  <script src="/shared/labs-session.js"></script>
+  <script defer src="https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js?v=2.7.1"></script>
+  <script defer src="/lab/js/config.js?v=158"></script>
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js" defer></script>
+
+  <!-- Firebase (Google sign-in) -->
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+
+  <style>
+    /* ── Design tokens ─────────────────────────────────────────── */
+    :root {
+      --bg:      #0b0b0f;
+      --panel:   #12121a;
+      --border:  #ffffff18;
+      --ink:     #eaeaf2;
+      --muted:   #888898;
+      --gold:    #ffd54d;
+      --xrp:     #00a3ff;
+      --danger:  #ff4f4f;
+      --success: #00d68f;
+      --radius:  12px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body, #app { height: 100%; background: var(--bg); color: var(--ink);
+      font: 14px/1.5 system-ui, -apple-system, Segoe UI, sans-serif; }
+    body { padding-top: 56px; }
+    body.labs-nav-fixed-pad { padding-top: 56px; }
+
+    /* ── Map + canvas overlay ──────────────────────────────────── */
+    #map    { position: absolute; left: 0; right: 0; bottom: 0; top: 56px; }
+    #layer  { position: absolute; left: 0; right: 0; bottom: 0; top: 56px; pointer-events: none; }
+
+    /* ── UI shell (bottom-anchored tool panels) ───────────────── */
+    #ui {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 14px;
+      z-index: 5;
+    }
+    #ui > * { pointer-events: auto; }
+
+    /* ── Card ──────────────────────────────────────────────────── */
+    .card {
+      background: color-mix(in srgb, var(--panel) 92%, #000);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      backdrop-filter: blur(8px);
+    }
+
+    /* ── Buttons ───────────────────────────────────────────────── */
+    .btn {
+      appearance: none; border: 1px solid var(--border);
+      background: #1c1c28; color: var(--ink);
+      padding: 7px 12px; border-radius: 9px;
+      font: 700 13px/1 system-ui; cursor: pointer;
+      transition: background .15s, opacity .15s;
+    }
+    .btn:hover  { background: #26263a; }
+    .btn:active { opacity: .75; }
+    .btn.primary { background: var(--gold); color: #111; border-color: transparent; }
+    .btn.primary:hover { background: #f5c830; }
+    .btn.danger  { background: var(--danger); color: #fff; border-color: transparent; }
+    .btn.sm      { padding: 5px 9px; font-size: 12px; }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* ── Pill badges ───────────────────────────────────────────── */
+    .pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 8px; border-radius: 999px;
+      background: #ffffff08; border: 1px solid var(--border);
+      font-size: 12px; color: var(--muted); white-space: nowrap;
+    }
+    .pill b { color: var(--ink); }
+    .pill.holder { border-color: var(--gold); color: var(--gold); }
+
+    /* ── Atlas activation (PKCE bridge → needs in-page XUMM) ───── */
+    #atlas-activate-banner {
+      display: none;
+      margin-bottom: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gold);
+      border-color: color-mix(in srgb, var(--gold) 45%, transparent);
+      background: color-mix(in srgb, var(--gold) 12%, var(--panel));
+      text-align: center;
+    }
+    #atlas-activate-banner.show {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    #atlas-activate-banner .btn { flex-shrink: 0; }
+    #btn-xumm.atlas-activate-highlight,
+    #labsToolNavConnect.atlas-activate-highlight {
+      box-shadow: 0 0 0 2px var(--gold), 0 0 18px rgba(255, 213, 77, 0.55);
+      animation: atlas-xumm-pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes atlas-xumm-pulse {
+      0%, 100% { box-shadow: 0 0 0 2px var(--gold), 0 0 12px rgba(255, 213, 77, 0.4); }
+      50% { box-shadow: 0 0 0 3px var(--gold), 0 0 22px rgba(255, 213, 77, 0.75); }
+    }
+
+    /* ── Top bar (hidden — wallet/auth via Labs nav; buttons kept for JS) ── */
+    #topbar { display: none !important; }
+
+    /* ── Bottom toolbar ────────────────────────────────────────── */
+    #toolbar {
+      position: relative;
+      padding: 12px 16px;
+      display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;
+    }
+
+    /* ── Palette ───────────────────────────────────────────────── */
+    #palette-card { flex: 0 0 auto; }
+    .palette-grid {
+      display: grid; grid-template-columns: repeat(10, 22px); gap: 5px;
+      margin-top: 7px;
+    }
+    .swatch {
+      width: 22px; height: 22px; border-radius: 5px;
+      border: 1px solid #0006; cursor: pointer;
+      box-shadow: inset 0 0 0 1px #fff1;
+      transition: transform .1s;
+    }
+    .swatch:hover  { transform: scale(1.2); }
+    .swatch.active { outline: 2px solid var(--gold); outline-offset: 1px; }
+
+    /* ── Tool selector ─────────────────────────────────────────── */
+    #tool-card { flex: 0 0 auto; }
+    .tool-row  { display: flex; gap: 6px; margin-top: 7px; }
+    .tool-btn  { width: 36px; height: 36px; border-radius: 8px; font-size: 17px;
+                 display: flex; align-items: center; justify-content: center; }
+    .tool-btn.active { background: var(--gold); color: #111; border-color: transparent; }
+
+    /* ── Claim panel ───────────────────────────────────────────── */
+    #claim-card { flex: 0 0 auto; min-width: 180px; }
+    #claim-form { margin-top: 7px; display: flex; flex-direction: column; gap: 6px; }
+    #claim-form input[type=text] {
+      background: #0c0c16; border: 1px solid var(--border); border-radius: 7px;
+      color: var(--ink); padding: 6px 8px; font-size: 13px; outline: none;
+      width: 100%;
+    }
+    #claim-form input:focus { border-color: var(--gold); }
+    #claim-status { font-size: 12px; color: var(--muted); min-height: 16px; }
+
+    /* ── Stats card ────────────────────────────────────────────── */
+    #stats-card { flex: 0 0 auto; }
+    .stat-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; margin-top: 6px; }
+    .stat-label { font-size: 11px; color: var(--muted); }
+    .stat-value { font-size: 13px; font-weight: 700; }
+
+    /* ── QR Modal ──────────────────────────────────────────────── */
+    #qr-modal {
+      position: fixed; inset: 0; background: #000b;
+      display: none; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    #qr-modal.open { display: flex; }
+    .qr-box {
+      background: #0f0f1a; border: 1px solid var(--border); border-radius: 16px;
+      padding: 20px; text-align: center; max-width: 90vw;
+    }
+    .qr-box h2  { font-size: 16px; margin-bottom: 12px; }
+    .qr-box img { max-width: 240px; border-radius: 10px; display: block; margin: 0 auto 12px; }
+    .qr-actions { display: flex; gap: 8px; justify-content: center; }
+    #qr-status  { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+    /* ── Claims overlay tooltip ────────────────────────────────── */
+    #claim-tooltip {
+      position: absolute; pointer-events: none;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 10px; font-size: 12px;
+      display: none; z-index: 10;
+    }
+
+    #erase-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 96px;
+      transform: translateX(-50%);
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      background: color-mix(in srgb, var(--panel) 94%, #000);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 25;
+      transition: opacity 0.35s ease;
+    }
+    #erase-toast.show { opacity: 1; }
+
+    /* ── Leaderboard panel (hidden by default) ─────────────────── */
+    #leaderboard-panel {
+      position: absolute; top: 60px; right: 14px;
+      width: 260px; max-height: 380px; overflow-y: auto;
+      display: none; z-index: 20;
+    }
+    #leaderboard-panel.open { display: block; }
+    #leaderboard-panel h3 { font-size: 13px; margin-bottom: 8px; }
+    .lb-row { display: flex; justify-content: space-between; padding: 4px 0;
+              border-bottom: 1px solid var(--border); font-size: 12px; }
+    .lb-row:last-child { border: none; }
+    .lb-wallet { color: var(--muted); overflow: hidden; text-overflow: ellipsis; max-width: 130px; }
+  
+</style>
+
+<style id="dood-brand-header-style">
+  .dood-return-header{position:sticky;top:0;z-index:99999;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 18px;background:#050806;border-bottom:1px solid rgba(85,255,154,.35);box-shadow:0 12px 30px rgba(0,0,0,.35);font-family:Arial,Helvetica,sans-serif}
+  .dood-brand{display:flex;align-items:center;gap:10px;color:#f6fff9;text-decoration:none;font-weight:950}
+  .dood-brand img{width:38px;height:38px;border-radius:999px;background:#fff;border:1px solid rgba(85,255,154,.5);object-fit:cover;box-shadow:0 0 18px rgba(85,255,154,.25)}
+  .dood-brand strong{font-size:18px;letter-spacing:.01em;color:#f6fff9}
+  .dood-return-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  .dood-return-actions a{color:#55ff9a;text-decoration:none;border:1px solid rgba(85,255,154,.45);border-radius:999px;padding:9px 12px;font-weight:950;background:rgba(85,255,154,.06)}
+  .dood-return-actions a:hover{background:rgba(85,255,154,.14)}
+  @media(max-width:640px){.dood-return-header{align-items:flex-start;flex-direction:column}.dood-return-actions{width:100%}.dood-return-actions a{width:100%;text-align:center}}
+</style>
+
+<style id="dood-single-header-cleanup">
+  #labGlobalHeader,
+  header#labGlobalHeader,
+  .appbar#labGlobalHeader,
+  .dood-v7-tool-bar,
+  .dood-hub-header {
+    display:none !important;
+    height:0 !important;
+    min-height:0 !important;
+    padding:0 !important;
+    margin:0 !important;
+    border:0 !important;
+    overflow:hidden !important;
+  }
+</style>
+
+
+<style id="dood-v53-force-logo">
+  .brand .mark,
+  .brand-mark,
+  .logo-mark,
+  .dood-logo,
+  .site-logo,
+  .app-logo {
+    background: transparent url('/assets/dood-portal-guide-v54.png?v=54') center/contain no-repeat !important;
+    color: transparent !important;
+    overflow: hidden !important;
+  }
+  .brand .mark::before,
+  .brand .mark::after,
+  .brand-mark::before,
+  .brand-mark::after,
+  .logo-mark::before,
+  .logo-mark::after {
+    content: none !important;
+    display: none !important;
+  }
+  .brand .mark img,
+  .brand-mark img,
+  .logo-mark img,
+  .dood-logo img,
+  .site-logo img,
+  .app-logo img {
+    content: url('/assets/dood-portal-guide-v54.png?v=54') !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    display: block !important;
+  }
+</style>
+
+
+<style id="dood-v54-portal-logo-component">
+  :root {
+    --dood-portal-logo-url: url('/assets/dood-portal-guide-v54.png?v=54');
+  }
+
+  .dood-portal-logo,
+  .brand .mark,
+  .brand-mark,
+  .logo-mark,
+  .site-logo,
+  .app-logo {
+    width: 46px !important;
+    height: 46px !important;
+    min-width: 46px !important;
+    border-radius: 999px !important;
+    border: 0 !important;
+    background: transparent var(--dood-portal-logo-url) center/contain no-repeat !important;
+    color: transparent !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    transition: transform .18s ease, filter .18s ease !important;
+    text-decoration: none !important;
+  }
+
+  .dood-portal-logo:hover,
+  .dood-portal-logo:focus-visible,
+  .brand .mark:hover,
+  .brand .mark:focus-visible,
+  .brand-mark:hover,
+  .brand-mark:focus-visible,
+  .logo-mark:hover,
+  .logo-mark:focus-visible,
+  .site-logo:hover,
+  .app-logo:hover {
+    transform: scale(1.05) !important;
+    filter: drop-shadow(0 0 10px rgba(85,255,154,.82)) drop-shadow(0 0 22px rgba(85,255,154,.32)) !important;
+  }
+
+  .dood-portal-logo img,
+  .brand .mark img,
+  .brand-mark img,
+  .logo-mark img,
+  .site-logo img,
+  .app-logo img {
+    content: url('/assets/dood-portal-guide-v54.png?v=54') !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    object-fit: contain !important;
+    pointer-events: none !important;
+  }
+
+  .brand .mark::before,
+  .brand .mark::after,
+  .brand-mark::before,
+  .brand-mark::after,
+  .logo-mark::before,
+  .logo-mark::after,
+  .dood-portal-logo::before,
+  .dood-portal-logo::after {
+    content: none !important;
+    display: none !important;
+  }
+
+  @media (min-width: 821px) {
+    .dood-portal-logo,
+    .brand .mark,
+    .brand-mark,
+    .logo-mark,
+    .site-logo,
+    .app-logo {
+      width: 66px !important;
+      height: 66px !important;
+      min-width: 66px !important;
+    }
+  }
+
+  @media (max-width: 820px) {
+    .brand span,
+    .brand-name,
+    .logo-text {
+      display: none !important;
+    }
+    .dood-portal-logo,
+    .brand .mark,
+    .brand-mark,
+    .logo-mark,
+    .site-logo,
+    .app-logo {
+      width: 46px !important;
+      height: 46px !important;
+      min-width: 46px !important;
+    }
+  }
+
+  @keyframes doodPortalPulse {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(85,255,154,0)); }
+    50% { filter: drop-shadow(0 0 12px rgba(85,255,154,.36)); }
+  }
+
+  .dood-portal-logo.is-alive,
+  .brand .mark {
+    animation: doodPortalPulse 4.5s ease-in-out infinite !important;
+  }
+</style>
+
+
+<style id="dood-v56-theme-modes">
+  :root,
+  body.theme-dood {
+    --dood-accent: #55ff9a;
+    --dood-accent-2: #00d68f;
+    --dood-accent-soft: rgba(85,255,154,.14);
+    --dood-accent-line: rgba(85,255,154,.32);
+    --dood-accent-glow: rgba(85,255,154,.34);
+    --dood-bg-main: #020402;
+    --dood-bg-panel: rgba(5, 17, 8, .88);
+    --dood-text-main: #f6fff9;
+  }
+
+  body.theme-doodette {
+    --dood-accent: #ff4fd8;
+    --dood-accent-2: #ff149d;
+    --dood-accent-soft: rgba(255,79,216,.16);
+    --dood-accent-line: rgba(255,79,216,.38);
+    --dood-accent-glow: rgba(255,79,216,.38);
+    --dood-bg-main: #09020a;
+    --dood-bg-panel: rgba(22, 5, 20, .90);
+    --dood-text-main: #fff3fb;
+  }
+
+  body.theme-dark {
+    --dood-accent: #bfc7d5;
+    --dood-accent-2: #6f7a8d;
+    --dood-accent-soft: rgba(191,199,213,.12);
+    --dood-accent-line: rgba(191,199,213,.28);
+    --dood-accent-glow: rgba(191,199,213,.22);
+    --dood-bg-main: #020202;
+    --dood-bg-panel: rgba(10, 10, 12, .94);
+    --dood-text-main: #f4f6fb;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 12% 4%, var(--dood-accent-soft), transparent 24rem),
+      linear-gradient(180deg, var(--dood-bg-main), #050705) !important;
+    color: var(--dood-text-main) !important;
+  }
+
+  header,
+  .site-header,
+  .topbar,
+  .panel,
+  .hero,
+  .section,
+  .screen,
+  .builder-card,
+  .preview-card,
+  .item,
+  .profile-auth-card,
+  .card,
+  .district-card,
+  .game-card {
+    border-color: var(--dood-accent-line) !important;
+  }
+
+  .hero,
+  .section,
+  .panel,
+  .screen,
+  .builder-card,
+  .preview-card,
+  .item,
+  .profile-auth-card,
+  .card,
+  .district-card,
+  .game-card {
+    background: linear-gradient(135deg, var(--dood-accent-soft), rgba(255,255,255,.025)) !important;
+  }
+
+  .tagline,
+  .screen-title,
+  .world-feature b,
+  .status,
+  .brand-text,
+  .brand-name,
+  h2,
+  .tab.active,
+  .step-tab.active,
+  a,
+  .footer-links a {
+    color: var(--dood-accent) !important;
+  }
+
+  .btn.primary,
+  button.primary,
+  .primary {
+    background: linear-gradient(135deg, var(--dood-accent), var(--dood-accent-2)) !important;
+    border-color: transparent !important;
+    color: #031006 !important;
+    box-shadow: 0 0 18px var(--dood-accent-glow) !important;
+  }
+
+  .btn,
+  button,
+  input,
+  textarea,
+  select,
+  .step-tab,
+  .tab {
+    border-color: var(--dood-accent-line) !important;
+  }
+
+  .dood-portal-logo:hover,
+  .dood-portal-logo:focus-visible,
+  .brand .mark:hover,
+  .brand .mark:focus-visible,
+  .brand-mark:hover,
+  .brand-mark:focus-visible,
+  .logo-mark:hover,
+  .logo-mark:focus-visible,
+  .site-logo:hover,
+  .app-logo:hover {
+    filter: drop-shadow(0 0 10px var(--dood-accent)) drop-shadow(0 0 22px var(--dood-accent-glow)) !important;
+  }
+
+  .theme-switcher {
+    display: inline-flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    margin-left: 12px;
+  }
+
+  .theme-switcher button {
+    min-height: 34px !important;
+    padding: 7px 10px !important;
+    border-radius: 999px !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    background: rgba(0,0,0,.24) !important;
+    color: var(--dood-text-main) !important;
+  }
+
+  .theme-switcher button.active {
+    color: #031006 !important;
+    background: linear-gradient(135deg, var(--dood-accent), var(--dood-accent-2)) !important;
+    border-color: transparent !important;
+  }
+
+  @media(max-width: 820px) {
+    .theme-switcher {
+      width: 100%;
+      margin-left: 0;
+      justify-content: flex-start;
+    }
+    .theme-switcher button {
+      font-size: 11px !important;
+      padding: 7px 9px !important;
+    }
+  }
+</style>
+
+</head>
+<body>
+
+<div class="dood-return-header">
+  <a class="dood-brand" href="../../../index.html#districts" aria-label="Back to Dood Labs">
+    <img src="/assets/dood-portal-guide-v54.png?v=54" alt="Dood Labs logo">
+    <strong>Dood Labs</strong>
+  </a>
+  <div class="dood-return-actions">
+    <a href="../../../index.html#districts">← Return to Dood Labs</a>
+    <a href="../../../index.html#districts">Back to Districts</a></div></div>
+
+
+<script>
+(function(){
+  window.__DOOD_HUB_BACK = function(){
+    try { localStorage.setItem('doodLabsReturnTarget','districts'); } catch(e) {}
+    window.location.href = '../../../index.html#districts';
+  };
+  if (!window.LabsSession) {
+    window.LabsSession = {
+      mountToolNav: function(){},
+      get: function(){ try { return JSON.parse(localStorage.getItem('doodLabsSession')||'null'); } catch(e){ return null; } },
+      set: function(v){ try { localStorage.setItem('doodLabsSession', JSON.stringify(v||{})); } catch(e){} },
+      clear: function(){ try { localStorage.removeItem('doodLabsSession'); } catch(e){} }
+    };
+  }
+})();
+</script>
+
+<div class="dood-hub-header" style="position:fixed;left:0;right:0;top:0;height:56px;">
+  <a class="dood-hub-brand" href="../../../index.html#districts" onclick="try{localStorage.setItem('doodLabsReturnTarget','districts')}catch(e){}">
+    <img class="dood-logo-img" src="/assets/dood-portal-guide-v54.png?v=54" alt="Dood Labs logo" style="width:38px;height:38px;border-radius:999px;object-fit:cover;background:#fff;">
+    <span class="dood-hub-title">Dood Labs</span>
+  </a>
+  <div class="dood-hub-actions">
+    <a class="dood-hub-btn" href="../../../index.html#districts" onclick="try{localStorage.setItem('doodLabsReturnTarget','districts')}catch(e){}">← Return to Dood Labs</a>
+    <a class="dood-hub-btn" href="../../../index.html#districts" onclick="try{localStorage.setItem('doodLabsReturnTarget','districts')}catch(e){}">Back to Districts</a>
+    <span class="dood-hub-btn" style="pointer-events:none;opacity:.75">Dood Atlas</span></div></div>
+<script>
+  LabsSession.mountToolNav({
+    accent: '#ffd54d',
+    accentDim: 'rgba(255,213,77,0.12)',
+    accentBorder: 'rgba(255,213,77,0.28)',
+    arcadeHref: '../../../arcade/index.html',
+    toolName: 'Dood Atlas',
+    fixed: true,
+  });
+</script>
+<div id="app">
+  <div id="map" aria-label="World pixel map"></div>
+  <canvas id="layer" aria-hidden="true"></canvas>
+
+  <!-- Claim tooltip -->
+  <div id="claim-tooltip"></div>
+
+  <!-- ── UI overlay ─────────────────────────────────────────── -->
+  <div id="ui">
+
+    <div id="atlas-activate-banner" class="card" role="status" aria-live="polite">
+      <span>Connect with XUMM to activate pixel placement on the map.</span>
+      <button type="button" class="btn primary sm" id="btn-atlas-banner-connect">Connect XUMM</button></div>
+
+    <!-- Top bar -->
+    <div id="topbar" class="card">
+      <button id="btn-xumm"   class="btn primary">Connect XUMM</button>
+      <button id="btn-google" class="btn">Sign in Google</button>
+      <button id="btn-logout" class="btn sm" style="display:none">Logout</button>
+
+      <span class="pill" id="pill-acct">Guest</span>
+      <span class="pill" id="pill-holder" style="display:none">🐸 Dood holder</span>
+      <span class="pill" id="pill-cd">CD: <b id="cd-val">0</b>s</span>
+      <span class="pill">Grid: <b id="grid-label">—</b></span>
+      <span class="pill">Pixels: <b id="pixel-count">0</b></span>
+
+      <button class="btn sm" id="btn-leaderboard" style="margin-left:auto">🏆 Board</button></div>
+
+    <!-- Bottom toolbar -->
+    <div id="toolbar">
+
+      <!-- Palette -->
+      <div class="card" id="palette-card">
+        <div style="font-size:11px;color:var(--muted)">Color</div>
+        <div class="palette-grid" id="palette"></div></div>
+
+      <!-- Tools -->
+      <div class="card" id="tool-card">
+        <div style="font-size:11px;color:var(--muted)">Tool</div>
+        <div class="tool-row">
+          <button class="btn tool-btn active" data-tool="paint" title="Paint pixel">🖌️</button>
+          <button class="btn tool-btn"        data-tool="erase" title="Erase pixel">🧹</button>
+          <button class="btn tool-btn"        data-tool="claim" title="Claim territory">📐</button>
+          <button class="btn tool-btn"        data-tool="inspect" title="Inspect pixel">🔍</button></div></div>
+
+      <!-- Claim panel (shown when claim tool active) -->
+      <div class="card" id="claim-card" style="display:none">
+        <div style="font-size:11px;color:var(--muted)">New claim</div>
+        <div id="claim-form">
+          <input type="text" id="claim-name" placeholder="Name your territory…" maxlength="40" />
+          <div style="font-size:11px;color:var(--muted)" id="claim-coords">Click + drag on map to draw</div>
+          <button class="btn primary sm" id="btn-submit-claim" disabled>Register claim</button>
+          <button class="btn sm"         id="btn-cancel-claim">Cancel</button>
+          <div id="claim-status"></div></div></div>
+
+      <!-- Stats + session info (moved from hidden #topbar) -->
+      <div class="card" id="stats-card">
+        <div style="font-size:11px;color:var(--muted)">Stats</div>
+        <div class="stat-grid">
+          <div class="stat-label">Cooldown</div> <div class="stat-value"><span id="cd-val">0</span>s</div>
+          <div class="stat-label">Grid</div> <div class="stat-value" id="grid-label">—</div>
+          <div class="stat-label">World pixels</div> <div class="stat-value" id="pixel-count">0</div>
+          <div class="stat-label">My pixels</div> <div class="stat-value" id="my-pixels">—</div>
+          <div class="stat-label">Claims</div> <div class="stat-value" id="my-claims">—</div></div></div>
+
+      <button type="button" class="btn sm" id="btn-leaderboard">🏆 Board</button></div>
+    <div id="erase-toast" role="status" aria-live="polite"></div></div>
+
+  <!-- Leaderboard -->
+  <div id="leaderboard-panel" class="card">
+    <h3>🏆 Top painters</h3>
+    <div id="lb-list"><div style="color:var(--muted);font-size:12px">Loading…</div></div></div>
+
+  <!-- QR Modal -->
+  <div id="qr-modal" role="dialog" aria-label="XUMM sign-in">
+    <div class="qr-box">
+      <h2>Scan in XUMM / Xaman</h2>
+      <img id="qr-img" alt="XUMM QR code" />
+      <div class="qr-actions">
+        <a id="qr-deeplink" class="btn" href="#" target="_blank" rel="noopener">Open XUMM</a>
+        <button class="btn" id="btn-close-qr">Close</button></div>
+      <div id="qr-status">Waiting for approval…</div></div></div></div>
+
+<script>
+// ============================================================
+// Dood Atlas — Client
+// ============================================================
+window.addEventListener('load', () => {
+  if (typeof maplibregl === 'undefined') { alert('Dood Atlas map library did not load. Check internet connection or upload with server access.'); return; }
+
+  // ── Firebase client config (lab/shared/firebase-client-config.js) ──
+  const firebaseConfig = window.LAB_FIREBASE_CLIENT_CONFIG;
+  if (!firebaseConfig) {
+    console.error('[Dood Atlas] LAB_FIREBASE_CLIENT_CONFIG missing — check /shared/firebase-client-config.js');
+  } else {
+    try { firebase.initializeApp(firebaseConfig); } catch (e) {
+      console.warn('[Dood Atlas] firebase.initializeApp:', e?.message || e);
+    }
+  }
+  const auth = firebase.auth?.();
+
+  // ── State ──────────────────────────────────────────────────
+  const state = {
+    gridX: 4096, gridY: 2048,
+    pixels: {},
+    claims: [],
+    color: '#ffd54d',
+    tool:  'paint',         // paint | erase | claim | inspect
+    sessionId: null,
+    account:   null,
+    isHolder:  false,
+    cooldown:  0,
+    // Claim drawing
+    claimDrag: null,        // { startLng, startLat } while dragging
+    claimBox:  null,        // { xMin, yMin, xMax, yMax } normalised, confirmed
+  };
+
+  // ── DOM refs ───────────────────────────────────────────────
+  const $ = id => document.getElementById(id);
+  const gridLabel    = $('grid-label');
+  const cdVal        = $('cd-val');
+  const pixelCount   = $('pixel-count');
+  const pillAcct     = $('pill-acct');
+  const pillHolder   = $('pill-holder');
+  const myPixels     = $('my-pixels');
+  const myClaims     = $('my-claims');
+  const claimCoords  = $('claim-coords');
+  const claimStatus  = $('claim-status');
+  const btnSubmit    = $('btn-submit-claim');
+  const claimTooltip = $('claim-tooltip');
+  const eraseToast   = $('erase-toast');
+  let eraseToastTimer = null;
+
+  function showEraseToast(message) {
+    if (!eraseToast) return;
+    eraseToast.textContent = message;
+    eraseToast.classList.add('show');
+    if (eraseToastTimer) clearTimeout(eraseToastTimer);
+    eraseToastTimer = setTimeout(() => {
+      eraseToast.classList.remove('show');
+      eraseToastTimer = null;
+    }, 2000);
+  }
+
+  function setMapCursor(value) {
+    canvas.style.cursor = value;
+    try { map.getCanvas().style.cursor = value; } catch {}
+  }
+
+  // ── Map setup ──────────────────────────────────────────────
+  const mapStyle = {
+    version: 8,
+    sources: { osm: {
+      type: 'raster',
+      tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+      tileSize: 256,
+      attribution: '© OpenStreetMap contributors',
+    }},
+    layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
+  };
+  const map = new maplibregl.Map({
+    container: 'map', style: mapStyle,
+    center: [-98.58, 39.83], zoom: 3, hash: true,
+  });
+  map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'bottom-right');
+
+  // ── Canvas overlay ─────────────────────────────────────────
+  const canvas = $('layer');
+  const ctx    = canvas.getContext('2d');
+  const dpr    = Math.max(1, window.devicePixelRatio || 1);
+
+  function resize() {
+    const w = canvas.parentElement.clientWidth;
+    const h = canvas.parentElement.clientHeight;
+    canvas.width  = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    canvas.style.width  = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+  window.addEventListener('resize', resize);
+  map.on('load', resize);
+  map.on('render', draw);
+
+  // ── Coordinate helpers ─────────────────────────────────────
+  function lonLatToNorm(lon, lat) {
+    const x = (lon + 180) / 360;
+    const r = lat * Math.PI / 180;
+    const y = (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2;
+    return [clamp(x, 0, 1), clamp(y, 0, 1)];
+  }
+  function normToLonLat(x, y) {
+    const lon = x * 360 - 180;
+    const n   = Math.PI - 2 * Math.PI * y;
+    const lat = (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
+    return [lon, lat];
+  }
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+  function qx(x) { return Math.round(x * state.gridX) / state.gridX; }
+  function qy(y) { return Math.round(y * state.gridY) / state.gridY; }
+  function pixKey(x, y) { return x.toFixed(6) + '_' + y.toFixed(6); }
+
+  // ── Draw ───────────────────────────────────────────────────
+  function draw() {
+    ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+    const stepX = 1 / state.gridX;
+    const stepY = 1 / state.gridY;
+    const b  = map.getBounds();
+    const lo = lonLatToNorm(b.getWest(),  b.getNorth());
+    const hi = lonLatToNorm(b.getEast(),  b.getSouth());
+    const xLo = Math.min(lo[0], hi[0]) - stepX;
+    const xHi = Math.max(lo[0], hi[0]) + stepX;
+    const yLo = Math.min(lo[1], hi[1]) - stepY;
+    const yHi = Math.max(lo[1], hi[1]) + stepY;
+
+    // Draw pixels
+    for (const p of Object.values(state.pixels)) {
+      if (!p || !p.color) continue;
+      if (p.xNorm < xLo || p.xNorm > xHi || p.yNorm < yLo || p.yNorm > yHi) continue;
+      const [lonA, latA] = normToLonLat(p.xNorm, p.yNorm);
+      const [lonB, latB] = normToLonLat(p.xNorm + stepX, p.yNorm + stepY);
+      const a  = map.project([lonA, latA]);
+      const bp = map.project([lonB, latB]);
+      const x = Math.min(a.x, bp.x);
+      const y = Math.min(a.y, bp.y);
+      const w = Math.max(1, Math.abs(bp.x - a.x));
+      const h = Math.max(1, Math.abs(bp.y - a.y));
+      ctx.fillStyle = p.color;
+      ctx.fillRect(x, y, w, h);
+    }
+
+    // Draw claim boundaries
+    for (const claim of state.claims) {
+      const [lonA, latA] = normToLonLat(claim.xMin, claim.yMin);
+      const [lonB, latB] = normToLonLat(claim.xMax, claim.yMax);
+      const a  = map.project([lonA, latA]);
+      const bp = map.project([lonB, latB]);
+      const isOwn = claim.wallet === state.account;
+      ctx.strokeStyle = isOwn ? '#ffd54d' : '#00a3ff';
+      ctx.lineWidth   = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.strokeRect(
+        Math.min(a.x, bp.x), Math.min(a.y, bp.y),
+        Math.abs(bp.x - a.x), Math.abs(bp.y - a.y)
+      );
+      ctx.setLineDash([]);
+    }
+
+    // Draw in-progress claim drag box
+    if (state.claimDrag && state.claimDrag.current) {
+      const s  = map.project([state.claimDrag.startLng, state.claimDrag.startLat]);
+      const e  = map.project([state.claimDrag.current.lng, state.claimDrag.current.lat]);
+      ctx.strokeStyle = '#ffd54d';
+      ctx.lineWidth   = 1.5;
+      ctx.setLineDash([6, 3]);
+      ctx.strokeRect(
+        Math.min(s.x, e.x), Math.min(s.y, e.y),
+        Math.abs(e.x - s.x), Math.abs(e.y - s.y)
+      );
+      ctx.setLineDash([]);
+    }
+  }
+
+
+  // ── Demo/API fallback for static testing ─────────────────────
+  const ATLAS_DEMO_KEY = 'doodAtlasDemoV1';
+  function loadAtlasDemo(){
+    try { return JSON.parse(localStorage.getItem(ATLAS_DEMO_KEY) || '{}'); } catch(e){ return {}; }
+  }
+  function saveAtlasDemo(data){ try { localStorage.setItem(ATLAS_DEMO_KEY, JSON.stringify(data)); } catch(e){} }
+  function atlasDemoPayload(){
+    const d = loadAtlasDemo();
+    return { gridX: state.gridX, gridY: state.gridY, pixels: d.pixels || {}, claims: d.claims || [] };
+  }
+
+  // ── Init data ──────────────────────────────────────────────
+  fetch('/api/init')
+    .then(r => r.ok ? r.json() : Promise.reject(new Error('API unavailable')))
+    .catch(() => atlasDemoPayload())
+    .then(d => {
+      state.gridX = d.gridX || state.gridX; state.gridY = d.gridY || state.gridY;
+      state.pixels = d.pixels || {};
+      gridLabel.textContent = state.gridX + '×' + state.gridY;
+      pixelCount.textContent = Object.keys(state.pixels).length;
+      draw();
+    });
+
+  fetch('/api/claims')
+    .then(r => r.ok ? r.json() : Promise.reject(new Error('API unavailable')))
+    .catch(() => atlasDemoPayload())
+    .then(d => { state.claims = d.claims || []; draw(); });
+
+  // ── WebSocket ──────────────────────────────────────────────
+  const wsProto = location.protocol === 'https:' ? 'wss' : 'ws';
+  let ws = null;
+  try { ws = new WebSocket(`${wsProto}://${location.host}/live`); } catch(e) { ws = null; }
+  if (ws) ws.onmessage = ev => {
+    try {
+      const msg = JSON.parse(ev.data);
+      if (msg.type === 'pixel') {
+        const p = msg.pixel;
+        if (p.color) state.pixels[pixKey(p.xNorm, p.yNorm)] = p;
+        else delete state.pixels[pixKey(p.xNorm, p.yNorm)];
+        pixelCount.textContent = Object.keys(state.pixels).length;
+        draw();
+      }
+      if (msg.type === 'claim') {
+        if (msg.action === 'add') {
+          state.claims.push(msg.claim);
+        } else if (msg.action === 'remove') {
+          state.claims = state.claims.filter(c => c.id !== msg.claimId);
+        }
+        draw();
+        refreshMyClaims();
+      }
+    } catch {}
+  };
+
+  // ── Palette ────────────────────────────────────────────────
+  const PALETTE = [
+    '#000000','#1a1a2e','#333344','#555566','#888899','#aaaacc','#ffffff',
+    '#ffd54d','#f5c830','#ff8a00','#ff4f4f','#c2185b','#ff80ab',
+    '#00a3ff','#0066cc','#7c4dff','#18ffff','#00d68f','#69f0ae',
+    '#8d6e63','#bdbdbd',
+  ];
+  const palEl = $('palette');
+  function renderPalette() {
+    palEl.innerHTML = '';
+    PALETTE.forEach(hex => {
+      const sw = document.createElement('div');
+      sw.className = 'swatch' + (state.color === hex ? ' active' : '');
+      sw.style.background = hex;
+      sw.title = hex;
+      sw.onclick = () => { state.color = hex; renderPalette(); };
+      palEl.appendChild(sw);
+    });
+  }
+  renderPalette();
+
+  // ── Tool selector ──────────────────────────────────────────
+  document.querySelectorAll('.tool-btn').forEach(btn => {
+    btn.onclick = () => {
+      state.tool = btn.dataset.tool;
+      document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      $('claim-card').style.display = state.tool === 'claim' ? 'block' : 'none';
+      map.dragPan.enable();
+      state.claimDrag = null;
+      state.claimBox  = null;
+      btnSubmit.disabled = true;
+      claimStatus.textContent = '';
+      if (state.tool !== 'erase') setMapCursor('');
+      draw();
+    };
+  });
+
+  // ── Map interaction ────────────────────────────────────────
+  map.on('mousedown', e => {
+    if (state.tool !== 'claim') return;
+    if (!state.sessionId) { state.sessionId = 'demo-local'; state.account = 'demo-wallet'; pillAcct.textContent = 'Demo wallet'; }
+    map.dragPan.disable();
+    state.claimDrag = { startLng: e.lngLat.lng, startLat: e.lngLat.lat, current: null };
+  });
+
+  map.on('mousemove', e => {
+    // Claim drag feedback
+    if (state.tool === 'claim' && state.claimDrag) {
+      state.claimDrag.current = e.lngLat;
+      draw();
+      updateClaimCoords();
+    }
+
+    if (state.tool === 'erase') {
+      claimTooltip.style.display = 'none';
+      const [xn, yn] = lonLatToNorm(e.lngLat.lng, e.lngLat.lat);
+      const key = pixKey(qx(xn), qy(yn));
+      const p = state.pixels[key];
+      if (p && state.account && p.by !== state.account) {
+        setMapCursor('not-allowed');
+      } else {
+        setMapCursor('crosshair');
+      }
+      return;
+    }
+
+    setMapCursor('');
+
+    // Claim tooltip on hover (non-drag)
+    if (state.tool === 'inspect' || state.tool === 'paint') {
+      const [xn, yn] = lonLatToNorm(e.lngLat.lng, e.lngLat.lat);
+      const hit = state.claims.find(c =>
+        xn >= c.xMin && xn <= c.xMax && yn >= c.yMin && yn <= c.yMax
+      );
+      if (hit) {
+        claimTooltip.style.display = 'block';
+        claimTooltip.style.left = (e.point.x + 12) + 'px';
+        claimTooltip.style.top  = (e.point.y + 12) + 'px';
+        claimTooltip.innerHTML =
+          `<b>${hit.name}</b><br><span style="color:var(--muted)">${hit.wallet.slice(0,8)}…</span>`;
+      } else {
+        claimTooltip.style.display = 'none';
+      }
+    }
+  });
+
+  map.on('mouseleave', () => {
+    setMapCursor('');
+    claimTooltip.style.display = 'none';
+  });
+
+  map.on('mouseup', e => {
+    if (state.tool !== 'claim' || !state.claimDrag) return;
+    map.dragPan.enable();
+    const [x1, y1] = lonLatToNorm(state.claimDrag.startLng, state.claimDrag.startLat);
+    const [x2, y2] = lonLatToNorm(e.lngLat.lng, e.lngLat.lat);
+    state.claimBox = {
+      xMin: Math.min(x1, x2), yMin: Math.min(y1, y2),
+      xMax: Math.max(x1, x2), yMax: Math.max(y1, y2),
+    };
+    state.claimDrag = null;
+    btnSubmit.disabled = false;
+    updateClaimCoords();
+    draw();
+  });
+
+  map.on('click', e => {
+    if (state.tool === 'paint' || state.tool === 'erase') {
+      if (!state.sessionId) { state.sessionId = 'demo-local'; state.account = 'demo-wallet'; pillAcct.textContent = 'Demo wallet'; }
+      placePixel(e.lngLat.lng, e.lngLat.lat);
+    }
+    if (state.tool === 'inspect') {
+      const [xn, yn] = lonLatToNorm(e.lngLat.lng, e.lngLat.lat);
+      const key = pixKey(qx(xn), qy(yn));
+      const p   = state.pixels[key];
+      if (p) alert(`By: ${p.by}\nColor: ${p.color}\nTime: ${new Date(p.ts).toLocaleString()}`);
+    }
+  });
+
+  function updateClaimCoords() {
+    const box = state.claimBox ||
+      (state.claimDrag?.current ? {
+        xMin: Math.min(...[state.claimDrag.startLng, state.claimDrag.current.lng].map((v,i) => lonLatToNorm(v, 0)[0])),
+      } : null);
+    if (state.claimBox) {
+      const area = (state.claimBox.xMax - state.claimBox.xMin) * (state.claimBox.yMax - state.claimBox.yMin);
+      claimCoords.textContent = `Area: ${(area * 100).toFixed(3)}% — max 5%`;
+      claimCoords.style.color = area > 0.05 ? 'var(--danger)' : 'var(--success)';
+    } else {
+      claimCoords.textContent = 'Click + drag on map to draw';
+      claimCoords.style.color = '';
+    }
+  }
+
+  // ── Place pixel ────────────────────────────────────────────
+  async function placePixel(lon, lat) {
+    const [xn, yn] = lonLatToNorm(lon, lat);
+    const erasing = state.tool === 'erase';
+    const color = erasing ? null : state.color;
+    const xNorm = qx(xn);
+    const yNorm = qy(yn);
+    try {
+      const r = await fetch('/api/place', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.sessionId },
+        body: JSON.stringify({ xNorm, yNorm, color: erasing ? null : color }),
+      });
+      if (r.status === 429) {
+        const j = await r.json();
+        cdVal.textContent = j.retryAfter || state.cooldown;
+        return;
+      }
+      if (r.status === 403) {
+        if (erasing) showEraseToast('You can only erase your own pixels');
+        return;
+      }
+      const j = await r.json();
+      if (!j.ok) { console.warn('[place]', j.error); return; }
+      state.cooldown = j.cooldown || 0;
+      cdVal.textContent = state.cooldown;
+      const p = j.pixel;
+      if (p.color) state.pixels[pixKey(p.xNorm, p.yNorm)] = p;
+      else delete state.pixels[pixKey(p.xNorm, p.yNorm)];
+      pixelCount.textContent = Object.keys(state.pixels).length;
+      draw();
+    } catch (err) {
+      console.warn('[place] API unavailable, saving demo pixel locally:', err);
+      const d = loadAtlasDemo();
+      d.pixels = d.pixels || {};
+      const demoPixel = { xNorm, yNorm, color, by: state.account || 'demo-wallet', ts: Date.now() };
+      if (color) d.pixels[pixKey(xNorm, yNorm)] = demoPixel;
+      else delete d.pixels[pixKey(xNorm, yNorm)];
+      saveAtlasDemo(d);
+      if (color) state.pixels[pixKey(xNorm, yNorm)] = demoPixel;
+      else delete state.pixels[pixKey(xNorm, yNorm)];
+      pixelCount.textContent = Object.keys(state.pixels).length;
+      draw();
+    }
+  }
+
+  // ── Claim submit ───────────────────────────────────────────
+  $('btn-submit-claim').onclick = async () => {
+    if (!state.claimBox || !state.sessionId) return;
+    claimStatus.textContent = 'Registering…';
+    claimStatus.style.color = 'var(--muted)';
+    const name = $('claim-name').value.trim() || 'Untitled';
+    try {
+      const r = await fetch('/api/claims', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + state.sessionId },
+        body: JSON.stringify({ ...state.claimBox, name }),
+      });
+      const j = await r.json();
+      if (!j.ok) {
+        claimStatus.textContent = j.error || 'Failed';
+        claimStatus.style.color = 'var(--danger)';
+      } else {
+        claimStatus.textContent = '✓ Claimed!';
+        claimStatus.style.color = 'var(--success)';
+        state.claimBox = null; btnSubmit.disabled = true;
+        $('claim-name').value = '';
+      }
+    } catch (err) {
+      const d = loadAtlasDemo();
+      d.claims = d.claims || [];
+      const demoClaim = { id:'demo-'+Date.now(), wallet: state.account || 'demo-wallet', name, ...state.claimBox };
+      d.claims.push(demoClaim);
+      saveAtlasDemo(d);
+      state.claims.push(demoClaim);
+      claimStatus.textContent = '✓ Claimed in demo mode';
+      claimStatus.style.color = 'var(--success)';
+      state.claimBox = null; btnSubmit.disabled = true;
+      $('claim-name').value = '';
+      draw();
+    }
+  };
+  $('btn-cancel-claim').onclick = () => {
+    state.claimBox = null; state.claimDrag = null;
+    btnSubmit.disabled = true; claimStatus.textContent = '';
+    claimCoords.textContent = 'Click + drag on map to draw';
+    draw();
+  };
+
+  // ── My stats refresh ───────────────────────────────────────
+  async function refreshMyClaims() {
+    if (!state.sessionId) return;
+    const r = await fetch('/api/claims/mine', {
+      headers: { 'Authorization': 'Bearer ' + state.sessionId },
+    }).catch(() => null);
+    if (!r || !r.ok) return;
+    const j = await r.json();
+    myClaims.textContent = (j.claims || []).length;
+  }
+
+  // ── Leaderboard ────────────────────────────────────────────
+  $('btn-leaderboard').onclick = async () => {
+    const panel = $('leaderboard-panel');
+    panel.classList.toggle('open');
+    if (!panel.classList.contains('open')) return;
+    const r = await fetch('/api/leaderboard').catch(() => null);
+    if (!r || !r.ok) return;
+    const { leaderboard } = await r.json();
+    $('lb-list').innerHTML = leaderboard.slice(0, 20).map((e, i) =>
+      `<div class="lb-row">
+         <span style="color:var(--muted);margin-right:6px">${i + 1}</span>
+         <span class="lb-wallet">${e.wallet}</span>
+         <span>${e.pixelsPlaced}px · ${e.claimsHeld}cl</span></div>`
+    ).join('') || '<div style="color:var(--muted);font-size:12px">No data yet</div>';
+  };
+
+  // ── XUMM auth (SSE via /api/auth/start) ─────────────────────
+  async function runAtlasXummConnect() {
+    try {
+      const r = await fetch('/api/auth/start', { method: 'POST' });
+      const raw = await r.text();
+      console.log('Auth start response:', r.status, raw);
+      let j = {};
+      try {
+        j = raw ? JSON.parse(raw) : {};
+      } catch (parseErr) {
+        console.error('Auth start JSON parse failed:', parseErr);
+      }
+      if (!r.ok) throw new Error(j.error || `Auth start failed (${r.status})`);
+      if (!j.uuid) throw new Error('No payload uuid from server');
+      $('qr-img').src       = j.qr;
+      $('qr-deeplink').href = j.next;
+      $('qr-modal').classList.add('open');
+      $('qr-status').textContent = 'Waiting for approval…';
+      const labsWhileQr = (e) => {
+        if (!e.detail?.account || !e.detail?.sessionId) return;
+        window.removeEventListener('labs:session', labsWhileQr);
+        void onLogin(e.detail.account, e.detail.sessionId, e.detail.provider || 'xumm').then(() => {
+          closeQrModal();
+        });
+      };
+      window.addEventListener('labs:session', labsWhileQr);
+      try {
+        await waitForSession(j.uuid);
+      } finally {
+        window.removeEventListener('labs:session', labsWhileQr);
+        closeQrModal();
+      }
+    } catch (e) {
+      alert('XUMM connect failed: ' + e.message);
+      closeQrModal();
+    }
+  }
+  window.atlasConnect = runAtlasXummConnect;
+  $('btn-xumm').onclick = () => { void runAtlasXummConnect(); };
+  $('btn-close-qr').onclick = () => closeQrModal();
+
+  function closeQrModal() {
+    const modal = $('qr-modal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  function waitForSession(uuid) {
+    return new Promise((resolve, reject) => {
+      const es = new EventSource(`/api/auth/events/${uuid}`);
+      es.addEventListener('session', async (ev) => {
+        try {
+          const d = JSON.parse(ev.data);
+          if (d.sessionId && d.account) {
+            if (typeof LabsSession !== 'undefined' && LabsSession.set) {
+              LabsSession.set(d.sessionId, d.account, 'xumm');
+            }
+            await onLogin(d.account, d.sessionId, 'xumm');
+            closeQrModal();
+            resolve();
+            es.close();
+          } else {
+            closeQrModal();
+            reject(new Error('declined'));
+            es.close();
+          }
+        } catch (e) {
+          closeQrModal();
+          reject(e);
+          es.close();
+        }
+      });
+      es.onerror = () => {
+        es.close();
+        reject(new Error('Event stream error'));
+      };
+    });
+  }
+
+  // ── Google auth ────────────────────────────────────────────
+  $('btn-google').onclick = async () => {
+    try {
+      if (!auth) return alert('Google sign-in not configured.');
+      const result  = await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+      const idToken = await result.user.getIdToken();
+      const r = await fetch('/api/auth/firebase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+      });
+      const j = await r.json();
+      if (!j.sessionId) throw new Error(j.error || 'Sign-in failed');
+      onLogin(j.account, j.sessionId, 'google');
+    } catch (e) { alert('Google sign-in failed: ' + e.message); }
+  };
+
+  function isBridgeLabsSession(sessionId, provider) {
+    const sid = String(sessionId || '');
+    const prov = String(provider || 'xumm').toLowerCase();
+    return prov === 'xumm' && (sid.startsWith('lab-pkce') || sid.startsWith('bridge-'));
+  }
+
+  function updateAtlasActivateUi(needsActivation) {
+    const banner = $('atlas-activate-banner');
+    const btnXumm = $('btn-xumm');
+    const labsConnect = document.getElementById('labsToolNavConnect');
+    if (banner) banner.classList.toggle('show', !!needsActivation);
+    if (btnXumm) btnXumm.classList.toggle('atlas-activate-highlight', !!needsActivation);
+    if (labsConnect) {
+      labsConnect.classList.toggle('atlas-activate-highlight', !!needsActivation);
+      if (needsActivation) {
+        labsConnect.style.display = 'inline-block';
+        labsConnect.textContent = 'Connect';
+        labsConnect.disabled = false;
+      }
+    }
+  }
+
+  function setAuthButtonsLoggedIn(loggedIn, bridgeOnly) {
+    const btnXumm = $('btn-xumm');
+    const btnGoogle = $('btn-google');
+    const btnLogout = $('btn-logout');
+    if (btnLogout) {
+      btnLogout.style.display = loggedIn ? 'inline-block' : 'none';
+      btnLogout.hidden = !loggedIn;
+    }
+    if (bridgeOnly) {
+      if (btnXumm) btnXumm.style.display = 'inline-block';
+      if (btnGoogle) btnGoogle.style.display = 'inline-block';
+    } else if (loggedIn) {
+      if (btnXumm) btnXumm.style.display = 'none';
+      if (btnGoogle) btnGoogle.style.display = 'none';
+    } else {
+      if (btnXumm) btnXumm.style.display = 'inline-block';
+      if (btnGoogle) btnGoogle.style.display = 'inline-block';
+    }
+  }
+
+  // ── Login / logout ─────────────────────────────────────────
+  async function onLogin(account, sessionId, provider) {
+    closeQrModal();
+    const prov = provider || 'xumm';
+    const bridgeOnly = isBridgeLabsSession(sessionId, prov);
+
+    state.account = account;
+    state.sessionId = bridgeOnly ? null : sessionId;
+    updateAtlasActivateUi(bridgeOnly);
+
+    pillAcct.innerHTML = `<b>${prov === 'xumm' ? account.slice(0, 8) + '…' : 'google:' + account.slice(0, 6) + '…'}</b>`;
+    setAuthButtonsLoggedIn(true, bridgeOnly);
+
+    // Check Dood holder status
+    // TODO (Phase 3): server can expose GET /api/me with holder status
+    // For now, it's embedded in cooldown response; placeholder here:
+    // state.isHolder = await checkHolder();
+    // if (state.isHolder) pillHolder.style.display = 'inline-flex';
+
+    // Tally my pixels
+    const mine = Object.values(state.pixels).filter(p => p.by === account).length;
+    myPixels.textContent = mine;
+    refreshMyClaims();
+  }
+
+  // Sync LabsSession → Atlas state.sessionId (verify real bearer vs bridge/PKCE)
+  async function applyLabsSessionSync(detail) {
+    if (!detail?.account || !detail?.sessionId) return;
+    const account = detail.account;
+    const sessionId = detail.sessionId;
+    const provider = detail.provider || 'xumm';
+
+    if (isBridgeLabsSession(sessionId, provider)) {
+      await onLogin(account, sessionId, provider);
+      return;
+    }
+
+    try {
+      const r = await fetch('/api/auth/verify', {
+        headers: { Authorization: 'Bearer ' + sessionId },
+      });
+      if (r.ok) {
+        let verifiedAccount = account;
+        try {
+          const j = await r.json();
+          if (j.account) verifiedAccount = j.account;
+        } catch {}
+        await onLogin(verifiedAccount, sessionId, provider);
+        return;
+      }
+    } catch (err) {
+      console.warn('[Atlas] session verify failed:', err);
+    }
+
+    await onLogin(account, `bridge-${account}`, provider);
+  }
+
+  if (typeof LabsSession !== 'undefined' && LabsSession.get) {
+    const labsStored = LabsSession.get();
+    if (labsStored) void applyLabsSessionSync(labsStored);
+  }
+
+  const btnAtlasBannerConnect = $('btn-atlas-banner-connect');
+  if (btnAtlasBannerConnect) {
+    btnAtlasBannerConnect.addEventListener('click', (e) => {
+      e.preventDefault();
+      void window.atlasConnect?.().catch((err) => {
+        alert('XUMM connect failed: ' + (err?.message || err));
+      });
+    });
+  }
+
+  window.addEventListener('labs:session', (e) => {
+    if (e.detail) {
+      closeQrModal();
+      void applyLabsSessionSync(e.detail);
+    } else {
+      state.sessionId = null;
+      state.account = null;
+      updateAtlasActivateUi(false);
+      pillAcct.textContent = 'Guest';
+      setAuthButtonsLoggedIn(false, false);
+      myPixels.textContent = '—';
+      myClaims.textContent = '—';
+    }
+  });
+
+  $('btn-logout').onclick = async () => {
+    const token = state.sessionId;
+    if (token) {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token },
+      }).catch(() => {});
+    }
+    if (typeof LabsSession !== 'undefined' && LabsSession.clear) {
+      LabsSession.clear();
+    }
+    state.sessionId = null;
+    state.account = null;
+    updateAtlasActivateUi(false);
+    pillAcct.textContent = 'Guest';
+    setAuthButtonsLoggedIn(false, false);
+    myPixels.textContent = '—';
+    myClaims.textContent = '—';
+  };
+
+  // ── Cooldown ticker ────────────────────────────────────────
+  setInterval(() => {
+    const cur = parseInt(cdVal.textContent || '0', 10);
+    if (cur > 0) cdVal.textContent = String(cur - 1);
+  }, 1000);
+});
+</script>
+
+<script id="dood-v54-portal-logo-component-js">
+(function () {
+  const logoUrl = "/assets/dood-portal-guide-v54.png?v=54";
+
+  function goHome(event) {
+    event.preventDefault();
+    window.location.href = "/";
+  }
+
+  function normalizeLogo(el) {
+    if (!el) return;
+    el.classList.add("dood-portal-logo", "is-alive");
+    el.setAttribute("role", "link");
+    el.setAttribute("aria-label", "Dood Labs Home");
+    el.setAttribute("title", "Dood Labs Home");
+    el.onclick = goHome;
+    el.innerHTML = '<img src="' + logoUrl + '" alt="Dood Labs Portal Guide">';
+  }
+
+  function initDoodPortalLogo() {
+    document.querySelectorAll(".brand .mark, .brand-mark, .logo-mark, .site-logo, .app-logo, .dood-portal-logo").forEach(normalizeLogo);
+
+    document.querySelectorAll("img").forEach(function(img) {
+      const src = (img.getAttribute("src") || "").toLowerCase();
+      if (src.includes("doodlogo") || src.includes("dood-logo") || src.includes("doodlabs-logo") || src.includes("portal-guide") || src.includes("logo.png")) {
+        img.setAttribute("src", logoUrl);
+      }
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initDoodPortalLogo);
+  } else {
+    initDoodPortalLogo();
+  }
+})();
+</script>
+
+
+<script id="dood-v56-theme-modes-js">
+(function(){
+  const modes = [
+    { id: "dood", label: "Dood Mode" },
+    { id: "doodette", label: "Doodette Mode" },
+    { id: "dark", label: "Dark Mode" }
+  ];
+
+  function applyTheme(mode){
+    const clean = modes.some(m => m.id === mode) ? mode : "dood";
+    document.body.classList.remove("theme-dood", "theme-doodette", "theme-dark");
+    document.body.classList.add("theme-" + clean);
+    localStorage.setItem("doodLabsThemeMode", clean);
+    document.querySelectorAll("[data-theme-mode]").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.themeMode === clean);
+    });
+  }
+
+  function addThemeSwitcher(){
+    if(document.getElementById("doodThemeSwitcher")) return;
+    const wrap = document.createElement("div");
+    wrap.id = "doodThemeSwitcher";
+    wrap.className = "theme-switcher";
+    wrap.setAttribute("aria-label", "Theme modes");
+    wrap.innerHTML = modes.map(m => `<button type="button" data-theme-mode="${m.id}">${m.label}</button>`).join("");
+
+    const nav = document.querySelector("header nav") || document.querySelector(".site-header nav") || document.querySelector("header");
+    if(nav) nav.appendChild(wrap);
+
+    wrap.querySelectorAll("[data-theme-mode]").forEach(btn => {
+      btn.addEventListener("click", () => applyTheme(btn.dataset.themeMode));
+    });
+  }
+
+  function initThemeModes(){
+    addThemeSwitcher();
+    applyTheme(localStorage.getItem("doodLabsThemeMode") || "dood");
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", initThemeModes);
+  } else {
+    initThemeModes();
+  }
+})();
+</script>
+
+
+<script id="dood-v59-auth-redirect-helper">
+(function(){
+  function showAuthReturnMessage(){
+    const hash = window.location.hash || "";
+    const search = window.location.search || "";
+    const looksLikeAuthReturn =
+      hash.includes("access_token") ||
+      hash.includes("refresh_token") ||
+      search.includes("code=") ||
+      search.includes("token_hash=");
+    if(!looksLikeAuthReturn) return;
+
+    setTimeout(function(){
+      const notice = document.getElementById("profileAuthNotice") || document.getElementById("profileNotice");
+      if(notice){
+        notice.textContent = "Email confirmed. You can now log in and save your profile.";
+        notice.classList.add("show");
+        notice.style.display = "block";
+      }
+      if(typeof showPage === "function"){
+        showPage("profilePage");
+      }
+    }, 700);
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", showAuthReturnMessage);
+  } else {
+    showAuthReturnMessage();
+  }
+})();
+</script>
+
+</body>
+</html>
