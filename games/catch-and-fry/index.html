@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>Catch & Fry</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+html,body{
+margin:0;
+width:100%;
+height:100%;
+overflow:hidden;
+background:#111;
+font-family:Arial,sans-serif;
+touch-action:none;
+overscroll-behavior:none;
+}
+
+canvas{
+display:block;
+width:100vw;
+height:100vh;
+}
+
+#hud,#msg{
+position:fixed;
+color:white;
+font-weight:bold;
+text-shadow:3px 3px 5px #000;
+z-index:10;
+}
+
+#hud{
+top:calc(8px + env(safe-area-inset-top));
+left:8px;
+font-size:15px;
+line-height:1.35;
+background:rgba(0,0,0,.62);
+padding:8px 10px;
+border-radius:14px;
+border:2px solid rgba(255,216,77,.55);
+box-shadow:0 0 10px rgba(0,0,0,.55);
+}
+
+#msg{
+bottom:calc(92px + env(safe-area-inset-bottom));
+left:0;
+width:100%;
+text-align:center;
+font-size:22px;
+pointer-events:none;
+padding:0 10px;
+box-sizing:border-box;
+}
+
+#controls{
+position:fixed;
+bottom:calc(14px + env(safe-area-inset-bottom));
+left:0;
+width:100%;
+display:flex;
+justify-content:center;
+gap:8px;
+z-index:20;
+flex-wrap:wrap;
+padding:0 8px;
+box-sizing:border-box;
+}
+
+button{
+font-size:16px;
+font-weight:900;
+padding:14px 14px;
+border:0;
+border-radius:16px;
+background:#ffd84d;
+color:#111;
+box-shadow:0 6px 0 #9f6a00,0 0 8px rgba(0,0,0,.35);
+touch-action:manipulation;
+cursor:pointer;
+}
+
+button:active{
+transform:translateY(4px);
+box-shadow:0 2px 0 #9f6a00;
+}
+
+button:disabled{
+opacity:.45;
+cursor:not-allowed;
+transform:none;
+}
+
+#start,#shop,#leaderboard,#loginPanel{
+position:fixed;
+inset:0;
+z-index:100;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+color:white;
+}
+
+#start{
+background:linear-gradient(#ff7b54,#ffd166,#0b6d99);
+}
+
+#shop,#leaderboard,#loginPanel{
+display:none;
+background:rgba(0,0,0,.88);
+}
+
+.box{
+background:rgba(0,0,0,.78);
+padding:24px;
+border-radius:26px;
+max-width:92%;
+box-shadow:0 0 22px #000;
+border:2px solid rgba(255,216,77,.45);
+}
+
+.box h1{
+font-size:48px;
+margin:0;
+color:#ffd84d;
+letter-spacing:1px;
+}
+
+.box h2{
+margin-top:0;
+color:#ffd84d;
+}
+
+.shopBtn{
+display:block;
+width:100%;
+margin:10px 0;
+font-size:17px;
+}
+
+.small{
+font-size:14px;
+color:#eee;
+}
+
+.loginInput{
+width:92%;
+max-width:380px;
+font-size:16px;
+font-weight:900;
+padding:13px 14px;
+border-radius:16px;
+border:3px solid #ffd84d;
+background:#fff;
+color:#111;
+text-align:center;
+box-sizing:border-box;
+margin:8px 0;
+}
+
+#profileStatus,#leaderProfileStatus{
+font-size:14px;
+font-weight:900;
+color:#fff;
+background:rgba(0,0,0,.4);
+border:1px solid rgba(255,216,77,.35);
+border-radius:14px;
+padding:10px;
+margin:12px auto;
+max-width:420px;
+}
+
+#leaderboardList{
+max-height:54vh;
+overflow:auto;
+text-align:left;
+margin:12px auto;
+width:min(620px,92vw);
+background:rgba(255,255,255,.08);
+border-radius:16px;
+padding:10px;
+box-sizing:border-box;
+}
+
+.lbRow{
+display:grid;
+grid-template-columns:44px 42px 1fr 90px;
+gap:8px;
+align-items:center;
+padding:10px 8px;
+border-bottom:1px solid rgba(255,255,255,.16);
+font-weight:900;
+}
+
+.lbRow:last-child{
+border-bottom:0;
+}
+
+.lbRank{
+color:#ffd84d;
+}
+
+.lbAvatar{
+width:36px;
+height:36px;
+border-radius:50%;
+background:#ffd84d;
+object-fit:cover;
+border:2px solid rgba(255,255,255,.75);
+}
+
+.lbName{
+overflow:hidden;
+text-overflow:ellipsis;
+white-space:nowrap;
+}
+
+.lbScore{
+text-align:right;
+color:#90e0ef;
+}
+
+.leaderButtons{
+display:flex;
+gap:8px;
+justify-content:center;
+flex-wrap:wrap;
+}
+
+.linkBtn{
+display:inline-block;
+margin-top:10px;
+color:#ffd84d;
+font-weight:900;
+text-decoration:none;
+}
+
+@media(max-width:700px){
+#hud{font-size:12px;padding:7px 8px}
+#msg{font-size:18px;bottom:calc(102px + env(safe-area-inset-bottom))}
+#controls{gap:5px;bottom:calc(12px + env(safe-area-inset-bottom))}
+button{font-size:13px;padding:12px 9px;border-radius:14px}
+.box h1{font-size:38px}
+.lbRow{grid-template-columns:34px 36px 1fr 72px;font-size:13px}
+.lbAvatar{width:32px;height:32px}
+}
+
+@media(max-width:430px){
+#controls{gap:4px}
+button{font-size:12px;padding:11px 7px}
+#hud{font-size:11px;max-width:54vw}
+#msg{font-size:16px}
+.box{padding:18px}
+}
+</style>
+</head>
+
+<body>
+
+<div id="hud">
+Money: $<span id="money">0</span><br>
+Score: <span id="score">0</span><br>
+Best: <span id="bestScore">0</span><br>
+Basket: <span id="basket">0</span>/<span id="basketMax">3</span> — $<span id="basketValue">0</span><br>
+Fish Caught: <span id="caught">0</span><br>
+Pole Lv: <span id="poleLv">1</span> | Bait Lv: <span id="baitLv">1</span><br>
+Catch Chance: <span id="chance">66</span>%<br>
+Profile: <span id="hudProfile">Guest</span><br>
+Last Fish: <span id="lastFish">None</span>
+</div>
+
+<div id="msg">Press START</div>
+
+<div id="controls">
+<button id="leftBtn">⬅️</button>
+<button id="castBtn">CAST 🎣</button>
+<button id="reelBtn">REEL ⬆️</button>
+<button id="fryBtn">FRY 🔥</button>
+<button id="shopBtn">SHOP 🛒</button>
+<button id="leaderBtn">🏆</button>
+<button id="loginBtnSmall">LOGIN</button>
+<button id="rightBtn">➡️</button>
+</div>
+
+<div id="start">
+<div class="box">
+<h1>CATCH & FRY</h1>
+<p>Cast it. Catch it. Fry it. Upgrade it.</p>
+<p>Play anytime. Log in with Dood Labs to join the leaderboard.</p>
+
+<div id="profileStatus">Checking Dood Labs profile...</div>
+
+<input id="loginEmail" class="loginInput" type="email" placeholder="Dood Labs email">
+<input id="loginPassword" class="loginInput" type="password" placeholder="Dood Labs password">
+
+<br>
+<button id="loginBtn">LOGIN FOR LEADERBOARD</button>
+<button id="startBtn">START GAME</button>
+<br>
+<a class="linkBtn" href="https://doodlabs.app" target="_blank" rel="noopener">Create a Dood Labs profile</a>
+</div>
+</div>
+
+<div id="loginPanel">
+<div class="box">
+<h2>DOOD LABS LOGIN</h2>
+<p class="small">Log in to submit Catch & Fry scores to the universal leaderboard.</p>
+
+<div id="loginPanelStatus">Not logged in.</div>
+
+<input id="panelLoginEmail" class="loginInput" type="email" placeholder="Dood Labs email">
+<input id="panelLoginPassword" class="loginInput" type="password" placeholder="Dood Labs password">
+
+<br>
+<button id="panelLoginBtn">LOGIN</button>
+<button id="logoutBtn">LOG OUT</button>
+<button id="closeLoginPanel">BACK</button>
+<br>
+<a class="linkBtn" href="https://doodlabs.app" target="_blank" rel="noopener">Create a Dood Labs profile</a>
+</div>
+</div>
+
+<div id="shop">
+<div class="box">
+<h2>FISH FRY SHOP 🛒</h2>
+<p>Money: $<span id="shopMoney">0</span></p>
+
+<button class="shopBtn" id="buyPole">Upgrade Pole 🎣 - $<span id="poleCost">75</span></button>
+<div class="small">Faster reel + better landing chance.</div>
+
+<button class="shopBtn" id="buyBait">Better Bait 🪱 - $<span id="baitCost">60</span></button>
+<div class="small">Better chance fish stays hooked.</div>
+
+<button class="shopBtn" id="buyBasket">Bigger Basket 🧺 - $<span id="basketCost">90</span></button>
+<div class="small">Carry more fish before frying.</div>
+
+<br>
+<button id="closeShop">BACK TO DOCK</button>
+</div>
+</div>
+
+<div id="leaderboard">
+<div class="box">
+<h2>UNIVERSAL LEADERBOARD 🏆</h2>
+<p class="small">Only Dood Labs profiles can submit scores.</p>
+<div id="leaderProfileStatus">Checking profile...</div>
+<div id="leaderboardList">Loading leaderboard...</div>
+<div class="leaderButtons">
+<button id="submitScoreBtn">SUBMIT SCORE</button>
+<button id="refreshLeaderboardBtn">REFRESH</button>
+<button id="leaderLoginBtn">LOGIN</button>
+<button id="closeLeaderboard">BACK</button>
+</div>
+</div>
+</div>
+
+<canvas id="game"></canvas>
+
+<script>
+const SUPABASE_URL="https://fshvettlltcujmwvikfq.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_ARrX-vYhy8l-yhs6384S_g_n6214taB";
+const LEADERBOARD_TABLE="catch_and_fry_leaderboard";
+const PROFILE_TABLE="dood_profiles";
+
+let supabaseClient=null;
+let currentUser=null;
+let currentProfile=null;
+
+if(
+  SUPABASE_URL &&
+  SUPABASE_ANON_KEY &&
+  window.supabase
+){
+  supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+}
+
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+
+function loadFirstImage(paths){
+  const img=new Image();
+  let i=0;
+  img.onload=()=>{ img.ready=true; };
+  img.onerror=()=>{ i++; if(i<paths.length) img.src=paths[i]; };
+  img.src=paths[i];
+  return img;
+}
+
+const bgImg=loadFirstImage([
+  "catch_and_fry_background.jpg",
+  "catch_and_fry_background(2).jpg",
+  "./catch_and_fry_background.jpg",
+  "./catch_and_fry_background(2).jpg",
+  "images/catch_and_fry_background.jpg",
+  "images/catch_and_fry_background(2).jpg",
+  "assets/catch_and_fry_background.jpg",
+  "assets/catch_and_fry_background(2).jpg"
+]);
+
+const castingGuy=loadFirstImage([
+  "characters/casting_guy.png",
+  "characters/casting_guy.jpg",
+  "./characters/casting_guy.png",
+  "./characters/casting_guy.jpg",
+  "casting_guy.png",
+  "casting_guy.jpg"
+]);
+
+const fishOnGuy=loadFirstImage([
+  "characters/fish_on_guy.png",
+  "characters/fish_on_guy.jpg",
+  "./characters/fish_on_guy.png",
+  "./characters/fish_on_guy.jpg",
+  "fish_on_guy.png",
+  "fish_on_guy.jpg"
+]);
+
+const fryingGuy=loadFirstImage([
+  "characters/frying_guy.png",
+  "characters/frying_guy.jpg",
+  "characters/fry_guy.png",
+  "characters/fry_guy.jpg",
+  "./characters/frying_guy.png",
+  "./characters/frying_guy.jpg",
+  "frying_guy.png",
+  "frying_guy.jpg",
+  "fry_guy.png",
+  "fry_guy.jpg"
+]);
+
+const music=new Audio("music/banjo_music.m4a");
+music.loop=true;
+music.volume=.32;
+
+function resize(){
+canvas.width=Math.floor(innerWidth*devicePixelRatio);
+canvas.height=Math.floor(innerHeight*devicePixelRatio);
+ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+}
+resize();
+addEventListener("resize",resize);
+
+function W(){return innerWidth;}
+function H(){return innerHeight;}
+
+let audioCtx=null;
+
+function audioStart(){
+if(!audioCtx){
+audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+}
+music.play().catch(()=>{});
+}
+
+function tone(freq,duration,type="sine",vol=.12){
+audioStart();
+let o=audioCtx.createOscillator();
+let g=audioCtx.createGain();
+o.type=type;
+o.frequency.value=freq;
+g.gain.value=vol;
+o.connect(g);
+g.connect(audioCtx.destination);
+o.start();
+g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);
+o.stop(audioCtx.currentTime+duration);
+}
+
+function vibrate(pattern){
+if(navigator.vibrate){
+navigator.vibrate(pattern);
+}
+}
+
+function soundCast(){
+tone(420,.08,"sine",.08);
+setTimeout(()=>tone(260,.1,"sine",.07),70);
+}
+
+function soundReel(){
+tone(190,.08,"square",.06);
+setTimeout(()=>tone(230,.08,"square",.05),80);
+}
+
+function soundCatch(){
+tone(520,.09,"triangle",.13);
+setTimeout(()=>tone(720,.12,"triangle",.13),95);
+setTimeout(()=>tone(920,.13,"triangle",.11),190);
+}
+
+function soundLost(){
+tone(180,.16,"sawtooth",.12);
+setTimeout(()=>tone(120,.22,"sawtooth",.1),130);
+}
+
+function soundFry(){
+tone(90,.08,"sawtooth",.08);
+setTimeout(()=>tone(130,.09,"sawtooth",.07),80);
+setTimeout(()=>tone(170,.1,"sawtooth",.06),160);
+}
+
+function soundBuy(){
+tone(600,.09,"triangle",.12);
+setTimeout(()=>tone(850,.12,"triangle",.12),90);
+}
+
+let started=false;
+let money=0;
+let caught=0;
+let score=0;
+let bestScore=Number(localStorage.getItem("catchAndFryBestScore") || 0);
+let basket=0;
+let basketValue=0;
+
+let poleLevel=1;
+let baitLevel=1;
+let basketLimit=3;
+
+let poleCost=75;
+let baitCost=60;
+let basketCost=90;
+
+let waterTop=0;
+let dockTop=0;
+let msgTimer=0;
+let fishJumpTimer=0;
+let splashTimer=0;
+let fryingAnimation=0;
+let lastSubmittedScore=0;
+
+const fishTypes=[
+{name:"Tiny Fry",color:"#90e0ef",value:10,speed:1.8,size:28},
+{name:"Bucket Bass",color:"#ff595e",value:25,speed:2.1,size:34},
+{name:"Grease Gill",color:"#8ac926",value:40,speed:2.4,size:38},
+{name:"Disco Trout",color:"#6a4c93",value:65,speed:2.8,size:42},
+{name:"Golden Fryfish",color:"#ffca3a",value:100,speed:3.2,size:46},
+{name:"Kraken Nugget",color:"#f72585",value:175,speed:3.7,size:54}
+];
+
+const player={
+x:90,
+y:0,
+w:58,
+h:78,
+speed:6,
+left:false,
+right:false
+};
+
+const cast={
+active:false,
+bobberX:0,
+bobberY:0,
+hookY:0,
+fish:null,
+reeling:false,
+escapeRoll:0,
+fishJump:false,
+fishJumpY:0
+};
+
+let fishes=[];
+let bubbles=[];
+
+const moneyEl=document.getElementById("money");
+const scoreEl=document.getElementById("score");
+const bestScoreEl=document.getElementById("bestScore");
+const caughtEl=document.getElementById("caught");
+const basketEl=document.getElementById("basket");
+const basketMaxEl=document.getElementById("basketMax");
+const basketValueEl=document.getElementById("basketValue");
+const poleLvEl=document.getElementById("poleLv");
+const baitLvEl=document.getElementById("baitLv");
+const chanceEl=document.getElementById("chance");
+const lastFishEl=document.getElementById("lastFish");
+const hudProfileEl=document.getElementById("hudProfile");
+
+const shopMoney=document.getElementById("shopMoney");
+const poleCostEl=document.getElementById("poleCost");
+const baitCostEl=document.getElementById("baitCost");
+const basketCostEl=document.getElementById("basketCost");
+
+const profileStatus=document.getElementById("profileStatus");
+const leaderProfileStatus=document.getElementById("leaderProfileStatus");
+const loginPanelStatus=document.getElementById("loginPanelStatus");
+const leaderboardList=document.getElementById("leaderboardList");
+const submitScoreBtn=document.getElementById("submitScoreBtn");
+
+function safeText(value){
+return String(value || "").replace(/[<>&"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;","\"":"&quot;"}[c]));
+}
+
+function profileName(){
+if(!currentProfile)return "Guest";
+return currentProfile.username || currentProfile.display_name || "Dood Player";
+}
+
+function profileDisplay(){
+if(!currentProfile)return "Guest";
+const username=currentProfile.username ? "@"+currentProfile.username : "Dood Player";
+const display=currentProfile.display_name || username;
+return display+" "+username;
+}
+
+function setStatus(message){
+profileStatus.innerHTML=message;
+leaderProfileStatus.innerHTML=message;
+loginPanelStatus.innerHTML=message;
+}
+
+function updateAuthUi(){
+if(currentProfile){
+const name=safeText(profileDisplay());
+hudProfileEl.textContent=profileName();
+setStatus("Logged in as <strong>"+name+"</strong>. Leaderboard enabled.");
+submitScoreBtn.disabled=false;
+document.getElementById("loginBtnSmall").textContent="PROFILE";
+document.getElementById("leaderLoginBtn").textContent="PROFILE";
+}else if(currentUser){
+hudProfileEl.textContent="No Profile";
+setStatus("You are logged in, but no Dood Labs profile was found. Create your Dood Labs profile before joining the leaderboard.");
+submitScoreBtn.disabled=true;
+document.getElementById("loginBtnSmall").textContent="LOGIN";
+document.getElementById("leaderLoginBtn").textContent="LOGIN";
+}else{
+hudProfileEl.textContent="Guest";
+setStatus("Guest mode. You can play, but you must log in with a Dood Labs profile to submit leaderboard scores.");
+submitScoreBtn.disabled=true;
+document.getElementById("loginBtnSmall").textContent="LOGIN";
+document.getElementById("leaderLoginBtn").textContent="LOGIN";
+}
+}
+
+async function loadCurrentSession(){
+if(!supabaseClient){
+setStatus("Supabase is not connected.");
+return;
+}
+
+const {data,error}=await supabaseClient.auth.getSession();
+
+if(error){
+currentUser=null;
+currentProfile=null;
+updateAuthUi();
+return;
+}
+
+currentUser=data && data.session && data.session.user ? data.session.user : null;
+
+if(currentUser){
+await loadProfileForUser(currentUser.id);
+}else{
+currentProfile=null;
+updateAuthUi();
+}
+}
+
+async function loadProfileForUser(userId){
+currentProfile=null;
+
+const {data,error}=await supabaseClient
+.from(PROFILE_TABLE)
+.select("id,user_id,email,display_name,username,profile_pic_url,is_public,status")
+.eq("user_id",userId)
+.order("created_at",{ascending:true})
+.limit(1)
+.maybeSingle();
+
+if(error){
+console.error(error);
+currentProfile=null;
+updateAuthUi();
+return;
+}
+
+if(data){
+currentProfile=data;
+}else{
+currentProfile=null;
+}
+
+updateAuthUi();
+}
+
+async function loginWithDoodLabs(email,password){
+if(!supabaseClient){
+say("Supabase is not connected.");
+return;
+}
+
+email=(email || "").trim();
+password=(password || "").trim();
+
+if(!email || !password){
+say("Enter your Dood Labs email and password.");
+setStatus("Enter your Dood Labs email and password.");
+return;
+}
+
+setStatus("Logging in...");
+
+const {data,error}=await supabaseClient.auth.signInWithPassword({
+email:email,
+password:password
+});
+
+if(error){
+console.error(error);
+currentUser=null;
+currentProfile=null;
+updateAuthUi();
+say("Login failed. Check email and password.");
+setStatus("Login failed. Check email and password.");
+return;
+}
+
+currentUser=data.user;
+await loadProfileForUser(currentUser.id);
+
+if(currentProfile){
+say("Leaderboard profile connected!");
+}else{
+say("Logged in, but no Dood Labs profile found.");
+}
+}
+
+async function logoutDoodLabs(){
+if(!supabaseClient)return;
+
+await supabaseClient.auth.signOut();
+currentUser=null;
+currentProfile=null;
+updateAuthUi();
+say("Logged out.");
+}
+
+function currentScore(){
+return score;
+}
+
+function updateBestScore(){
+if(score>bestScore){
+bestScore=score;
+localStorage.setItem("catchAndFryBestScore",String(bestScore));
+}
+}
+
+function catchChance(){
+return Math.min(.95,.45+(poleLevel*.11)+(baitLevel*.10));
+}
+
+function say(t){
+document.getElementById("msg").textContent=t;
+msgTimer=150;
+}
+
+function updateHud(){
+updateBestScore();
+
+moneyEl.textContent=money;
+scoreEl.textContent=currentScore();
+bestScoreEl.textContent=bestScore;
+caughtEl.textContent=caught;
+basketEl.textContent=basket;
+basketMaxEl.textContent=basketLimit;
+basketValueEl.textContent=basketValue;
+poleLvEl.textContent=poleLevel;
+baitLvEl.textContent=baitLevel;
+chanceEl.textContent=Math.round(catchChance()*100);
+
+shopMoney.textContent=money;
+poleCostEl.textContent=poleCost;
+baitCostEl.textContent=baitCost;
+basketCostEl.textContent=basketCost;
+}
+
+function chooseFish(){
+let roll=Math.random();
+if(roll<.38)return fishTypes[0];
+if(roll<.62)return fishTypes[1];
+if(roll<.78)return fishTypes[2];
+if(roll<.90)return fishTypes[3];
+if(roll<.98)return fishTypes[4];
+return fishTypes[5];
+}
+
+function spawnFish(){
+const t=chooseFish();
+fishes.push({
+...t,
+x:Math.random()*W(),
+y:H()*.40+Math.random()*H()*.25,
+dir:Math.random()>.5?1:-1
+});
+}
+
+function resetFish(){
+fishes=[];
+for(let i=0;i<18;i++){
+spawnFish();
+}
+}
+
+function startGame(){
+audioStart();
+started=true;
+document.getElementById("start").style.display="none";
+say("Press CAST to start fishing!");
+updateHud();
+}
+
+function castLine(){
+audioStart();
+
+if(!started)return;
+
+if(cast.active){
+say("Already casting! Tap REEL.");
+return;
+}
+
+if(basket>=basketLimit){
+say("Basket full! Fry or upgrade basket.");
+return;
+}
+
+soundCast();
+
+waterTop=H()*.36;
+
+cast.active=true;
+cast.reeling=false;
+cast.bobberX=Math.max(120,Math.min(W()-120,player.x+260));
+cast.bobberY=waterTop+35;
+cast.hookY=cast.bobberY+115;
+cast.fish={...chooseFish()};
+cast.escapeRoll=Math.random();
+cast.fishJump=false;
+cast.fishJumpY=0;
+
+splashTimer=20;
+
+vibrate([120,60,120]);
+
+say("Fish on! Reel in the "+cast.fish.name+" worth $"+cast.fish.value+"!");
+}
+
+function reelLine(){
+audioStart();
+
+if(!cast.active){
+say("Cast first!");
+return;
+}
+
+cast.reeling=true;
+soundReel();
+say("Reeling it in!");
+}
+
+async function fryFish(){
+audioStart();
+
+if(basket<=0){
+say("No fish to fry!");
+return;
+}
+
+let earned=basketValue;
+money+=earned;
+score+=earned+(basket*15)+(poleLevel*5)+(baitLevel*5);
+
+basket=0;
+basketValue=0;
+fryingAnimation=100;
+
+updateHud();
+soundFry();
+
+for(let i=0;i<50;i++){
+bubbles.push({
+x:W()-230+Math.random()*150,
+y:H()-210+Math.random()*80,
+r:4+Math.random()*8,
+life:30+Math.random()*25
+});
+}
+
+if(currentProfile){
+say("Sizzle! Sold basket for $"+earned+"! Score submitted.");
+await submitScore(false);
+}else{
+say("Sizzle! Sold basket for $"+earned+"! Log in with Dood Labs to submit.");
+}
+}
+
+function openShop(){
+if(!started)return;
+updateHud();
+document.getElementById("shop").style.display="flex";
+}
+
+function closeShop(){
+document.getElementById("shop").style.display="none";
+say("Back to fishing!");
+}
+
+function buyPole(){
+if(money<poleCost){
+say("Not enough money!");
+return;
+}
+money-=poleCost;
+poleLevel++;
+score+=20;
+poleCost=Math.floor(poleCost*1.7);
+updateHud();
+soundBuy();
+say("Pole upgraded!");
+}
+
+function buyBait(){
+if(money<baitCost){
+say("Not enough money!");
+return;
+}
+money-=baitCost;
+baitLevel++;
+score+=15;
+baitCost=Math.floor(baitCost*1.6);
+updateHud();
+soundBuy();
+say("Better bait bought!");
+}
+
+function buyBasket(){
+if(money<basketCost){
+say("Not enough money!");
+return;
+}
+money-=basketCost;
+basketLimit+=2;
+score+=15;
+basketCost=Math.floor(basketCost*1.8);
+updateHud();
+soundBuy();
+say("Basket upgraded!");
+}
+
+async function openLeaderboard(){
+if(!started)return;
+document.getElementById("leaderboard").style.display="flex";
+updateAuthUi();
+await loadLeaderboard();
+}
+
+function closeLeaderboard(){
+document.getElementById("leaderboard").style.display="none";
+say("Back to fishing!");
+}
+
+function openLoginPanel(){
+document.getElementById("loginPanel").style.display="flex";
+updateAuthUi();
+}
+
+function closeLoginPanel(){
+document.getElementById("loginPanel").style.display="none";
+say("Back to fishing!");
+}
+
+async function submitScore(showMessage=true){
+if(score<=0){
+if(showMessage){
+say("Catch and fry fish first!");
+}
+return;
+}
+
+if(!currentUser || !currentProfile){
+if(showMessage){
+say("Create or log in to your Dood Labs profile to submit.");
+openLoginPanel();
+}
+return;
+}
+
+if(score===lastSubmittedScore && !showMessage){
+return;
+}
+
+if(!supabaseClient){
+if(showMessage){
+say("Leaderboard needs Supabase connection.");
+}
+return;
+}
+
+lastSubmittedScore=score;
+
+const payload={
+user_id:currentUser.id,
+profile_id:currentProfile.id,
+username:currentProfile.username || "doodplayer",
+display_name:currentProfile.display_name || currentProfile.username || "Dood Player",
+profile_pic_url:currentProfile.profile_pic_url || null,
+score:score,
+money:money,
+fish_caught:caught,
+pole_level:poleLevel,
+bait_level:baitLevel,
+basket_limit:basketLimit
+};
+
+const {error}=await supabaseClient
+.from(LEADERBOARD_TABLE)
+.insert(payload);
+
+if(error){
+console.error(error);
+if(showMessage){
+say("Leaderboard submit failed.");
+}
+return;
+}
+
+if(showMessage){
+say("Score submitted!");
+}
+
+if(document.getElementById("leaderboard").style.display==="flex"){
+await loadLeaderboard();
+}
+}
+
+async function loadLeaderboard(){
+if(!supabaseClient){
+leaderboardList.innerHTML=
+"<p style='text-align:center'>Leaderboard is not connected.</p>";
+return;
+}
+
+leaderboardList.textContent="Loading leaderboard...";
+
+const {data,error}=await supabaseClient
+.from(LEADERBOARD_TABLE)
+.select("username,display_name,profile_pic_url,score,money,fish_caught,created_at")
+.order("score",{ascending:false})
+.order("created_at",{ascending:true})
+.limit(25);
+
+if(error){
+console.error(error);
+leaderboardList.innerHTML="<p style='text-align:center'>Could not load leaderboard.</p>";
+return;
+}
+
+if(!data || !data.length){
+leaderboardList.innerHTML="<p style='text-align:center'>No scores yet. Be the first!</p>";
+return;
+}
+
+leaderboardList.innerHTML=data.map((row,index)=>{
+const rank=index+1;
+const username=safeText(row.username || "doodplayer");
+const displayName=safeText(row.display_name || username);
+const avatar=safeText(row.profile_pic_url || "");
+const avatarHtml=avatar
+  ? `<img class="lbAvatar" src="${avatar}" alt="">`
+  : `<div class="lbAvatar"></div>`;
+
+return `
+<div class="lbRow">
+  <div class="lbRank">#${rank}</div>
+  <div>${avatarHtml}</div>
+  <div class="lbName">${displayName}<br><span class="small">@${username} • $${row.money} • ${row.fish_caught} fish</span></div>
+  <div class="lbScore">${row.score}</div>
+</div>
+`;
+}).join("");
+}
+
+function bind(id,fn){
+let el=document.getElementById(id);
+el.addEventListener("pointerdown",e=>{
+e.preventDefault();
+fn();
+});
+}
+
+bind("startBtn",startGame);
+bind("castBtn",castLine);
+bind("reelBtn",reelLine);
+bind("fryBtn",fryFish);
+bind("shopBtn",openShop);
+bind("leaderBtn",openLeaderboard);
+bind("loginBtnSmall",openLoginPanel);
+bind("leaderLoginBtn",openLoginPanel);
+bind("closeShop",closeShop);
+bind("closeLeaderboard",closeLeaderboard);
+bind("closeLoginPanel",closeLoginPanel);
+bind("submitScoreBtn",()=>submitScore(true));
+bind("refreshLeaderboardBtn",loadLeaderboard);
+bind("buyPole",buyPole);
+bind("buyBait",buyBait);
+bind("buyBasket",buyBasket);
+
+bind("loginBtn",()=>{
+const email=document.getElementById("loginEmail").value;
+const password=document.getElementById("loginPassword").value;
+loginWithDoodLabs(email,password);
+});
+
+bind("panelLoginBtn",()=>{
+const email=document.getElementById("panelLoginEmail").value;
+const password=document.getElementById("panelLoginPassword").value;
+loginWithDoodLabs(email,password);
+});
+
+bind("logoutBtn",logoutDoodLabs);
+
+function hold(id,on,off){
+let el=document.getElementById(id);
+el.addEventListener("pointerdown",e=>{e.preventDefault();on()});
+el.addEventListener("pointerup",e=>{e.preventDefault();off()});
+el.addEventListener("pointerleave",e=>{e.preventDefault();off()});
+el.addEventListener("pointercancel",e=>{e.preventDefault();off()});
+}
+
+hold("leftBtn",()=>player.left=true,()=>player.left=false);
+hold("rightBtn",()=>player.right=true,()=>player.right=false);
+
+addEventListener("keydown",e=>{
+let k=e.key.toLowerCase();
+if(k==="a"||k==="arrowleft")player.left=true;
+if(k==="d"||k==="arrowright")player.right=true;
+if(k===" "||k==="c")castLine();
+if(k==="r")reelLine();
+if(k==="f")fryFish();
+if(k==="s")openShop();
+if(k==="l")openLeaderboard();
+});
+
+addEventListener("keyup",e=>{
+let k=e.key.toLowerCase();
+if(k==="a"||k==="arrowleft")player.left=false;
+if(k==="d"||k==="arrowright")player.right=false;
+});
+
+if(supabaseClient){
+supabaseClient.auth.onAuthStateChange(async(event,session)=>{
+currentUser=session && session.user ? session.user : null;
+if(currentUser){
+await loadProfileForUser(currentUser.id);
+}else{
+currentProfile=null;
+updateAuthUi();
+}
+});
+}
+
+loadCurrentSession();
+resetFish();
+updateHud();
+
+function update(){
+waterTop=H()*.36;
+dockTop=H()-120;
+
+player.y=H()-205;
+if(W()<700){
+  player.y=H()-198;
+}
+
+if(player.left)player.x-=player.speed;
+if(player.right)player.x+=player.speed;
+
+player.x=Math.max(8,Math.min(W()-player.w-8,player.x));
+
+fishes.forEach(f=>{
+f.x+=f.speed*f.dir;
+if(f.x<-100)f.x=W()+100;
+if(f.x>W()+100)f.x=-100;
+});
+
+if(cast.active){
+cast.bobberY=waterTop+35+Math.sin(Date.now()/180)*4;
+
+if(cast.reeling){
+let reelSpeed=6+poleLevel*2;
+
+cast.hookY-=reelSpeed;
+cast.bobberY-=reelSpeed*.45;
+
+if(Math.random()<.045){
+cast.fishJump=true;
+fishJumpTimer=20;
+splashTimer=16;
+}
+
+if(fishJumpTimer>0){
+fishJumpTimer--;
+cast.fishJumpY=Math.sin(fishJumpTimer*.3)*-85;
+}else{
+cast.fishJump=false;
+cast.fishJumpY=0;
+}
+
+if(cast.hookY<=player.y+20){
+if(cast.escapeRoll<catchChance()){
+caught++;
+basket++;
+basketValue+=cast.fish.value;
+score+=Math.floor(cast.fish.value*.35)+10;
+lastFishEl.textContent=cast.fish.name+" ($"+cast.fish.value+")";
+soundCatch();
+vibrate([80,40,80,40,160]);
+say("Caught "+cast.fish.name+"!");
+}else{
+score=Math.max(0,score-5);
+soundLost();
+vibrate([250]);
+say(cast.fish.name+" got away!");
+}
+
+cast.active=false;
+updateHud();
+}
+}
+}
+
+if(splashTimer>0)splashTimer--;
+if(fryingAnimation>0)fryingAnimation--;
+
+bubbles=bubbles.filter(b=>{
+b.y-=1;
+b.life--;
+return b.life>0;
+});
+
+if(msgTimer>0)msgTimer--;
+}
+
+function bg(){
+if(bgImg.ready || (bgImg.complete && bgImg.naturalWidth)){
+  const iw=bgImg.naturalWidth || bgImg.width;
+  const ih=bgImg.naturalHeight || bgImg.height;
+  const scale=Math.max(W()/iw,H()/ih);
+  const dw=iw*scale;
+  const dh=ih*scale;
+  const dx=(W()-dw)/2;
+  const dy=(H()-dh)/2;
+  ctx.drawImage(bgImg,dx,dy,dw,dh);
+}else{
+  let g=ctx.createLinearGradient(0,0,0,H());
+  g.addColorStop(0,"#ff7b54");
+  g.addColorStop(.32,"#ffd166");
+  g.addColorStop(.33,"#1b9aaa");
+  g.addColorStop(1,"#05345f");
+  ctx.fillStyle=g;
+  ctx.fillRect(0,0,W(),H());
+}
+}
+
+function fishShape(x,y,f,dir=1){
+ctx.save();
+ctx.translate(x,y);
+ctx.scale(dir,1);
+
+ctx.fillStyle=f.color;
+ctx.beginPath();
+ctx.ellipse(0,0,f.size,f.size*.45,0,0,Math.PI*2);
+ctx.fill();
+
+ctx.beginPath();
+ctx.moveTo(-f.size,0);
+ctx.lineTo(-f.size-22,-15);
+ctx.lineTo(-f.size-22,15);
+ctx.closePath();
+ctx.fill();
+
+ctx.fillStyle="white";
+ctx.beginPath();
+ctx.arc(f.size*.42,-6,5,0,Math.PI*2);
+ctx.fill();
+
+ctx.fillStyle="black";
+ctx.beginPath();
+ctx.arc(f.size*.44,-6,2,0,Math.PI*2);
+ctx.fill();
+
+ctx.restore();
+}
+
+function drawFish(){
+fishes.forEach(f=>fishShape(f.x,f.y,f,f.dir));
+}
+
+function dock(){
+ctx.fillStyle="rgba(0,0,0,.12)";
+ctx.fillRect(0,dockTop,W(),120);
+}
+
+function drawCharacterImage(img,x,y,w,h){
+if(img.ready || (img.complete && img.naturalWidth)){
+ctx.drawImage(img,x,y,w,h);
+return true;
+}
+return false;
+}
+
+function playerDraw(){
+let img=castingGuy;
+if(cast.active){
+img=fishOnGuy;
+}
+
+const mobile=W()<700;
+const drawW=mobile?235:360;
+const drawH=mobile?170:250;
+const drawX=player.x-(mobile?28:42);
+const drawY=player.y-(mobile?96:150);
+
+if(!drawCharacterImage(img,drawX,drawY,drawW,drawH)){
+ctx.fillStyle="#ffd84d";
+ctx.fillRect(player.x,player.y,player.w,player.h);
+}
+}
+
+function fryGuyDraw(){
+if(fryingAnimation<=0)return;
+const t=fryingAnimation/100;
+const pulse=1+Math.sin(Date.now()/80)*.025;
+const mobile=W()<700;
+const drawW=(mobile?245:360)*pulse;
+const drawH=(mobile?170:250)*pulse;
+const drawX=W()-drawW-(mobile?4:20);
+const drawY=H()-drawH-(mobile?75:82);
+
+if(!drawCharacterImage(fryingGuy,drawX,drawY,drawW,drawH)){
+ctx.fillStyle="rgba(255,216,77,.9)";
+ctx.fillRect(drawX,drawY,drawW,drawH);
+}
+
+ctx.fillStyle="rgba(255,230,90,"+(0.18*t)+")";
+ctx.beginPath();
+ctx.arc(drawX+drawW*.65,drawY+drawH*.38,80*t,0,Math.PI*2);
+ctx.fill();
+}
+
+function drawSplash(x,y){
+if(splashTimer<=0)return;
+
+ctx.fillStyle="rgba(255,255,255,.8)";
+for(let i=0;i<5;i++){
+ctx.beginPath();
+ctx.arc(
+x-30+i*15,
+y+Math.sin((splashTimer+i)*.7)*8,
+4+i%2*3,
+0,
+Math.PI*2
+);
+ctx.fill();
+}
+}
+
+function drawCast(){
+if(!cast.active)return;
+
+let rodX=player.x+260;
+let rodY=player.y-95;
+
+ctx.strokeStyle="white";
+ctx.lineWidth=3;
+ctx.beginPath();
+ctx.moveTo(rodX,rodY);
+ctx.lineTo(cast.bobberX,cast.bobberY);
+ctx.stroke();
+
+ctx.strokeStyle="#ddd";
+ctx.lineWidth=2;
+ctx.beginPath();
+ctx.moveTo(cast.bobberX,cast.bobberY);
+ctx.lineTo(cast.bobberX,cast.hookY);
+ctx.stroke();
+
+drawSplash(cast.bobberX,waterTop+55);
+
+ctx.fillStyle="red";
+ctx.beginPath();
+ctx.arc(cast.bobberX,cast.bobberY,13,0,Math.PI*2);
+ctx.fill();
+
+ctx.fillStyle="white";
+ctx.beginPath();
+ctx.arc(cast.bobberX,cast.bobberY-5,7,0,Math.PI*2);
+ctx.fill();
+
+ctx.fillStyle="#222";
+ctx.beginPath();
+ctx.arc(cast.bobberX,cast.hookY,7,0,Math.PI*2);
+ctx.fill();
+
+if(cast.fish){
+fishShape(
+cast.bobberX,
+cast.hookY+25+(cast.fishJump?cast.fishJumpY:0),
+cast.fish,
+1
+);
+}
+}
+
+function fryerEffects(){
+bubbles.forEach(b=>{
+ctx.fillStyle="rgba(255,255,255,.75)";
+ctx.beginPath();
+ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+ctx.fill();
+});
+}
+
+function draw(){
+bg();
+drawFish();
+dock();
+fryerEffects();
+playerDraw();
+drawCast();
+fryGuyDraw();
+}
+
+function loop(){
+if(started)update();
+draw();
+requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+</body>
+</html>
