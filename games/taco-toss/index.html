@@ -1,0 +1,2061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Toss My Taco - Rollies Taco Truck</title>
+
+<style>
+:root{
+  --vh:100vh;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --safe-left:env(safe-area-inset-left,0px);
+  --safe-right:env(safe-area-inset-right,0px);
+  --gold:#ffd166;
+  --shadow:0 12px 30px rgba(0,0,0,.42);
+}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#12091e;
+  color:white;
+  font-family:Arial, Helvetica, sans-serif;
+  touch-action:none;
+  overscroll-behavior:none;
+}
+
+body{
+  position:fixed;
+  inset:0;
+}
+
+#app{
+  position:fixed;
+  left:0;
+  top:0;
+  width:100vw;
+  height:var(--vh);
+  overflow:hidden;
+  background:#12091e;
+}
+
+#bgLayer{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  background-image:
+    linear-gradient(180deg, rgba(18,9,30,.08), rgba(18,9,30,.28)),
+    url("background/tacotossbackground.png");
+  background-size:cover;
+  background-position:center center;
+  background-repeat:no-repeat;
+}
+
+#bgLayer::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,.20));
+  pointer-events:none;
+}
+
+canvas{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  width:100%;
+  height:100%;
+  display:block;
+  touch-action:none;
+}
+
+.hidden{display:none!important;}
+
+.screen{
+  position:absolute;
+  inset:0;
+  z-index:40;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:24px;
+  padding-left:max(24px,var(--safe-left));
+  padding-right:max(24px,var(--safe-right));
+  padding-top:max(24px,var(--safe-top));
+  padding-bottom:max(24px,var(--safe-bottom));
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255,209,102,.15), transparent 32%),
+    linear-gradient(180deg, rgba(13,6,28,.24), rgba(5,3,10,.60));
+}
+
+.title{
+  margin:0 0 10px;
+  font-size:clamp(36px,8vw,82px);
+  color:var(--gold);
+  font-weight:900;
+  letter-spacing:1px;
+  text-shadow:0 0 18px rgba(255,209,102,.42),0 4px 0 rgba(0,0,0,.35);
+}
+
+.subtitle{
+  max-width:920px;
+  font-size:clamp(16px,2.7vw,24px);
+  line-height:1.35;
+  color:#fff5d6;
+  margin-bottom:12px;
+  text-shadow:0 2px 8px rgba(0,0,0,.7);
+}
+
+.small{
+  max-width:860px;
+  color:#eadfff;
+  font-size:clamp(13px,2vw,17px);
+  line-height:1.35;
+  text-shadow:0 2px 8px rgba(0,0,0,.7);
+}
+
+.cta{
+  margin-top:22px;
+  padding:16px 28px;
+  border-radius:999px;
+  background:linear-gradient(180deg,#ffd166,#ff9f1c);
+  color:#2a1302;
+  font-weight:900;
+  font-size:clamp(18px,2.7vw,25px);
+  border:2px solid rgba(255,255,255,.25);
+  box-shadow:var(--shadow);
+  animation:pulse 1.35s infinite ease-in-out;
+}
+
+@keyframes pulse{
+  0%,100%{transform:scale(1);}
+  50%{transform:scale(1.04);}
+}
+
+#startWalkArea{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:calc(16px + var(--safe-bottom));
+  height:110px;
+  overflow:hidden;
+  pointer-events:none;
+}
+
+#startTaco{
+  position:absolute;
+  left:-150px;
+  bottom:8px;
+  width:100px;
+  height:80px;
+  animation:walk 7.2s linear infinite;
+  filter:drop-shadow(0 8px 10px rgba(0,0,0,.35));
+}
+
+#startTaco img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+@keyframes walk{
+  0%{transform:translateX(0);}
+  100%{transform:translateX(calc(100vw + 320px));}
+}
+
+#startBubble{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:calc(122px + var(--safe-bottom));
+  padding:10px 16px;
+  border-radius:18px;
+  background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.18);
+  color:#fff5d2;
+  font-weight:900;
+  box-shadow:var(--shadow);
+}
+
+#musicBtn{
+  position:absolute;
+  z-index:35;
+  right:calc(10px + var(--safe-right));
+  top:calc(10px + var(--safe-top));
+  min-height:38px;
+  padding:8px 12px;
+  border:none;
+  border-radius:999px;
+  background:rgba(8,4,18,.78);
+  color:#fff3c6;
+  font-weight:900;
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 8px 18px rgba(0,0,0,.28);
+  cursor:pointer;
+}
+
+#hud{
+  position:absolute;
+  z-index:18;
+  top:calc(8px + var(--safe-top));
+  left:calc(8px + var(--safe-left));
+  right:calc(8px + var(--safe-right));
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:6px;
+  pointer-events:none;
+}
+
+.hudCard{
+  min-height:48px;
+  border-radius:14px;
+  background:rgba(8,4,18,.58);
+  border:1px solid rgba(255,255,255,.13);
+  box-shadow:0 8px 20px rgba(0,0,0,.24);
+  backdrop-filter:blur(5px);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:6px;
+}
+
+.hudLabel{
+  font-size:10px;
+  color:#e9dfff;
+  opacity:.9;
+  text-transform:uppercase;
+  font-weight:800;
+  letter-spacing:.7px;
+  margin-bottom:2px;
+}
+
+.hudValue{
+  color:#fff3c6;
+  font-size:clamp(16px,2.7vw,24px);
+  font-weight:900;
+}
+
+#orderPanel{
+  position:absolute;
+  z-index:19;
+  top:calc(64px + var(--safe-top));
+  left:50%;
+  transform:translateX(-50%);
+  width:min(92vw,720px);
+  padding:10px 14px;
+  border-radius:18px;
+  background:rgba(7,3,16,.72);
+  border:1px solid rgba(255,255,255,.15);
+  box-shadow:var(--shadow);
+  text-align:center;
+  backdrop-filter:blur(7px);
+  pointer-events:none;
+}
+
+#roundText{
+  color:var(--gold);
+  font-size:clamp(14px,2vw,19px);
+  font-weight:900;
+  margin-bottom:4px;
+}
+
+#orderLabel{
+  color:#fff4c6;
+  font-size:clamp(13px,2vw,16px);
+  font-weight:900;
+  letter-spacing:.8px;
+  text-transform:uppercase;
+  margin-bottom:2px;
+}
+
+#matchText{
+  color:#fff0b8;
+  font-size:clamp(11px,1.7vw,14px);
+  font-weight:900;
+  margin-bottom:6px;
+}
+
+#orderIcons{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  min-height:54px;
+  flex-wrap:wrap;
+}
+
+.orderIcon{
+  width:52px;
+  height:52px;
+  border-radius:15px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.22);
+  box-shadow:0 8px 16px rgba(0,0,0,.30);
+  overflow:hidden;
+  padding:4px;
+}
+
+.orderIcon img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  pointer-events:none;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.35));
+}
+
+#hintText{
+  margin-top:6px;
+  color:#e8dcff;
+  font-size:clamp(11px,1.7vw,14px);
+  line-height:1.25;
+}
+
+#bonusText{
+  display:none;
+  margin-top:7px;
+  color:#fff7b0;
+  font-size:clamp(12px,1.8vw,15px);
+  font-weight:900;
+  padding:6px 10px;
+  border-radius:999px;
+  background:rgba(255,209,102,.16);
+  border:1px solid rgba(255,235,156,.22);
+}
+
+#tray{
+  position:absolute;
+  z-index:20;
+  left:calc(8px + var(--safe-left));
+  right:calc(8px + var(--safe-right));
+  bottom:calc(8px + var(--safe-bottom));
+  max-width:1040px;
+  margin:0 auto;
+  padding:10px;
+  border-radius:20px;
+  background:rgba(8,4,18,.76);
+  border:1px solid rgba(255,255,255,.15);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(8px);
+}
+
+#trayTop{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+#trayTitle{
+  color:var(--gold);
+  font-size:clamp(15px,2.2vw,22px);
+  font-weight:900;
+  white-space:nowrap;
+}
+
+#selectedText{
+  flex:1;
+  text-align:center;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#fff2cb;
+  font-size:clamp(12px,1.8vw,15px);
+  font-weight:800;
+}
+
+#clearBtn{
+  border:none;
+  border-radius:999px;
+  min-height:34px;
+  padding:8px 12px;
+  background:linear-gradient(180deg,#5b426f,#2c1e3d);
+  color:white;
+  font-size:12px;
+  font-weight:900;
+  border:1px solid rgba(255,255,255,.13);
+  box-shadow:0 7px 14px rgba(0,0,0,.25);
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+#buttons{
+  display:grid;
+  grid-template-columns:repeat(10,72px);
+  gap:10px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:4px 3px 7px;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+
+#buttons::-webkit-scrollbar{display:none;}
+
+.topBtn{
+  width:72px;
+  height:72px;
+  border:none;
+  border-radius:20px;
+  padding:5px;
+  box-shadow:0 8px 16px rgba(0,0,0,.30);
+  border:1px solid rgba(255,255,255,.22);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.18);
+  overflow:hidden;
+}
+
+.topBtn img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  pointer-events:none;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.35));
+}
+
+.topBtn.selected{
+  outline:3px solid rgba(255,255,255,.58);
+  transform:translateY(-2px) scale(1.04);
+  box-shadow:0 0 18px rgba(255,209,102,.40),0 8px 16px rgba(0,0,0,.30);
+}
+
+.topBtn:active,#clearBtn:active,#restartBtn:active,#musicBtn:active{
+  transform:scale(.96);
+  filter:brightness(.96);
+}
+
+#toast{
+  position:absolute;
+  z-index:30;
+  top:calc(172px + var(--safe-top));
+  left:50%;
+  transform:translateX(-50%);
+  max-width:90vw;
+  padding:12px 18px;
+  border-radius:16px;
+  background:rgba(8,4,18,.82);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:var(--shadow);
+  color:#fff8dd;
+  font-size:clamp(17px,3vw,30px);
+  font-weight:900;
+  text-align:center;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .18s ease, transform .18s ease;
+}
+
+#toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(-2px);
+}
+
+.summaryBox{
+  width:min(92vw,720px);
+  border-radius:24px;
+  background:rgba(8,4,18,.82);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:var(--shadow);
+  padding:22px;
+  backdrop-filter:blur(8px);
+}
+
+.summaryGrid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin:18px 0 6px;
+}
+
+.sumCard{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:16px;
+  padding:14px 10px;
+}
+
+.sumK{
+  font-size:12px;
+  color:#d6c8ef;
+  text-transform:uppercase;
+  font-weight:800;
+  letter-spacing:.7px;
+  margin-bottom:4px;
+}
+
+.sumV{
+  font-size:clamp(18px,3vw,30px);
+  font-weight:900;
+  color:#fff3c6;
+}
+
+#restartBtn{
+  margin-top:16px;
+  min-height:52px;
+  padding:12px 20px;
+  border:none;
+  border-radius:16px;
+  background:linear-gradient(180deg,#ffd166,#ff9f1c);
+  color:#291606;
+  font-weight:900;
+  font-size:clamp(18px,2.8vw,24px);
+  box-shadow:var(--shadow);
+  cursor:pointer;
+}
+
+@media(max-width:760px){
+  #hud{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+
+  .hudCard{
+    min-height:42px;
+  }
+
+  #orderPanel{
+    top:calc(58px + var(--safe-top));
+    width:min(94vw,720px);
+    padding:8px 10px;
+  }
+
+  #tray{
+    padding:8px;
+  }
+
+  #trayTop{
+    align-items:center;
+    flex-wrap:wrap;
+    margin-bottom:6px;
+    gap:5px;
+  }
+
+  #trayTitle{
+    width:100%;
+    text-align:center;
+    font-size:20px;
+    line-height:1;
+  }
+
+  #selectedText{
+    text-align:left;
+    font-size:14px;
+  }
+
+  #clearBtn{
+    min-height:30px;
+    padding:6px 10px;
+  }
+
+  #buttons{
+    grid-template-columns:repeat(5,1fr);
+    grid-template-rows:repeat(2,46px);
+    gap:6px;
+    overflow:visible;
+    padding:2px;
+  }
+
+  .topBtn{
+    width:100%;
+    height:46px;
+    border-radius:15px;
+    padding:3px;
+  }
+
+  .orderIcon{
+    width:48px;
+    height:48px;
+  }
+}
+
+@media(max-width:480px){
+  #hud{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:5px;
+  }
+
+  .hudCard{
+    min-height:41px;
+  }
+
+  #orderPanel{
+    top:calc(96px + var(--safe-top));
+    padding:8px 9px;
+  }
+
+  #orderIcons{
+    min-height:44px;
+    gap:7px;
+  }
+
+  .orderIcon{
+    width:42px;
+    height:42px;
+  }
+
+  #hintText{
+    font-size:12px;
+  }
+
+  #toast{
+    top:calc(230px + var(--safe-top));
+  }
+
+  #tray{
+    padding:7px;
+    border-radius:18px;
+    bottom:calc(6px + var(--safe-bottom));
+  }
+
+  #buttons{
+    grid-template-columns:repeat(5,1fr);
+    grid-template-rows:repeat(2,42px);
+    gap:5px;
+  }
+
+  .topBtn{
+    height:42px;
+    border-radius:14px;
+  }
+
+  #musicBtn{
+    top:calc(58px + var(--safe-top));
+    right:calc(8px + var(--safe-right));
+    min-height:34px;
+    font-size:12px;
+  }
+}
+
+@media(max-height:740px) and (max-width:480px){
+  #orderPanel{
+    top:calc(90px + var(--safe-top));
+    transform:translateX(-50%) scale(.90);
+    transform-origin:top center;
+  }
+
+  #tray{
+    transform:scale(.90);
+    transform-origin:bottom center;
+    left:0;
+    right:0;
+    bottom:calc(0px + var(--safe-bottom));
+  }
+
+  #buttons{
+    grid-template-rows:repeat(2,39px);
+  }
+
+  .topBtn{
+    height:39px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+  <div id="bgLayer"></div>
+  <canvas id="gameCanvas"></canvas>
+
+  <button id="musicBtn" type="button">🎵 MUSIC</button>
+  <audio id="bgMusic" loop preload="auto"></audio>
+
+  <div id="startScreen" class="screen">
+    <h1 class="title">TOSS MY TACO</h1>
+    <div class="subtitle">
+      Taco Tuesday is live outside Rollies Bowling Alley.
+      Build the customer’s taco order and toss it into the bowling ball buddy’s mouth.
+    </div>
+    <div class="small">
+      Tap the ingredient pictures. Match the picture order. Then swipe the taco into the moving bowling ball mouth.
+    </div>
+    <div class="cta">TAP ANYWHERE TO START</div>
+    <div id="startBubble">🌮 “Taco’s!”</div>
+    <div id="startWalkArea"><div id="startTaco"></div></div>
+  </div>
+
+  <div id="hud" class="hidden">
+    <div class="hudCard"><div class="hudLabel">Score</div><div class="hudValue" id="scoreValue">0</div></div>
+    <div class="hudCard"><div class="hudLabel">Time</div><div class="hudValue" id="timeValue">75</div></div>
+    <div class="hudCard"><div class="hudLabel">Round</div><div class="hudValue" id="roundValue">1</div></div>
+    <div class="hudCard"><div class="hudLabel">Combo</div><div class="hudValue" id="comboValue">0</div></div>
+  </div>
+
+  <div id="orderPanel" class="hidden">
+    <div id="roundText">ROUND 1</div>
+    <div id="orderLabel">Customer Order</div>
+    <div id="matchText">Match these toppings</div>
+    <div id="orderIcons"></div>
+    <div id="hintText">Swipe the taco into the bowling ball’s mouth.</div>
+    <div id="bonusText">🌮 TACO TIME! THIS ROUND SCORES DOUBLE!</div>
+  </div>
+
+  <div id="tray" class="hidden">
+    <div id="trayTop">
+      <div id="trayTitle">Build Taco</div>
+      <div id="selectedText">Selected: shell only</div>
+      <button id="clearBtn">CLEAR</button>
+    </div>
+    <div id="buttons"></div>
+  </div>
+
+  <div id="toast"></div>
+
+  <div id="gameOver" class="screen hidden">
+    <div class="summaryBox">
+      <h2 class="title" style="font-size:clamp(28px,6vw,54px); margin-bottom:6px;">TRUCK CLOSED</h2>
+      <div class="subtitle" style="margin-bottom:8px;">Rollies Taco Tuesday is done for the night.</div>
+
+      <div class="summaryGrid">
+        <div class="sumCard"><div class="sumK">Final Score</div><div class="sumV" id="finalScore">0</div></div>
+        <div class="sumCard"><div class="sumK">Best Score</div><div class="sumV" id="bestScore">0</div></div>
+        <div class="sumCard"><div class="sumK">Served</div><div class="sumV" id="servedScore">0</div></div>
+        <div class="sumCard"><div class="sumK">Best Combo</div><div class="sumV" id="bestComboScore">0</div></div>
+      </div>
+
+      <button id="restartBtn">PLAY AGAIN</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+
+const bgLayer = document.getElementById("bgLayer");
+const startTaco = document.getElementById("startTaco");
+const startScreen = document.getElementById("startScreen");
+const hud = document.getElementById("hud");
+const orderPanel = document.getElementById("orderPanel");
+const tray = document.getElementById("tray");
+const toastEl = document.getElementById("toast");
+const gameOver = document.getElementById("gameOver");
+
+const scoreValue = document.getElementById("scoreValue");
+const timeValue = document.getElementById("timeValue");
+const roundValue = document.getElementById("roundValue");
+const comboValue = document.getElementById("comboValue");
+const roundText = document.getElementById("roundText");
+const orderIcons = document.getElementById("orderIcons");
+const bonusText = document.getElementById("bonusText");
+const selectedText = document.getElementById("selectedText");
+const buttonsWrap = document.getElementById("buttons");
+const clearBtn = document.getElementById("clearBtn");
+const restartBtn = document.getElementById("restartBtn");
+const musicBtn = document.getElementById("musicBtn");
+const bgMusic = document.getElementById("bgMusic");
+
+const finalScoreEl = document.getElementById("finalScore");
+const bestScoreEl = document.getElementById("bestScore");
+const servedScoreEl = document.getElementById("servedScore");
+const bestComboScoreEl = document.getElementById("bestComboScore");
+
+let W = window.innerWidth;
+let H = window.innerHeight;
+let DPR = Math.min(window.devicePixelRatio || 1, 2);
+let lastTime = 0;
+let lastSecondDrawn = null;
+
+function setViewportHeight(){
+  const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  document.documentElement.style.setProperty("--vh", h + "px");
+}
+setViewportHeight();
+window.addEventListener("resize", setViewportHeight);
+if(window.visualViewport){
+  window.visualViewport.addEventListener("resize", setViewportHeight);
+  window.visualViewport.addEventListener("scroll", setViewportHeight);
+}
+
+function assetPaths(fileNames){
+  const out = [];
+  fileNames.forEach(name => {
+    out.push("assets/" + name);
+    out.push("./assets/" + name);
+    out.push("assets/taco_assets_png/" + name);
+    out.push("./assets/taco_assets_png/" + name);
+  });
+  return out;
+}
+
+function colorDistance(a,b){
+  const dr = a[0] - b[0];
+  const dg = a[1] - b[1];
+  const db = a[2] - b[2];
+  return Math.sqrt(dr*dr + dg*dg + db*db);
+}
+
+function removeBackgroundFromImage(img){
+  const c = document.createElement("canvas");
+  const w = img.naturalWidth || img.width;
+  const h = img.naturalHeight || img.height;
+
+  c.width = w;
+  c.height = h;
+
+  const x = c.getContext("2d", {willReadFrequently:true});
+  x.drawImage(img,0,0,w,h);
+
+  try{
+    const data = x.getImageData(0,0,w,h);
+    const p = data.data;
+
+    function getPixel(px,py){
+      const i = (py*w + px)*4;
+      return [p[i],p[i+1],p[i+2],p[i+3]];
+    }
+
+    const samples = [
+      getPixel(0,0),
+      getPixel(w-1,0),
+      getPixel(0,h-1),
+      getPixel(w-1,h-1),
+      getPixel(Math.floor(w/2),0),
+      getPixel(Math.floor(w/2),h-1),
+      getPixel(0,Math.floor(h/2)),
+      getPixel(w-1,Math.floor(h/2))
+    ];
+
+    let bg = [0,0,0];
+    samples.forEach(s => {
+      bg[0]+=s[0];
+      bg[1]+=s[1];
+      bg[2]+=s[2];
+    });
+    bg = [bg[0]/samples.length,bg[1]/samples.length,bg[2]/samples.length];
+
+    const visited = new Uint8Array(w*h);
+    const stack = [];
+
+    function push(px,py){
+      if(px<0 || py<0 || px>=w || py>=h) return;
+      const idx = py*w + px;
+      if(visited[idx]) return;
+      visited[idx] = 1;
+      stack.push([px,py]);
+    }
+
+    for(let xx=0; xx<w; xx++){
+      push(xx,0);
+      push(xx,h-1);
+    }
+
+    for(let yy=0; yy<h; yy++){
+      push(0,yy);
+      push(w-1,yy);
+    }
+
+    while(stack.length){
+      const item = stack.pop();
+      const px = item[0];
+      const py = item[1];
+      const i = (py*w + px)*4;
+
+      const r = p[i];
+      const g = p[i+1];
+      const b = p[i+2];
+      const a = p[i+3];
+
+      const dist = colorDistance([r,g,b], bg);
+      const veryLight = r > 210 && g > 210 && b > 210;
+      const closeToBg = dist < 88;
+      const transparentAlready = a < 20;
+
+      if(closeToBg || veryLight || transparentAlready){
+        p[i+3] = 0;
+        push(px+1,py);
+        push(px-1,py);
+        push(px,py+1);
+        push(px,py-1);
+      }
+    }
+
+    x.putImageData(data,0,0);
+  }catch(e){}
+
+  return c;
+}
+
+function makeCanvasImage(paths, removeBg=true, onloadExtra=null){
+  const img = new Image();
+  img.loaded = false;
+  img.processed = null;
+  img.pathIndex = 0;
+  img.paths = paths;
+
+  img.onload = function(){
+    img.loaded = true;
+    img.processed = removeBg ? removeBackgroundFromImage(img) : img;
+    if(onloadExtra) onloadExtra();
+  };
+
+  img.onerror = function(){
+    img.loaded = false;
+    img.pathIndex++;
+    if(img.pathIndex < img.paths.length){
+      img.src = img.paths[img.pathIndex];
+    }
+  };
+
+  img.src = img.paths[0];
+  return img;
+}
+
+function makeAssetElement(paths, altText, fallbackText, removeBg=true){
+  const img = document.createElement("img");
+  img.alt = altText || "";
+  img.dataset.index = "0";
+  img.dataset.paths = JSON.stringify(paths);
+  img.dataset.processed = "0";
+
+  img.onload = function(){
+    if(removeBg && img.dataset.processed !== "1"){
+      try{
+        img.dataset.processed = "1";
+        const processed = removeBackgroundFromImage(img);
+        img.src = processed.toDataURL("image/png");
+      }catch(e){
+        img.dataset.processed = "1";
+      }
+    }
+  };
+
+  img.onerror = function(){
+    const list = JSON.parse(img.dataset.paths || "[]");
+    const nextIndex = Number(img.dataset.index || 0) + 1;
+
+    img.dataset.index = String(nextIndex);
+    img.dataset.processed = "0";
+
+    if(nextIndex < list.length){
+      img.src = list[nextIndex];
+    } else {
+      const parent = img.parentElement;
+      if(parent){
+        parent.innerHTML = "";
+        parent.textContent = fallbackText || "❓";
+        parent.style.fontSize = "28px";
+      }
+    }
+  };
+
+  img.src = paths[0];
+  return img;
+}
+
+const assetImages = {
+  bowlingBall: makeCanvasImage(assetPaths([
+    "bowling_ball_baby_blue.png",
+    "bowling ball baby blue.png",
+    "bowling_ball.png",
+    "bowlingball.png"
+  ]), false),
+
+  tacoShell: makeCanvasImage(assetPaths([
+    "taco_shell_empty.png",
+    "taco_shell.png",
+    "taco shell.png",
+    "taco.png",
+    "taco-shell.png",
+    "Taco.png"
+  ]), true, makeStartTaco),
+
+  Beef: makeCanvasImage(assetPaths(["shredded_beef.png","beef.png","Beef.png"]), true),
+  Chicken: makeCanvasImage(assetPaths(["shredded_chicken.png","chicken.png","Chicken.png"]), true),
+  Cheese: makeCanvasImage(assetPaths(["mixed_cheese.png","cheese.png","Cheese.png"]), true),
+  Lettuce: makeCanvasImage(assetPaths(["shredded_lettuce.png","lettuce.png","Lettuce.png"]), true),
+  Tomato: makeCanvasImage(assetPaths(["diced_tomatoes.png","tomatoes.png","tomato.png","Tomato.png"]), true),
+  Onion: makeCanvasImage(assetPaths(["diced_onions.png","onions.png","onion.png","Onion.png"]), true),
+  Salsa: makeCanvasImage(assetPaths(["pico_de_gallo.png","salsa.png","pico.png","Salsa.png"]), true),
+  Guac: makeCanvasImage(assetPaths(["guacamole.png","guac.png","Guacamole.png"]), true),
+  SourCream: makeCanvasImage(assetPaths(["sour_cream.png","sourcream.png","Sour Cream.png"]), true),
+  Jalapeno: makeCanvasImage(assetPaths(["jalapeno_slices.png","jalapeño_slices.png","jalapeno.png","Jalapeno.png"]), true)
+};
+
+const toppings = [
+  {name:"Beef", color:"#8a4f2d", emoji:"🥩", imgKey:"Beef"},
+  {name:"Chicken", color:"#d79a54", emoji:"🍗", imgKey:"Chicken"},
+  {name:"Cheese", color:"#ffd93d", emoji:"🧀", imgKey:"Cheese"},
+  {name:"Lettuce", color:"#79c84b", emoji:"🥬", imgKey:"Lettuce"},
+  {name:"Tomato", color:"#f25f5c", emoji:"🍅", imgKey:"Tomato"},
+  {name:"Onion", color:"#d1a7ff", emoji:"🧅", imgKey:"Onion"},
+  {name:"Salsa", color:"#d64045", emoji:"🌶️", imgKey:"Salsa"},
+  {name:"Guac", color:"#89d061", emoji:"🥑", imgKey:"Guac"},
+  {name:"Sour Cream", color:"#f4f4f4", emoji:"⚪", imgKey:"SourCream"},
+  {name:"Jalapeño", color:"#2db06d", emoji:"🔥", imgKey:"Jalapeno"}
+];
+
+const toppingMap = {};
+toppings.forEach(t => toppingMap[t.name] = t);
+
+function makeStartTaco(){
+  if(!startTaco) return;
+
+  const c = document.createElement("canvas");
+  c.width = 150;
+  c.height = 110;
+  const x = c.getContext("2d");
+
+  x.translate(75,58);
+  x.scale(1.15,1.15);
+
+  x.fillStyle = "rgba(0,0,0,.22)";
+  x.beginPath();
+  x.ellipse(0,35,44,13,0,0,Math.PI*2);
+  x.fill();
+
+  if(assetImages.tacoShell && assetImages.tacoShell.loaded){
+    const source = assetImages.tacoShell.processed || assetImages.tacoShell;
+    x.drawImage(source,-58,-40,116,86);
+  } else {
+    x.fillStyle = "#efbd56";
+    x.beginPath();
+    x.moveTo(-48,8);
+    x.quadraticCurveTo(0,-35,48,8);
+    x.quadraticCurveTo(40,28,25,36);
+    x.quadraticCurveTo(0,18,-25,36);
+    x.quadraticCurveTo(-40,28,-48,8);
+    x.closePath();
+    x.fill();
+  }
+
+  startTaco.innerHTML = "";
+  const img = document.createElement("img");
+  img.src = c.toDataURL("image/png");
+  startTaco.appendChild(img);
+}
+setTimeout(makeStartTaco, 500);
+setTimeout(makeStartTaco, 1200);
+
+const backgroundPaths = [
+  "background/tacotossbackground.png",
+  "./background/tacotossbackground.png",
+  "background/tacotossbackground.PNG",
+  "./background/tacotossbackground.PNG",
+  "backgrounds/tacotossbackground.png",
+  "./backgrounds/tacotossbackground.png",
+  "assets/tacotossbackground.png",
+  "./assets/tacotossbackground.png",
+  "tacotossbackground.png",
+  "./tacotossbackground.png"
+];
+
+function setReliableBackground(){
+  let i = 0;
+
+  function testNext(){
+    if(i >= backgroundPaths.length){
+      bgLayer.style.background =
+        "linear-gradient(180deg, rgba(18,9,30,.3), rgba(18,9,30,.7)), radial-gradient(circle at 50% 35%, #5d2077, #12091e)";
+      return;
+    }
+
+    const path = backgroundPaths[i];
+    const img = new Image();
+
+    img.onload = function(){
+      bgLayer.style.backgroundImage =
+        `linear-gradient(180deg, rgba(18,9,30,.08), rgba(18,9,30,.28)), url("${path}")`;
+      bgLayer.style.backgroundSize = "cover";
+      bgLayer.style.backgroundPosition = "center center";
+      bgLayer.style.backgroundRepeat = "no-repeat";
+    };
+
+    img.onerror = function(){
+      i++;
+      testNext();
+    };
+
+    img.src = path;
+  }
+
+  testNext();
+}
+setReliableBackground();
+
+const musicPaths = [
+  "backgroundmusic/backgroundmusic.mp3",
+  "./backgroundmusic/backgroundmusic.mp3",
+  "backgroundmusic/backgroundmusic.m4a",
+  "./backgroundmusic/backgroundmusic.m4a",
+  "backgroundmusic/backgroundmusic.wav",
+  "./backgroundmusic/backgroundmusic.wav",
+  "backgroundmusic/backgroundmusic.ogg",
+  "./backgroundmusic/backgroundmusic.ogg"
+];
+
+let musicLoaded = false;
+let musicWanted = true;
+
+function setReliableMusic(){
+  let i = 0;
+
+  function testNext(){
+    if(i >= musicPaths.length){
+      musicLoaded = false;
+      musicBtn.textContent = "🎵 NO MUSIC";
+      return;
+    }
+
+    const path = musicPaths[i];
+    const testAudio = new Audio();
+
+    testAudio.addEventListener("canplaythrough", function(){
+      bgMusic.src = path;
+      bgMusic.loop = true;
+      bgMusic.volume = 0.30;
+      musicLoaded = true;
+      musicBtn.textContent = "🎵 MUSIC";
+    }, {once:true});
+
+    testAudio.addEventListener("error", function(){
+      i++;
+      testNext();
+    }, {once:true});
+
+    testAudio.src = path;
+    testAudio.load();
+  }
+
+  testNext();
+}
+setReliableMusic();
+
+function playMusic(){
+  if(!musicLoaded || !musicWanted) return;
+  bgMusic.volume = 0.30;
+  bgMusic.play().then(() => {
+    musicBtn.textContent = "🎵 ON";
+  }).catch(() => {
+    musicBtn.textContent = "🎵 TAP";
+  });
+}
+
+function toggleMusic(){
+  unlockAudio();
+
+  if(!musicLoaded){
+    setReliableMusic();
+    showToast("Music file not found yet",900);
+    return;
+  }
+
+  if(bgMusic.paused){
+    musicWanted = true;
+    playMusic();
+    showToast("Music on",700);
+  } else {
+    musicWanted = false;
+    bgMusic.pause();
+    musicBtn.textContent = "🔇 OFF";
+    showToast("Music off",700);
+  }
+}
+musicBtn.addEventListener("click", toggleMusic);
+
+const state = {
+  screen:"start",
+  score:0,
+  round:0,
+  served:0,
+  combo:0,
+  bestCombo:0,
+  timeLeft:75,
+  order:[],
+  selected:[],
+  resolving:false,
+  bonusThisRound:false,
+  tacoCooldown:0,
+  tacoSeen:0
+};
+
+const launcher = {x:110,y:520,r:54};
+const customer = {x:0,y:0,baseY:0,dir:1,speed:66,bob:0,mouth:.8};
+const projectile = {active:false,x:0,y:0,vx:0,vy:0,rot:0,toppings:[]};
+const drag = {active:false,startX:0,startY:0,x:0,y:0};
+const mascot = {active:false,x:-130,y:120,speed:210,ttl:0};
+const effects = [];
+
+let audioUnlocked = false;
+let audioCtx = null;
+let voices = [];
+
+function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
+function rand(min,max){return Math.random()*(max-min)+min;}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function resizeCanvas(){
+  setViewportHeight();
+
+  W = window.innerWidth;
+  H = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  DPR = Math.min(window.devicePixelRatio || 1,2);
+
+  canvas.width = Math.round(W*DPR);
+  canvas.height = Math.round(H*DPR);
+  canvas.style.width = W + "px";
+  canvas.style.height = H + "px";
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+
+  const portrait = H >= W;
+
+  if(portrait){
+    launcher.x = clamp(W*.20,78,138);
+    launcher.y = H - Math.max(198,H*.285);
+    customer.baseY = H - Math.max(278,H*.375);
+    customer.speed = 50;
+  } else {
+    launcher.x = clamp(W*.14,84,150);
+    launcher.y = H - Math.max(165,H*.22);
+    customer.baseY = H - Math.max(218,H*.30);
+    customer.speed = 62;
+  }
+
+  customer.x = clamp(customer.x || W*.82, W*.62, W-105);
+}
+window.addEventListener("resize", resizeCanvas);
+if(window.visualViewport){
+  window.visualViewport.addEventListener("resize", resizeCanvas);
+}
+
+function showToast(text,ms=1100){
+  toastEl.textContent = text;
+  toastEl.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toastEl.classList.remove("show"),ms);
+}
+
+function vibrate(pattern){
+  if(navigator.vibrate) navigator.vibrate(pattern);
+}
+
+function loadVoices(){
+  if("speechSynthesis" in window) voices = window.speechSynthesis.getVoices();
+}
+
+if("speechSynthesis" in window){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function pickVoice(){
+  if(!voices.length) return null;
+  return voices.find(v => /^es/i.test(v.lang)) ||
+         voices.find(v => /spanish/i.test(v.name)) ||
+         voices[0];
+}
+
+function unlockAudio(){
+  if(audioUnlocked) return;
+  try{
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(AC){
+      audioCtx = new AC();
+      if(audioCtx.state === "suspended") audioCtx.resume();
+    }
+  }catch(e){}
+  audioUnlocked = true;
+}
+
+function speak(text){
+  if(!audioUnlocked || !("speechSynthesis" in window)) return;
+  try{
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    const voice = pickVoice();
+    if(voice) u.voice = voice;
+    u.pitch = 1.95;
+    u.rate = 1.08;
+    u.volume = 1;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+function beep(a,b,d=.1,type="triangle",vol=.04){
+  if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = type;
+  osc.frequency.setValueAtTime(a,now);
+  osc.frequency.linearRampToValueAtTime(b,now+d);
+
+  gain.gain.setValueAtTime(vol,now);
+  gain.gain.exponentialRampToValueAtTime(.0001,now+d);
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(now);
+  osc.stop(now+d);
+}
+
+function sfxTap(){beep(700,900,.05,"triangle",.03);}
+function sfxThrow(){beep(420,135,.11,"sawtooth",.04);}
+function sfxMiss(){beep(230,100,.18,"square",.04);}
+function sfxHit(){
+  beep(760,1120,.08,"triangle",.05);
+  setTimeout(() => beep(980,1320,.08,"triangle",.04),70);
+  setTimeout(() => beep(1320,1600,.06,"triangle",.035),140);
+}
+
+function createButtons(){
+  buttonsWrap.innerHTML = "";
+
+  toppings.forEach(top => {
+    const btn = document.createElement("button");
+    btn.className = "topBtn";
+    btn.title = top.name;
+    btn.dataset.name = top.name;
+    btn.style.background = `linear-gradient(180deg, rgba(255,255,255,.24), rgba(0,0,0,.22)), ${top.color}`;
+
+    const asset = assetImages[top.imgKey];
+    const img = makeAssetElement(asset.paths, top.name, top.emoji, true);
+    btn.appendChild(img);
+
+    btn.addEventListener("click", () => {
+      if(state.screen !== "play" || state.resolving || projectile.active) return;
+
+      const i = state.selected.indexOf(top.name);
+      if(i >= 0) state.selected.splice(i,1);
+      else state.selected.push(top.name);
+
+      sfxTap();
+      updateUI();
+    });
+
+    buttonsWrap.appendChild(btn);
+  });
+}
+
+function updateOrderIcons(){
+  orderIcons.innerHTML = "";
+
+  state.order.forEach(name => {
+    const item = toppingMap[name] || {emoji:"❓",color:"#777",imgKey:""};
+    const d = document.createElement("div");
+
+    d.className = "orderIcon";
+    d.title = name;
+    d.style.background = `linear-gradient(180deg, rgba(255,255,255,.24), rgba(0,0,0,.22)), ${item.color}`;
+
+    const asset = assetImages[item.imgKey];
+    const img = makeAssetElement(asset.paths, name, item.emoji || "❓", true);
+    d.appendChild(img);
+
+    orderIcons.appendChild(d);
+  });
+}
+
+function updateUI(){
+  scoreValue.textContent = state.score;
+  roundValue.textContent = state.round;
+  comboValue.textContent = state.combo;
+
+  roundText.textContent = `ROUND ${state.round}`;
+  updateOrderIcons();
+
+  selectedText.textContent = state.selected.length
+    ? `Selected: ${state.selected.map(n => toppingMap[n]?.emoji || "❓").join(" ")}`
+    : "Selected: shell only";
+
+  bonusText.style.display = state.bonusThisRound ? "inline-block" : "none";
+
+  [...buttonsWrap.children].forEach(btn => {
+    btn.classList.toggle("selected", state.selected.includes(btn.dataset.name));
+  });
+}
+
+function updateTimeDisplay(force=false){
+  const whole = Math.max(0,Math.ceil(state.timeLeft));
+  if(force || whole !== lastSecondDrawn){
+    lastSecondDrawn = whole;
+    timeValue.textContent = whole;
+  }
+}
+
+function chooseOrder(){
+  const choices = shuffle(toppings.map(t => t.name));
+  const count = state.round < 3 ? 2 : state.round < 7 ? 3 : 4;
+  return choices.slice(0,count);
+}
+
+function maybeTacoTime(){
+  if(state.tacoCooldown > 0){
+    state.tacoCooldown--;
+    state.bonusThisRound = false;
+    return;
+  }
+
+  const chance = state.tacoSeen === 0 ? .08 : .045;
+
+  if(Math.random() < chance){
+    state.bonusThisRound = true;
+    state.tacoSeen++;
+    state.tacoCooldown = 2;
+    mascot.active = true;
+    mascot.x = -130;
+    mascot.y = rand(105,Math.max(115,H*.34));
+    mascot.speed = rand(185,235);
+    mascot.ttl = 5.5;
+    speak("Taco Time!");
+    showToast("🌮 TACO TIME! DOUBLE POINTS!",1300);
+  } else {
+    state.bonusThisRound = false;
+  }
+}
+
+function startRound(){
+  state.round++;
+  state.selected = [];
+  state.order = chooseOrder();
+  state.resolving = false;
+  projectile.active = false;
+  drag.active = false;
+  maybeTacoTime();
+  updateUI();
+}
+
+function startGame(){
+  if(state.screen === "play") return;
+
+  unlockAudio();
+  playMusic();
+  speak("Tacos!");
+
+  state.screen = "play";
+  state.score = 0;
+  state.round = 0;
+  state.served = 0;
+  state.combo = 0;
+  state.bestCombo = 0;
+  state.timeLeft = 75;
+  state.order = [];
+  state.selected = [];
+  state.resolving = false;
+  state.bonusThisRound = false;
+  state.tacoCooldown = 0;
+  state.tacoSeen = 0;
+  effects.length = 0;
+
+  resizeCanvas();
+  customer.dir = 1;
+  customer.x = W*.82;
+
+  startScreen.classList.add("hidden");
+  gameOver.classList.add("hidden");
+  hud.classList.remove("hidden");
+  orderPanel.classList.remove("hidden");
+  tray.classList.remove("hidden");
+
+  lastSecondDrawn = null;
+  updateTimeDisplay(true);
+  startRound();
+  showToast("Taco Tuesday started!",1100);
+}
+
+function endGame(){
+  state.screen = "over";
+  hud.classList.add("hidden");
+  orderPanel.classList.add("hidden");
+  tray.classList.add("hidden");
+  mascot.active = false;
+  projectile.active = false;
+  drag.active = false;
+
+  const best = Math.max(state.score,Number(localStorage.getItem("tossMyTacoBest") || 0));
+  localStorage.setItem("tossMyTacoBest",String(best));
+
+  finalScoreEl.textContent = state.score;
+  bestScoreEl.textContent = best;
+  servedScoreEl.textContent = state.served;
+  bestComboScoreEl.textContent = state.bestCombo;
+
+  gameOver.classList.remove("hidden");
+}
+
+function evaluate(order, selected){
+  const matches = order.filter(x => selected.includes(x)).length;
+  const extras = selected.filter(x => !order.includes(x)).length;
+  const perfect = matches === order.length && extras === 0;
+  return {matches, extras, perfect};
+}
+
+function addCatchEffect(points){
+  effects.push({type:"catch",x:customer.x-10,y:customer.y+12,age:0,ttl:.75});
+  effects.push({type:"text",text:"YUM!",x:customer.x-10,y:customer.y-82,age:0,ttl:.95});
+  effects.push({type:"text",text:"+"+points,x:customer.x+30,y:customer.y-52,age:0,ttl:.9});
+
+  for(let i=0;i<14;i++){
+    effects.push({
+      type:"spark",
+      x:customer.x-10,
+      y:customer.y+18,
+      vx:rand(-110,110),
+      vy:rand(-160,50),
+      age:0,
+      ttl:rand(.38,.75),
+      size:rand(2.5,5.5)
+    });
+  }
+}
+
+function finishRound(success){
+  if(state.resolving) return;
+  state.resolving = true;
+
+  if(success){
+    const r = evaluate(state.order,projectile.toppings);
+    let points = 10 + r.matches*10 - r.extras*4;
+
+    if(r.perfect) points += 24;
+    if(state.combo > 0) points += Math.min(24,state.combo*2);
+
+    points = Math.max(6,Math.round(points));
+    if(state.bonusThisRound) points *= 2;
+
+    state.score += points;
+    state.served++;
+    state.combo++;
+    state.bestCombo = Math.max(state.bestCombo,state.combo);
+    state.bonusThisRound = false;
+
+    addCatchEffect(points);
+    sfxHit();
+    vibrate([35,25,60]);
+
+    if(r.perfect) showToast(`PERFECT ORDER! +${points}`,1200);
+    else if(points >= 30) showToast(`GOOD TOSS! +${points}`,1100);
+    else showToast(`SERVED! +${points}`,1000);
+  } else {
+    state.combo = 0;
+    state.bonusThisRound = false;
+    sfxMiss();
+    vibrate(90);
+    showToast("TACO DOWN!",900);
+  }
+
+  updateUI();
+
+  setTimeout(() => {
+    if(state.screen === "play") startRound();
+  }, success ? 1150 : 850);
+}
+
+function getPointer(e){
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x:(e.clientX - rect.left) / rect.width * W,
+    y:(e.clientY - rect.top) / rect.height * H
+  };
+}
+
+function tacoHit(x,y){
+  return Math.hypot(x-launcher.x,y-launcher.y) <= 92;
+}
+
+function onPointerDown(e){
+  if(state.screen === "start"){
+    startGame();
+    return;
+  }
+
+  if(state.screen !== "play") return;
+  if(projectile.active || state.resolving) return;
+
+  const p = getPointer(e);
+
+  if(tacoHit(p.x,p.y)){
+    drag.active = true;
+    drag.startX = launcher.x;
+    drag.startY = launcher.y;
+    drag.x = p.x;
+    drag.y = p.y;
+  }
+}
+
+function onPointerMove(e){
+  if(!drag.active) return;
+  const p = getPointer(e);
+  drag.x = p.x;
+  drag.y = p.y;
+}
+
+function onPointerUp(){
+  if(!drag.active) return;
+
+  const dx = drag.x - drag.startX;
+  const dy = drag.y - drag.startY;
+  const dist = Math.hypot(dx,dy);
+
+  drag.active = false;
+  if(dist < 16) return;
+
+  const capped = Math.min(dist,290);
+  const scale = capped / Math.max(dist,1);
+
+  projectile.active = true;
+  projectile.x = launcher.x;
+  projectile.y = launcher.y;
+  projectile.vx = dx * 5.55 * scale;
+  projectile.vy = dy * 5.20 * scale;
+  projectile.rot = 0;
+  projectile.toppings = state.selected.slice();
+
+  sfxThrow();
+}
+
+canvas.addEventListener("pointerdown",onPointerDown);
+window.addEventListener("pointermove",onPointerMove);
+window.addEventListener("pointerup",onPointerUp);
+window.addEventListener("pointercancel",onPointerUp);
+canvas.addEventListener("contextmenu",e => e.preventDefault());
+
+document.addEventListener("touchmove",function(e){
+  if(state.screen === "play") e.preventDefault();
+},{passive:false});
+
+clearBtn.addEventListener("click",() => {
+  if(state.screen !== "play" || state.resolving || projectile.active) return;
+  state.selected = [];
+  sfxTap();
+  updateUI();
+});
+
+restartBtn.addEventListener("click",() => {
+  gameOver.classList.add("hidden");
+  startGame();
+});
+
+startScreen.addEventListener("click",startGame);
+startScreen.addEventListener("pointerdown",startGame);
+
+function getMouth(){
+  return {
+    x:customer.x - 10,
+    y:customer.y + 18,
+    r:58 + customer.mouth*20
+  };
+}
+
+function updateEffects(dt){
+  for(let i=effects.length-1;i>=0;i--){
+    const e = effects[i];
+    e.age += dt;
+
+    if(e.type === "spark"){
+      e.x += e.vx*dt;
+      e.y += e.vy*dt;
+      e.vy += 280*dt;
+    }
+
+    if(e.type === "text"){
+      e.y -= 34*dt;
+    }
+
+    if(e.age >= e.ttl){
+      effects.splice(i,1);
+    }
+  }
+}
+
+function update(dt){
+  updateEffects(dt);
+
+  if(state.screen !== "play") return;
+
+  state.timeLeft -= dt;
+
+  if(state.timeLeft <= 0){
+    state.timeLeft = 0;
+    updateTimeDisplay(true);
+    endGame();
+    return;
+  }
+
+  updateTimeDisplay();
+
+  const portrait = H >= W;
+
+  customer.bob += dt*2.8;
+  customer.y = customer.baseY + Math.sin(customer.bob)*4;
+  customer.mouth = .42 + (Math.sin(customer.bob*1.35)*.5 + .5)*.80;
+
+  const minX = portrait ? W*.60 : W*.64;
+  const maxX = W - 105;
+  const moveSpeed = portrait ? 50 : 62;
+
+  customer.x += customer.dir * moveSpeed * dt;
+
+  if(customer.x < minX){
+    customer.x = minX;
+    customer.dir = 1;
+  }
+
+  if(customer.x > maxX){
+    customer.x = maxX;
+    customer.dir = -1;
+  }
+
+  if(mascot.active){
+    mascot.x += mascot.speed*dt;
+    mascot.ttl -= dt;
+    if(mascot.ttl <= 0 || mascot.x > W + 150) mascot.active = false;
+  }
+
+  if(projectile.active){
+    projectile.vy += 1450*dt;
+    projectile.x += projectile.vx*dt;
+    projectile.y += projectile.vy*dt;
+    projectile.rot += projectile.vx*dt*.016;
+
+    const m = getMouth();
+    const dx = projectile.x - m.x;
+    const dy = projectile.y - m.y;
+
+    if(Math.hypot(dx,dy) < m.r && projectile.vx > 0){
+      projectile.active = false;
+      finishRound(true);
+    } else if(projectile.y > H-42 || projectile.x > W+140 || projectile.x < -140){
+      projectile.active = false;
+      finishRound(false);
+    }
+  }
+}
+
+function roundedRect(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+function drawTacoBase(){
+  ctx.fillStyle = "rgba(0,0,0,.24)";
+  ctx.beginPath();
+  ctx.ellipse(0,35,44,13,0,0,Math.PI*2);
+  ctx.fill();
+
+  if(assetImages.tacoShell.loaded){
+    const source = assetImages.tacoShell.processed || assetImages.tacoShell;
+    ctx.drawImage(source,-58,-40,116,86);
+  } else {
+    ctx.fillStyle = "#efbd56";
+    ctx.beginPath();
+    ctx.moveTo(-48,8);
+    ctx.quadraticCurveTo(0,-35,48,8);
+    ctx.quadraticCurveTo(40,28,25,36);
+    ctx.quadraticCurveTo(0,18,-25,36);
+    ctx.quadraticCurveTo(-40,28,-48,8);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.strokeStyle = "rgba(130,80,30,.36)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-36,26);
+    ctx.quadraticCurveTo(0,42,36,26);
+    ctx.stroke();
+  }
+}
+
+function drawTaco(x,y,scale=1,fillList=[],rot=0){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.rotate(rot);
+  ctx.scale(scale,scale);
+
+  drawTacoBase();
+
+  const names = Array.isArray(fillList) ? fillList : [];
+
+  if(names.length > 0){
+    const positions = [
+      [-30,-5,34,27],
+      [-13,-14,36,29],
+      [5,-7,36,29],
+      [24,-12,34,27],
+      [-2,6,32,25],
+      [31,4,30,24]
+    ];
+
+    names.forEach((name,index) => {
+      const top = toppingMap[name];
+      const pos = positions[index % positions.length];
+      const img = top ? assetImages[top.imgKey] : null;
+
+      if(img && img.loaded){
+        const source = img.processed || img;
+        ctx.save();
+        ctx.translate(pos[0],pos[1]);
+        ctx.rotate(index % 2 === 0 ? -.08 : .08);
+        ctx.drawImage(source,-pos[2]/2,-pos[3]/2,pos[2],pos[3]);
+        ctx.restore();
+      } else {
+        ctx.fillStyle = top ? top.color : "#fff";
+        ctx.beginPath();
+        ctx.arc(pos[0],pos[1],7,0,Math.PI*2);
+        ctx.arc(pos[0]+7,pos[1]-7,5.5,0,Math.PI*2);
+        ctx.arc(pos[0]+14,pos[1]-2,5,0,Math.PI*2);
+        ctx.fill();
+      }
+    });
+  }
+
+  ctx.restore();
+}
+
+function drawBowlingBallCustomer(x,y,scale=1,mouthOpen=.8){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.scale(scale,scale);
+
+  ctx.fillStyle = "rgba(0,0,0,.32)";
+  ctx.beginPath();
+  ctx.ellipse(0,93,66,18,0,0,Math.PI*2);
+  ctx.fill();
+
+  if(assetImages.bowlingBall.loaded){
+    ctx.drawImage(assetImages.bowlingBall,-92,-92,184,184);
+  } else {
+    const grad = ctx.createRadialGradient(-18,-22,8,0,0,84);
+    grad.addColorStop(0,"#5a88aa");
+    grad.addColorStop(.35,"#23445c");
+    grad.addColorStop(1,"#071019");
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(0,0,82,0,Math.PI*2);
+    ctx.fill();
+  }
+
+  const mouthH = 17 + 34*mouthOpen;
+
+  ctx.save();
+  ctx.globalAlpha = .38;
+  ctx.strokeStyle = "#ffd166";
+  ctx.lineWidth = 8;
+  ctx.beginPath();
+  ctx.ellipse(-10,22,42,mouthH+7,0,0,Math.PI*2);
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.fillStyle = "#050509";
+  ctx.beginPath();
+  ctx.ellipse(-10,22,38,mouthH,0,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle = "#ff8fa6";
+  ctx.beginPath();
+  ctx.ellipse(-10,35,18,8 + 12*mouthOpen,0,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawLauncher(){
+  ctx.fillStyle = "rgba(0,0,0,.28)";
+  roundedRect(launcher.x-54,launcher.y+32,108,20,10);
+  ctx.fill();
+
+  ctx.strokeStyle = "rgba(255,255,255,.22)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(launcher.x,launcher.y,52,0,Math.PI*2);
+  ctx.stroke();
+
+  drawTaco(launcher.x,launcher.y,1.13,state.selected,0);
+
+  ctx.fillStyle = "#fff6cf";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "bottom";
+  ctx.font = "900 13px Arial";
+  ctx.fillText("SWIPE",launcher.x,launcher.y-68);
+
+  if(drag.active){
+    ctx.strokeStyle = "rgba(255,255,255,.72)";
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(drag.startX,drag.startY);
+    ctx.lineTo(drag.x,drag.y);
+    ctx.stroke();
+
+    ctx.strokeStyle = "rgba(255,209,102,.95)";
+    ctx.lineWidth = 2;
+
+    let px = launcher.x;
+    let py = launcher.y;
+    let vx = (drag.x - drag.startX)*.128;
+    let vy = (drag.y - drag.startY)*.12;
+
+    ctx.beginPath();
+    ctx.moveTo(px,py);
+
+    for(let i=0;i<30;i++){
+      px += vx*.22;
+      py += vy*.22;
+      vy += .46;
+      ctx.lineTo(px,py);
+    }
+
+    ctx.stroke();
+  }
+}
+
+function drawMascot(){
+  if(!mascot.active) return;
+
+  ctx.save();
+  ctx.translate(mascot.x,mascot.y);
+
+  ctx.fillStyle = "rgba(10,5,20,.72)";
+  roundedRect(-60,-58,120,30,15);
+  ctx.fill();
+
+  ctx.fillStyle = "#fff7d3";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.font = "900 12px Arial";
+  ctx.fillText("Taco Time!",0,-43);
+
+  drawTaco(0,0,.98,["Lettuce","Cheese","Tomato"],0);
+
+  ctx.fillStyle = "#111";
+  ctx.beginPath();
+  ctx.arc(-10,6,3.2,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(10,6,3.2,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.strokeStyle = "#111";
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.arc(0,11,8,.15,Math.PI-.15);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawEffects(){
+  effects.forEach(e => {
+    const t = Math.min(1,e.age/e.ttl);
+    const alpha = 1 - t;
+
+    if(e.type === "catch"){
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = "#ffd166";
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.arc(e.x,e.y,18 + t*48,0,Math.PI*2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    if(e.type === "spark"){
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = "#ffd166";
+      ctx.beginPath();
+      ctx.arc(e.x,e.y,e.size,0,Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    if(e.type === "text"){
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = "#fff4bd";
+      ctx.strokeStyle = "rgba(0,0,0,.55)";
+      ctx.lineWidth = 5;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = e.text === "YUM!" ? "900 32px Arial" : "900 24px Arial";
+      ctx.strokeText(e.text,e.x,e.y);
+      ctx.fillText(e.text,e.x,e.y);
+      ctx.restore();
+    }
+  });
+}
+
+function drawScene(){
+  ctx.clearRect(0,0,W,H);
+
+  if(state.screen === "play" || state.screen === "over"){
+    drawBowlingBallCustomer(customer.x,customer.y,1.14,customer.mouth);
+  }
+
+  if(state.screen === "play"){
+    drawMascot();
+
+    if(!projectile.active){
+      drawLauncher();
+    }
+
+    if(projectile.active){
+      drawTaco(projectile.x,projectile.y,1.16,projectile.toppings,projectile.rot);
+    }
+
+    drawEffects();
+
+    if(state.bonusThisRound){
+      ctx.save();
+      ctx.globalAlpha = .11;
+      ctx.fillStyle = "#ffd166";
+      ctx.fillRect(0,0,W,H);
+      ctx.restore();
+    }
+  } else {
+    drawEffects();
+  }
+}
+
+function loop(ts){
+  const dt = Math.min(.033,(ts-lastTime)/1000 || 0);
+  lastTime = ts;
+  update(dt);
+  drawScene();
+  requestAnimationFrame(loop);
+}
+
+createButtons();
+resizeCanvas();
+updateUI();
+updateTimeDisplay(true);
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
