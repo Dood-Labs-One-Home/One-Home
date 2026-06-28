@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+  />
+  <title>Wiener Yeeter</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #071820;
+      font-family: Arial, Helvetica, sans-serif;
+      touch-action: none;
+      overscroll-behavior: none;
+      position: fixed;
+      inset: 0;
+    }
+
+    #gameWrap {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100dvh;
+      min-height: 100vh;
+      overflow: hidden;
+      background: #071820;
+    }
+
+    canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+      background: #071820;
+    }
+
+    #topUI {
+      position: absolute;
+      top: max(8px, env(safe-area-inset-top));
+      left: max(8px, env(safe-area-inset-left));
+      right: max(8px, env(safe-area-inset-right));
+      z-index: 10;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      pointer-events: none;
+    }
+
+    .panel {
+      background: rgba(0, 0, 0, 0.74);
+      border: 2px solid rgba(255, 220, 70, 0.95);
+      color: white;
+      border-radius: 14px;
+      padding: 8px 10px;
+      font-weight: 900;
+      text-shadow: 1px 1px 0 #000;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.45);
+    }
+
+    #scorePanel {
+      min-width: 112px;
+      font-size: clamp(12px, 2.4vw, 18px);
+      line-height: 1.3;
+    }
+
+    #orderPanel {
+      flex: 1;
+      text-align: center;
+      font-size: clamp(12px, 2.35vw, 18px);
+      line-height: 1.25;
+      max-height: 128px;
+      overflow: hidden;
+    }
+
+    #musicBtn {
+      position: absolute;
+      z-index: 30;
+      right: max(10px, env(safe-area-inset-right));
+      bottom: max(10px, env(safe-area-inset-bottom));
+      width: 54px;
+      height: 54px;
+      border-radius: 999px;
+      padding: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 23px;
+    }
+
+    .styleName {
+      color: #ffd84a;
+      font-size: 1.15em;
+      letter-spacing: 0.3px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .challengeName {
+      color: #76ff62;
+      font-size: 1.18em;
+      letter-spacing: 0.5px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .orderImages {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+      max-height: 74px;
+      overflow: hidden;
+    }
+
+    .orderItem {
+      width: clamp(25px, 5vw, 46px);
+      height: clamp(25px, 5vw, 46px);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.12);
+      border: 2px solid rgba(255,255,255,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 2px;
+    }
+
+    .orderItem.done {
+      background: rgba(92, 255, 104, 0.22);
+      border-color: rgba(117, 255, 123, 0.95);
+    }
+
+    .orderItem.done::after {
+      content: "✓";
+      position: absolute;
+      right: -4px;
+      top: -8px;
+      color: #75ff7b;
+      font-size: 18px;
+      font-weight: 1000;
+      text-shadow: 1px 1px 0 #000;
+    }
+
+    .orderItem img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      display: block;
+    }
+
+    #message {
+      position: absolute;
+      z-index: 20;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(92vw, 720px);
+      background: rgba(0, 0, 0, 0.82);
+      color: white;
+      border: 3px solid #ffd84a;
+      border-radius: 22px;
+      padding: 18px;
+      text-align: center;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.58);
+    }
+
+    #message h1 {
+      margin: 0 0 8px;
+      color: #ffd84a;
+      font-size: clamp(34px, 8vw, 72px);
+      text-shadow: 3px 3px 0 #7a2500;
+      letter-spacing: 1px;
+    }
+
+    #message p {
+      margin: 8px 0;
+      font-size: clamp(15px, 3.3vw, 23px);
+      font-weight: 900;
+      line-height: 1.25;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 18px;
+      background: linear-gradient(#fff56e, #ffb700);
+      color: #421a00;
+      font-size: clamp(14px, 3vw, 21px);
+      font-weight: 1000;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #935100, 0 8px 18px rgba(0, 0, 0, 0.35);
+      touch-action: manipulation;
+      -webkit-touch-callout: none;
+    }
+
+    button:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #935100, 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    #toppingBar {
+      display: none;
+      position: absolute;
+      z-index: 12;
+      left: 50%;
+      bottom: max(10px, env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      width: min(98vw, 1060px);
+      max-height: 39vh;
+      overflow-y: auto;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 7px;
+      padding: 8px;
+      background: rgba(0, 0, 0, 0.56);
+      border: 2px solid rgba(255, 216, 74, 0.92);
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+      -webkit-overflow-scrolling: touch;
+      touch-action: manipulation;
+    }
+
+    .topBtn {
+      min-height: 52px;
+      padding: 4px;
+      border-radius: 16px;
+      box-shadow: 0 4px 0 #935100, 0 6px 12px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(#fffdf0, #ffc949);
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+
+    .topBtn img {
+      width: 88%;
+      height: 88%;
+      object-fit: contain;
+      display: block;
+      pointer-events: none;
+    }
+
+    .fallbackText {
+      font-size: clamp(10px, 2vw, 14px);
+      line-height: 1.05;
+      text-align: center;
+      font-weight: 1000;
+    }
+
+    @media (max-width: 900px) {
+      #toppingBar {
+        grid-template-columns: repeat(5, 1fr);
+        max-height: min(32dvh, 230px);
+        width: min(96vw, 760px);
+        gap: 6px;
+        padding: 7px;
+      }
+
+      .topBtn {
+        min-height: 54px;
+        border-radius: 15px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      #topUI {
+        top: max(5px, env(safe-area-inset-top));
+        left: max(5px, env(safe-area-inset-left));
+        right: max(5px, env(safe-area-inset-right));
+        gap: 5px;
+      }
+
+      .panel {
+        padding: 6px 7px;
+        border-radius: 10px;
+      }
+
+      #scorePanel {
+        min-width: 88px;
+      }
+
+      #orderPanel {
+        max-height: 118px;
+      }
+
+      #toppingBar {
+        grid-template-columns: repeat(5, 1fr);
+        bottom: max(82px, calc(env(safe-area-inset-bottom) + 72px));
+        max-height: min(31dvh, 220px);
+        gap: 5px;
+        padding: 6px;
+        border-radius: 16px;
+      }
+
+      .topBtn {
+        min-height: 50px;
+        padding: 3px;
+        border-radius: 14px;
+      }
+
+      .topBtn img {
+        width: 92%;
+        height: 92%;
+      }
+
+      #message {
+        padding: 14px;
+      }
+
+      #musicBtn {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+      }
+    }
+
+    @media (max-width: 430px) {
+      #toppingBar {
+        grid-template-columns: repeat(5, 1fr);
+        max-height: 214px;
+        bottom: max(86px, calc(env(safe-area-inset-bottom) + 74px));
+      }
+
+      .topBtn {
+        min-height: 48px;
+      }
+
+      .orderItem {
+        width: 29px;
+        height: 29px;
+      }
+    }
+
+    @media (max-height: 620px) {
+      #toppingBar {
+        grid-template-columns: repeat(7, 1fr);
+        bottom: max(10px, env(safe-area-inset-bottom));
+        max-height: 33vh;
+      }
+
+      .topBtn {
+        min-height: 42px;
+        padding: 3px;
+      }
+    }
+
+    @media (max-height: 520px) {
+      #toppingBar {
+        max-height: 31vh;
+      }
+
+      .topBtn {
+        min-height: 38px;
+        padding: 2px;
+      }
+
+      #orderPanel {
+        max-height: 86px;
+      }
+
+      .orderImages {
+        max-height: 42px;
+      }
+
+      #message p {
+        margin: 5px 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="gameWrap">
+    <canvas id="game"></canvas>
+
+    <div id="topUI">
+      <div id="scorePanel" class="panel">
+        Score: <span id="score">0</span><br>
+        Round: <span id="round">1</span><br>
+        Time: <span id="time">--</span>
+      </div>
+
+      <div id="orderPanel" class="panel">
+        Tap the wiener to toss it into the bun!
+      </div>
+    </div>
+
+    <button id="musicBtn">🔊</button>
+    <div id="toppingBar"></div>
+
+    <div id="message">
+      <h1>Wiener Yeeter</h1>
+      <p>Tap the wiener to yeet it into the customer’s bun.</p>
+      <p>Add the correct toppings before the seagull steals it!</p>
+      <p>Rare challenge: all toppings, zombie seagull, 8 seconds, double points.</p>
+      <button id="startBtn">PLAY</button>
+    </div>
+  </div>
+
+  <script>
+    const NORMAL_SECONDS = 15;
+    const ALL_TOPPINGS_SECONDS = 8;
+    const ALL_TOPPINGS_CHANCE = 0.10;
+
+    const MUSIC_TRACKS = [
+      "music/backgroundmusic1.m4a",
+      "music/backgroundmusic2.m4a",
+      "music/backgroundmusic3.m4a"
+    ];
+
+    const BEACH_AMBIENCE_SRC = "music/Beach%20background%20noise.m4a";
+
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    const scoreEl = document.getElementById("score");
+    const roundEl = document.getElementById("round");
+    const timeEl = document.getElementById("time");
+    const orderPanel = document.getElementById("orderPanel");
+    const message = document.getElementById("message");
+    const startBtn = document.getElementById("startBtn");
+    const toppingBar = document.getElementById("toppingBar");
+    const musicBtn = document.getElementById("musicBtn");
+
+    const ASSETS = {
+      bg: "assets/wiener_yeeter_background.jpg",
+      seagull: "assets/seagull.png",
+      zombieSeagull: "assets/zombieseagull.png",
+      weiner: "assets/wiener.png",
+      bun: "assets/wienerbun.png"
+    };
+
+    const TOPPING_ASSETS = {
+      catchup: "assets/catchup.png",
+      mustard: "assets/mustard.png",
+      relish: "assets/relish.png",
+      peppers: "assets/peppers.png",
+      chiliBeans: "assets/chilibeans.png",
+      cheeseWhiz: "assets/cheesewhiz.png",
+      onions: "assets/onions.png",
+      bacon: "assets/bacon.png",
+      tomatoes: "assets/tomatoes.png",
+      pintoBeans: "assets/pintobeans.png",
+      jalapeno: "assets/jalapeno.png",
+      mayo: "assets/mayo.png",
+      shreddedCheese: "assets/shreddedcheese.png"
+    };
+
+    const images = {};
+    const toppingImages = {};
+
+    let W = 1000;
+    let H = 600;
+    let dpr = 1;
+    let scale = 1;
+    let lastTime = 0;
+
+    let state = "title";
+    let score = 0;
+    let round = 1;
+    let timer = NORMAL_SECONDS;
+    let roundSeconds = NORMAL_SECONDS;
+    let doublePoints = false;
+
+    let launchSpot = {};
+    let bun = {};
+
+    let currentOrder = null;
+    let order = [];
+    let added = [];
+
+    let feedback = "";
+    let feedbackTimer = 0;
+
+    let yeetProgress = 0;
+    let stealProgress = 0;
+
+    let music = null;
+    let ambience = null;
+    let musicEnabled = true;
+    let currentTrackIndex = -1;
+
+    const wiener = {
+      x: 0,
+      y: 0,
+      startX: 0,
+      startY: 0,
+      targetX: 0,
+      targetY: 0,
+      angle: 0,
+      visible: true
+    };
+
+    const bird = {
+      x: 0,
+      y: 0,
+      active: false,
+      stealMode: false,
+      carrying: false,
+      zombie: false,
+      flap: 0
+    };
+
+    const toppingList = [
+      "catchup",
+      "mustard",
+      "relish",
+      "peppers",
+      "chiliBeans",
+      "cheeseWhiz",
+      "onions",
+      "bacon",
+      "tomatoes",
+      "pintoBeans",
+      "jalapeno",
+      "mayo",
+      "shreddedCheese"
+    ];
+
+    const toppings = {
+      catchup: { label: "Catchup", short: "Catchup", icon: "🍅" },
+      mustard: { label: "Mustard", short: "Mustard", icon: "💛" },
+      relish: { label: "Relish", short: "Relish", icon: "🥒" },
+      peppers: { label: "Peppers", short: "Peppers", icon: "🫑" },
+      chiliBeans: { label: "Chili Beans", short: "Chili", icon: "🥣" },
+      cheeseWhiz: { label: "Cheese Whiz", short: "Cheese Whiz", icon: "🧀" },
+      onions: { label: "Onions", short: "Onions", icon: "🧅" },
+      bacon: { label: "Bacon", short: "Bacon", icon: "🥓" },
+      tomatoes: { label: "Diced Tomatoes", short: "Tomatoes", icon: "🍅" },
+      pintoBeans: { label: "Pinto Beans", short: "Beans", icon: "🫘" },
+      jalapeno: { label: "Jalapeños", short: "Jalapeños", icon: "🌶️" },
+      mayo: { label: "Mayo", short: "Mayo", icon: "⚪" },
+      shreddedCheese: { label: "Shredded Cheese", short: "Cheese", icon: "🧀" }
+    };
+
+    const specials = [
+      {
+        style: "Sonoran",
+        ingredients: ["bacon", "pintoBeans", "tomatoes", "jalapeno", "onions", "mayo"]
+      },
+      {
+        style: "Chicago Style",
+        ingredients: ["mustard", "relish", "onions", "tomatoes", "peppers"]
+      }
+    ];
+
+    const cleanToppingSlots = [
+      { x: -0.35, y: -0.20, size: 0.72, rot: -0.12 },
+      { x: -0.23, y:  0.08, size: 0.70, rot:  0.10 },
+      { x: -0.11, y: -0.13, size: 0.72, rot: -0.08 },
+      { x:  0.01, y:  0.10, size: 0.70, rot:  0.08 },
+      { x:  0.13, y: -0.13, size: 0.72, rot: -0.10 },
+      { x:  0.25, y:  0.08, size: 0.70, rot:  0.10 },
+      { x:  0.36, y: -0.20, size: 0.72, rot:  0.12 },
+      { x: -0.30, y:  0.25, size: 0.62, rot:  0.05 },
+      { x: -0.15, y:  0.27, size: 0.62, rot: -0.05 },
+      { x:  0.00, y:  0.28, size: 0.62, rot:  0.05 },
+      { x:  0.15, y:  0.27, size: 0.62, rot: -0.05 },
+      { x:  0.30, y:  0.25, size: 0.62, rot:  0.05 },
+      { x:  0.00, y: -0.36, size: 0.66, rot:  0.00 }
+    ];
+
+    function chooseRandomTrackIndex() {
+      if (MUSIC_TRACKS.length <= 1) return 0;
+
+      let lastSaved = Number(localStorage.getItem("wienerYeeterLastTrack") || "-1");
+      let next = Math.floor(Math.random() * MUSIC_TRACKS.length);
+
+      let safety = 0;
+      while ((next === currentTrackIndex || next === lastSaved) && safety < 10) {
+        next = Math.floor(Math.random() * MUSIC_TRACKS.length);
+        safety++;
+      }
+
+      localStorage.setItem("wienerYeeterLastTrack", String(next));
+      return next;
+    }
+
+    function setupAmbience() {
+      if (ambience) return;
+
+      ambience = new Audio(BEACH_AMBIENCE_SRC);
+      ambience.loop = true;
+      ambience.volume = 0.16;
+      ambience.preload = "auto";
+
+      ambience.addEventListener("error", () => {
+        console.warn("Beach ambience could not load:", BEACH_AMBIENCE_SRC);
+      });
+    }
+
+    function setupMusic(forceNewTrack = false) {
+      if (!forceNewTrack && music) return;
+
+      if (music) {
+        music.pause();
+        music.src = "";
+        music = null;
+      }
+
+      currentTrackIndex = chooseRandomTrackIndex();
+
+      music = new Audio(MUSIC_TRACKS[currentTrackIndex]);
+      music.volume = 0.34;
+      music.preload = "auto";
+      music.loop = false;
+
+      music.addEventListener("ended", () => {
+        playRandomMusicTrack(true);
+      });
+
+      music.addEventListener("error", () => {
+        console.warn("Music file could not load:", MUSIC_TRACKS[currentTrackIndex]);
+        playRandomMusicTrack(true);
+      });
+    }
+
+    function playAudioLayers(forceNewTrack = false) {
+      if (!musicEnabled) return;
+
+      setupAmbience();
+      setupMusic(forceNewTrack);
+
+      if (ambience) {
+        ambience.play().catch(() => {});
+      }
+
+      if (music) {
+        music.currentTime = 0;
+        music.play().then(() => {
+          musicBtn.textContent = "🔊";
+        }).catch(() => {
+          musicBtn.textContent = "🔇";
+        });
+      }
+    }
+
+    function playRandomMusicTrack(forceNewTrack = false) {
+      if (!musicEnabled) return;
+
+      setupMusic(forceNewTrack);
+
+      if (!music) return;
+
+      music.currentTime = 0;
+      music.play().then(() => {
+        musicBtn.textContent = "🔊";
+      }).catch(() => {
+        musicBtn.textContent = "🔇";
+      });
+    }
+
+    function toggleMusic() {
+      if (!music) setupMusic(false);
+      if (!ambience) setupAmbience();
+
+      if (!music) return;
+
+      if (music.paused) {
+        musicEnabled = true;
+        playAudioLayers(false);
+        musicBtn.textContent = "🔊";
+      } else {
+        music.pause();
+        if (ambience) ambience.pause();
+        musicEnabled = false;
+        musicBtn.textContent = "🔇";
+      }
+    }
+
+    function loadImages() {
+      Object.keys(ASSETS).forEach(name => {
+        const img = new Image();
+        img.onload = () => images[name] = img;
+        img.onerror = () => images[name] = null;
+        img.src = ASSETS[name];
+      });
+
+      Object.keys(TOPPING_ASSETS).forEach(name => {
+        const img = new Image();
+        img.onload = () => toppingImages[name] = img;
+        img.onerror = () => toppingImages[name] = null;
+        img.src = TOPPING_ASSETS[name];
+      });
+    }
+
+    function resize() {
+      dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+
+      W = Math.max(320, window.innerWidth);
+      H = Math.max(320, window.innerHeight);
+
+      if (window.visualViewport) {
+        W = Math.max(320, window.visualViewport.width);
+        H = Math.max(320, window.visualViewport.height);
+      }
+
+      canvas.width = Math.floor(W * dpr);
+      canvas.height = Math.floor(H * dpr);
+      canvas.style.width = W + "px";
+      canvas.style.height = H + "px";
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      scale = Math.min(W / 1000, H / 600);
+      layout();
+    }
+
+    function layout() {
+      launchSpot = {
+        x: W * 0.235,
+        y: H * 0.665
+      };
+
+      bun = {
+        w: Math.max(155, Math.min(275, W * 0.25)),
+        h: Math.max(78, Math.min(145, W * 0.25 * 0.52))
+      };
+
+      bun.x = W - bun.w - W * 0.13;
+      bun.y = H * 0.70 - bun.h * 0.50;
+
+      if (state === "aim" || state === "title") {
+        resetWienerAtLaunch();
+      }
+    }
+
+    function resetWienerAtLaunch() {
+      wiener.startX = launchSpot.x;
+      wiener.startY = launchSpot.y;
+      wiener.targetX = bun.x + bun.w * 0.50;
+      wiener.targetY = bun.y + bun.h * 0.42;
+      wiener.x = wiener.startX;
+      wiener.y = wiener.startY;
+      wiener.angle = -0.05;
+      wiener.visible = true;
+      yeetProgress = 0;
+    }
+
+    function buildToppingButtons() {
+      toppingBar.innerHTML = "";
+
+      toppingList.forEach(name => {
+        const btn = document.createElement("button");
+        btn.className = "topBtn";
+        btn.dataset.topping = name;
+
+        const img = document.createElement("img");
+        img.src = TOPPING_ASSETS[name];
+        img.alt = toppings[name].label;
+        img.onerror = () => {
+          btn.innerHTML = `<span class="fallbackText">${toppings[name].icon}</span>`;
+        };
+
+        btn.appendChild(img);
+
+        btn.addEventListener("pointerdown", e => {
+          e.preventDefault();
+          addTopping(name);
+        }, { passive: false });
+
+        toppingBar.appendChild(btn);
+      });
+    }
+
+    function newOrder() {
+      added = [];
+      doublePoints = false;
+
+      const allToppingsChallenge = Math.random() < ALL_TOPPINGS_CHANCE;
+
+      if (allToppingsChallenge) {
+        currentOrder = {
+          type: "all",
+          style: "ALL TOPPINGS CHALLENGE",
+          ingredients: [...toppingList]
+        };
+
+        order = [...toppingList];
+        roundSeconds = ALL_TOPPINGS_SECONDS;
+        timer = ALL_TOPPINGS_SECONDS;
+        doublePoints = true;
+        bird.zombie = true;
+        return;
+      }
+
+      bird.zombie = false;
+      roundSeconds = NORMAL_SECONDS;
+      timer = NORMAL_SECONDS;
+
+      const specialChance = round >= 2 ? 0.42 : 0.25;
+
+      if (Math.random() < specialChance) {
+        const special = specials[Math.floor(Math.random() * specials.length)];
+        currentOrder = {
+          type: "special",
+          style: special.style,
+          ingredients: [...special.ingredients]
+        };
+        order = [...special.ingredients];
+        return;
+      }
+
+      const shuffled = [...toppingList].sort(() => Math.random() - 0.5);
+      const count = Math.min(2 + Math.floor((round - 1) / 2), 6);
+      order = shuffled.slice(0, count);
+
+      currentOrder = {
+        type: "custom",
+        style: "Custom Wiener",
+        ingredients: [...order]
+      };
+    }
+
+    function startRound() {
+      musicBtn.style.display = "flex";
+
+      if (!music) {
+        playAudioLayers(true);
+      } else if (musicEnabled && music.paused) {
+        playAudioLayers(false);
+      }
+
+      state = "aim";
+      newOrder();
+      resetWienerAtLaunch();
+
+      bird.active = false;
+      bird.stealMode = false;
+      bird.carrying = false;
+      bird.x = -180 * scale;
+      bird.y = H * 0.14;
+      stealProgress = 0;
+
+      feedback = "";
+      feedbackTimer = 0;
+
+      message.style.display = "none";
+      toppingBar.style.display = "none";
+
+      updateUI();
+    }
+
+    function orderImageHTML(name, isDone) {
+      return `
+        <span class="orderItem ${isDone ? "done" : ""}">
+          <img src="${TOPPING_ASSETS[name]}" alt="${toppings[name].label}" />
+        </span>
+      `;
+    }
+
+    function updateUI() {
+      scoreEl.textContent = score;
+      roundEl.textContent = round;
+      timeEl.textContent = state === "decorate" ? Math.ceil(timer) : "--";
+
+      if (state === "aim") {
+        orderPanel.innerHTML = "Tap the wiener to toss it into the bun!";
+      }
+
+      if (state === "yeeting") {
+        orderPanel.innerHTML = "Wiener flying!";
+      }
+
+      if (state === "decorate") {
+        let styleClass = "styleName";
+        if (currentOrder.type === "all") styleClass = "challengeName";
+
+        const bonus = currentOrder.type === "all" ? " — 8 SEC + DOUBLE POINTS" : "";
+        const styleLabel = `<span class="${styleClass}">${currentOrder.style}${bonus}</span>`;
+
+        const pics = order.map(t => {
+          const isDone = added.includes(t);
+          return orderImageHTML(t, isDone);
+        }).join("");
+
+        orderPanel.innerHTML = styleLabel + `<div class="orderImages">${pics}</div>`;
+      }
+
+      if (state === "stolen") {
+        orderPanel.innerHTML = bird.zombie
+          ? "Zombie seagull stole the all-toppings wiener!"
+          : "The seagull stole the hotdog!";
+      }
+    }
+
+    function showMessage(title, text, buttonText) {
+      message.innerHTML = `
+        <h1>${title}</h1>
+        <p>${text}</p>
+        <button id="againBtn">${buttonText}</button>
+      `;
+
+      message.style.display = "block";
+      document.getElementById("againBtn").addEventListener("click", startRound);
+    }
+
+    function yeet() {
+      if (state !== "aim") return;
+
+      state = "yeeting";
+      yeetProgress = 0;
+      toppingBar.style.display = "none";
+      feedback = "YEET!";
+      feedbackTimer = 0.7;
+      updateUI();
+      vibrate(35);
+    }
+
+    function landInBun() {
+      state = "decorate";
+      timer = roundSeconds;
+      wiener.visible = false;
+      toppingBar.style.display = "grid";
+      feedback = currentOrder.type === "all" ? "ZOMBIE ROUND! GO!" : "Add toppings fast!";
+      feedbackTimer = 1.1;
+      updateUI();
+      vibrate([35, 25, 35]);
+    }
+
+    function addTopping(name) {
+      if (state !== "decorate") return;
+
+      if (added.includes(name)) {
+        feedback = "Already added!";
+        feedbackTimer = 0.65;
+        return;
+      }
+
+      if (!order.includes(name)) {
+        timer = Math.max(0.75, timer - 2);
+        feedback = "Wrong topping!";
+        feedbackTimer = 0.85;
+        vibrate([35, 25, 35]);
+        return;
+      }
+
+      added.push(name);
+
+      const basePoints = doublePoints ? 20 : 10;
+      score += basePoints;
+
+      feedback = toppings[name].short + "!";
+      feedbackTimer = 0.55;
+      updateUI();
+      vibrate(18);
+
+      if (order.every(t => added.includes(t))) {
+        serveOrder();
+      }
+    }
+
+    function serveOrder() {
+      state = "served";
+
+      let roundScore = 50 + Math.ceil(timer) * 4;
+
+      if (currentOrder.type === "special") {
+        roundScore += 35;
+      }
+
+      if (currentOrder.type === "all") {
+        roundScore *= 2;
+      }
+
+      score += roundScore;
+      round += 1;
+
+      toppingBar.style.display = "none";
+      updateUI();
+      vibrate([45, 30, 90]);
+
+      let servedText = "Perfect custom order! The bird gets nothing this time.";
+
+      if (currentOrder.type === "special") {
+        servedText = `Perfect ${currentOrder.style}! The bird gets nothing this time.`;
+      }
+
+      if (currentOrder.type === "all") {
+        servedText = "You beat the zombie seagull! All toppings served for double points!";
+      }
+
+      showMessage("Served!", servedText, "NEXT ORDER");
+    }
+
+    function birdSteal() {
+      if (state === "stolen") return;
+
+      state = "stolen";
+      stealProgress = 0;
+      bird.active = true;
+      bird.stealMode = true;
+      bird.carrying = false;
+      bird.x = -190 * scale;
+      bird.y = H * 0.14;
+
+      toppingBar.style.display = "none";
+
+      feedback = bird.zombie ? "ZOMBIE SEAGULL!" : "SEAGULL STEAL!";
+      feedbackTimer = 2;
+      updateUI();
+      vibrate([80, 40, 80, 40, 120]);
+
+      setTimeout(() => {
+        score = Math.max(0, score - 25);
+        round = 1;
+        const msg = bird.zombie
+          ? "The zombie seagull stole the all-toppings wiener. Try again!"
+          : "You ran out of time and the seagull carried the hotdog away.";
+        showMessage("Stolen!", msg, "TRY AGAIN");
+      }, 2400);
+    }
+
+    function vibrate(pattern) {
+      if (navigator.vibrate) navigator.vibrate(pattern);
+    }
+
+    function drawCoverImage(img) {
+      if (!img) {
+        const g = ctx.createLinearGradient(0, 0, 0, H);
+        g.addColorStop(0, "#74d5ff");
+        g.addColorStop(0.62, "#f6c76b");
+        g.addColorStop(1, "#3576a8");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, W, H);
+        return;
+      }
+
+      const ir = img.width / img.height;
+      const cr = W / H;
+
+      let dw, dh, dx, dy;
+
+      if (ir > cr) {
+        dh = H;
+        dw = H * ir;
+        dx = (W - dw) / 2;
+        dy = 0;
+      } else {
+        dw = W;
+        dh = W / ir;
+        dx = 0;
+        dy = (H - dh) / 2;
+      }
+
+      ctx.drawImage(img, dx, dy, dw, dh);
+      ctx.fillStyle = "rgba(0, 0, 0, 0.04)";
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    function drawImageCentered(img, x, y, w, h, rotation = 0, flipX = false) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rotation);
+      if (flipX) ctx.scale(-1, 1);
+
+      if (img) {
+        ctx.drawImage(img, -w / 2, -h / 2, w, h);
+      } else {
+        ctx.fillStyle = "#ff9b1c";
+        ctx.strokeStyle = "#5c2200";
+        ctx.lineWidth = 4;
+        roundedRect(-w / 2, -h / 2, w, h, 20 * scale);
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    function roundedRect(x, y, w, h, r) {
+      const rr = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.lineTo(x + w - rr, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + rr);
+      ctx.lineTo(x + w, y + h - rr);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - rr, y + h);
+      ctx.lineTo(x + rr, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - rr);
+      ctx.lineTo(x, y + rr);
+      ctx.quadraticCurveTo(x, y, x + rr, y);
+      ctx.closePath();
+    }
+
+    function drawBunArea() {
+      drawImageCentered(
+        images.bun,
+        bun.x + bun.w / 2,
+        bun.y + bun.h / 2,
+        bun.w,
+        bun.h,
+        0
+      );
+
+      if (state === "decorate" || state === "served") {
+        drawBuiltHotdog(
+          bun.x + bun.w * 0.50,
+          bun.y + bun.h * 0.45,
+          bun.w * 0.72,
+          bun.h * 0.34,
+          0
+        );
+      }
+    }
+
+    function drawBuiltHotdog(x, y, w, h, rotation = 0) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rotation);
+
+      if (images.weiner) {
+        ctx.drawImage(images.weiner, -w / 2, -h / 2, w, h);
+      } else {
+        ctx.fillStyle = "#d84c18";
+        roundedRect(-w / 2, -h / 2, w, h, h / 2);
+        ctx.fill();
+      }
+
+      drawCleanToppingsLocal(w, h);
+
+      ctx.restore();
+    }
+
+    function drawCleanToppingsLocal(w, h) {
+      const len = w * 0.88;
+      const total = added.length;
+      if (!total) return;
+
+      const sizeAdjust = total > 9 ? 0.68 : total > 6 ? 0.78 : 0.9;
+
+      added.forEach((name, index) => {
+        const img = toppingImages[name];
+        const slot = cleanToppingSlots[index % cleanToppingSlots.length];
+
+        const x = slot.x * len;
+        const y = slot.y * h * 2.0;
+        const size = h * slot.size * sizeAdjust;
+
+        if (img) {
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(slot.rot);
+          ctx.drawImage(img, -size / 2, -size / 2, size, size);
+          ctx.restore();
+        } else {
+          drawFallbackTopping(x, y, size);
+        }
+      });
+    }
+
+    function drawFallbackTopping(x, y, size) {
+      ctx.save();
+      ctx.fillStyle = "#ffd84a";
+      ctx.strokeStyle = "rgba(0,0,0,0.35)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(x, y, size * 0.25, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawFlyingWiener() {
+      if (!wiener.visible) return;
+
+      const ww = Math.max(78, 145 * scale);
+      const wh = ww * 0.34;
+
+      drawImageCentered(
+        images.weiner,
+        wiener.x,
+        wiener.y,
+        ww,
+        wh,
+        wiener.angle
+      );
+    }
+
+    function drawBird() {
+      if (state !== "decorate" && !bird.active) return;
+
+      bird.flap += 0.12;
+
+      let bx;
+      let by;
+
+      if (state === "decorate") {
+        const danger = 1 - timer / roundSeconds;
+        bx = -140 * scale + danger * (W * 0.48);
+        by = H * 0.15 + Math.sin(bird.flap) * 10 * scale;
+      } else {
+        bx = bird.x;
+        by = bird.y + Math.sin(bird.flap) * 8 * scale;
+      }
+
+      const birdImg = bird.zombie ? images.zombieSeagull : images.seagull;
+      const bw = Math.max(92, 170 * scale);
+      const bh = bw * 0.72;
+
+      drawImageCentered(birdImg, bx, by, bw, bh, 0, false);
+
+      if (bird.carrying) {
+        const hotdogX = bx + bw * 0.10;
+        const hotdogY = by + bh * 0.28;
+        const hotdogW = Math.max(55, 88 * scale);
+        const hotdogH = hotdogW * 0.34;
+        drawBuiltHotdog(hotdogX, hotdogY, hotdogW, hotdogH, 0.10);
+      }
+    }
+
+    function drawFeedback() {
+      if (feedbackTimer <= 0 || !feedback) return;
+
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, feedbackTimer);
+      const bw = Math.min(W * 0.88, 560);
+      const bh = Math.max(46, 58 * scale);
+      const x = W / 2 - bw / 2;
+      const y = H * 0.18;
+
+      ctx.fillStyle = "rgba(0,0,0,0.74)";
+      ctx.strokeStyle = bird.zombie ? "#85ff4a" : "#ffd84a";
+      ctx.lineWidth = Math.max(2, 3 * scale);
+      roundedRect(x, y, bw, bh, 16 * scale);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "white";
+      ctx.font = `900 ${Math.max(16, 25 * scale)}px Arial`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(feedback, W / 2, y + bh / 2);
+      ctx.restore();
+    }
+
+    function drawCountdown() {
+      if (state !== "decorate") return;
+
+      const r = Math.max(25, 34 * scale);
+      const x = W - r - 18 * scale;
+      const y = H * 0.20;
+      const pct = Math.max(0, timer / roundSeconds);
+
+      ctx.save();
+      ctx.lineWidth = Math.max(6, 8 * scale);
+
+      ctx.strokeStyle = "rgba(255,255,255,0.35)";
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.strokeStyle = pct > 0.55 ? "#42ff5b" : pct > 0.25 ? "#ffd84a" : "#ff4545";
+      if (bird.zombie) ctx.strokeStyle = pct > 0.45 ? "#85ff4a" : "#ff4545";
+
+      ctx.beginPath();
+      ctx.arc(x, y, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * pct);
+      ctx.stroke();
+
+      ctx.fillStyle = "white";
+      ctx.font = `900 ${Math.max(15, 20 * scale)}px Arial`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(Math.ceil(timer), x, y);
+
+      ctx.restore();
+    }
+
+    function update(dt) {
+      if (feedbackTimer > 0) feedbackTimer -= dt;
+
+      if (state === "yeeting") {
+        yeetProgress += dt * 1.35;
+        const t = Math.min(1, yeetProgress);
+
+        const sx = wiener.startX;
+        const sy = wiener.startY;
+        const tx = wiener.targetX;
+        const ty = wiener.targetY;
+
+        const arc = Math.sin(t * Math.PI) * Math.max(120 * scale, H * 0.22);
+
+        wiener.x = sx + (tx - sx) * t;
+        wiener.y = sy + (ty - sy) * t - arc;
+        wiener.angle = -0.35 + t * 1.0;
+
+        if (t >= 1) {
+          landInBun();
+        }
+      }
+
+      if (state === "decorate") {
+        timer -= dt;
+        if (timer <= 0) {
+          timer = 0;
+          birdSteal();
+        }
+        updateUI();
+      }
+
+      if (state === "stolen" && bird.stealMode) {
+        stealProgress += dt;
+
+        const startX = -190 * scale;
+        const startY = H * 0.14;
+        const bunX = bun.x + bun.w * 0.50;
+        const bunY = bun.y + bun.h * 0.05;
+        const exitX = W + 230 * scale;
+        const exitY = -70 * scale;
+
+        if (stealProgress < 0.95) {
+          const t = stealProgress / 0.95;
+          bird.x = startX + (bunX - startX) * t;
+          bird.y = startY + (bunY - startY) * t + Math.sin(t * Math.PI) * -40 * scale;
+          bird.carrying = false;
+        } else if (stealProgress < 1.45) {
+          bird.x = bunX;
+          bird.y = bunY + Math.sin(bird.flap) * 5 * scale;
+          bird.carrying = true;
+        } else {
+          const t = Math.min(1, (stealProgress - 1.45) / 1.15);
+          bird.x = bunX + (exitX - bunX) * t;
+          bird.y = bunY + (exitY - bunY) * t + Math.sin(t * Math.PI) * -25 * scale;
+          bird.carrying = true;
+        }
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      drawCoverImage(images.bg);
+      drawBunArea();
+      drawFlyingWiener();
+      drawBird();
+      drawCountdown();
+      drawFeedback();
+    }
+
+    function loop(timestamp) {
+      if (!lastTime) lastTime = timestamp;
+      const dt = Math.min(0.05, (timestamp - lastTime) / 1000);
+      lastTime = timestamp;
+
+      update(dt);
+      draw();
+
+      requestAnimationFrame(loop);
+    }
+
+    function pointerPosition(e) {
+      const rect = canvas.getBoundingClientRect();
+      const p = e.touches ? e.touches[0] : e;
+      return {
+        x: p.clientX - rect.left,
+        y: p.clientY - rect.top
+      };
+    }
+
+    function canvasPress(e) {
+      if (state !== "aim") return;
+      e.preventDefault();
+
+      const p = pointerPosition(e);
+
+      const hotdogW = Math.max(78, 145 * scale);
+      const hotdogH = hotdogW * 0.55;
+
+      const hit =
+        p.x >= wiener.x - hotdogW * 0.70 &&
+        p.x <= wiener.x + hotdogW * 0.70 &&
+        p.y >= wiener.y - hotdogH * 0.80 &&
+        p.y <= wiener.y + hotdogH * 0.80;
+
+      if (hit) {
+        yeet();
+      }
+    }
+
+    function preventBadMobileGestures() {
+      document.addEventListener("gesturestart", e => e.preventDefault());
+      document.addEventListener("gesturechange", e => e.preventDefault());
+      document.addEventListener("gestureend", e => e.preventDefault());
+      document.addEventListener("dblclick", e => e.preventDefault());
+
+      document.addEventListener("touchmove", e => {
+        if (e.target.closest("#toppingBar")) return;
+        e.preventDefault();
+      }, { passive: false });
+    }
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        if (music) music.pause();
+        if (ambience) ambience.pause();
+      } else if (musicEnabled && state !== "title") {
+        playAudioLayers(true);
+      }
+    });
+
+    startBtn.addEventListener("click", startRound);
+    musicBtn.addEventListener("click", toggleMusic);
+
+    canvas.addEventListener("mousedown", canvasPress);
+    canvas.addEventListener("touchstart", canvasPress, { passive: false });
+
+    window.addEventListener("resize", resize);
+    window.addEventListener("orientationchange", () => {
+      setTimeout(resize, 250);
+      setTimeout(resize, 700);
+    });
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", resize);
+    }
+
+    buildToppingButtons();
+    loadImages();
+    resize();
+    preventBadMobileGestures();
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
