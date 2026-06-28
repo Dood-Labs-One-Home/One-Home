@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Monster Truck Jump</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  background: #05070c;
+  color: white;
+  touch-action: none;
+}
+
+.game-wrap {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: #05070c;
+}
+
+.game {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-image: url("monster_truck_jump_background_3.jpg");
+  background-size: cover;
+  background-position: center bottom;
+}
+
+.game::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    rgba(0,0,0,0.04),
+    rgba(0,0,0,0.08),
+    rgba(0,0,0,0.30)
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* HUD */
+
+.hud {
+  position: absolute;
+  left: 14px;
+  top: 10px;
+  right: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.title-box {
+  background: rgba(0,0,0,0.62);
+  border: 2px solid rgba(120,255,0,0.75);
+  border-radius: 14px;
+  padding: 8px 12px;
+  box-shadow: 0 0 18px rgba(113,255,0,0.28);
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 900;
+  color: #9dff00;
+  text-shadow: 2px 2px #000;
+  letter-spacing: 1px;
+}
+
+.subtitle {
+  font-size: 12px;
+  color: #d9d9d9;
+}
+
+.stats {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.stat {
+  min-width: 90px;
+  background: rgba(0,0,0,0.62);
+  border: 2px solid rgba(170,60,255,0.7);
+  border-radius: 14px;
+  padding: 8px 10px;
+  text-align: center;
+  box-shadow: 0 0 18px rgba(170,60,255,0.25);
+}
+
+.stat-label {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.stat-value {
+  font-size: 21px;
+  font-weight: 900;
+  color: #fff;
+}
+
+/* COURSE */
+
+.world {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 6000px;
+  height: 100%;
+  transform: translateX(0);
+  z-index: 10;
+}
+
+.ground {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 6000px;
+  height: 20vh;
+  background:
+    radial-gradient(circle at 20px 20px, rgba(255,255,255,0.08) 0 3px, transparent 4px),
+    linear-gradient(#7b4a22, #3d2110);
+  border-top: 6px solid #1b1009;
+  box-shadow: inset 0 12px rgba(255,255,255,0.06);
+}
+
+.ground-line {
+  position: absolute;
+  left: 0;
+  bottom: 19vh;
+  width: 6000px;
+  height: 8px;
+  background: repeating-linear-gradient(
+    to right,
+    #aaff00 0,
+    #aaff00 80px,
+    #7b2cff 80px,
+    #7b2cff 160px,
+    transparent 160px,
+    transparent 230px
+  );
+  opacity: 0.8;
+}
+
+.ramp {
+  position: absolute;
+  bottom: 18vh;
+  width: 260px;
+  height: 130px;
+  background:
+    linear-gradient(140deg, #543114, #a56a2e 45%, #2b180c 46%, #2b180c);
+  border: 5px solid #1a0e07;
+  border-radius: 14px 14px 0 0;
+  transform-origin: bottom left;
+  box-shadow:
+    inset 0 10px rgba(255,255,255,0.12),
+    0 8px 12px rgba(0,0,0,0.35);
+}
+
+.ramp::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(0,0,0,0.25) 0 8px,
+    rgba(255,255,255,0.08) 8px 18px
+  );
+  border-radius: 8px;
+}
+
+.ramp.small {
+  width: 200px;
+  height: 95px;
+}
+
+.ramp.big {
+  width: 330px;
+  height: 165px;
+}
+
+.ramp.up {
+  transform: skewX(-28deg);
+}
+
+.crush-car {
+  position: absolute;
+  bottom: 20vh;
+  width: 130px;
+  height: 42px;
+  border: 4px solid #151515;
+  border-radius: 18px 18px 8px 8px;
+  background: linear-gradient(#e33, #741);
+  box-shadow: inset 0 -8px rgba(0,0,0,0.35);
+}
+
+.crush-car.blue {
+  background: linear-gradient(#2fb9ff, #154c9a);
+}
+
+.crush-car.green {
+  background: linear-gradient(#6eff00, #2b7a10);
+}
+
+.crush-car.purple {
+  background: linear-gradient(#a747ff, #4c1a76);
+}
+
+.crush-car::before {
+  content: "";
+  position: absolute;
+  left: 20px;
+  top: -15px;
+  width: 62px;
+  height: 25px;
+  background: inherit;
+  border: 4px solid #151515;
+  border-bottom: 0;
+  border-radius: 16px 16px 2px 2px;
+}
+
+.crush-car::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: -8px;
+  height: 10px;
+  background: #111;
+  border-radius: 50%;
+}
+
+.obstacle {
+  position: absolute;
+  bottom: 20vh;
+  width: 70px;
+  height: 70px;
+  font-size: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 5px 3px rgba(0,0,0,0.55));
+}
+
+/* REAL TRUCK CHARACTER */
+
+.truck {
+  position: absolute;
+  left: 10vw;
+  bottom: 20vh;
+  width: 330px;
+  height: 210px;
+  z-index: 30;
+  transform-origin: 50% 82%;
+  filter: drop-shadow(0 18px 14px rgba(0,0,0,0.65));
+}
+
+.truck-shadow {
+  position: absolute;
+  left: 35px;
+  bottom: -8px;
+  width: 260px;
+  height: 34px;
+  background: rgba(0,0,0,0.50);
+  border-radius: 50%;
+  filter: blur(6px);
+  z-index: 1;
+}
+
+.truck-img {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.smoke {
+  position: absolute;
+  left: 32px;
+  bottom: 150px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(30,30,30,0.68);
+  animation: smoke 0.95s ease-out infinite;
+  z-index: 1;
+}
+
+@keyframes smoke {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4);
+  }
+
+  40% {
+    opacity: 0.75;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-34px, -40px) scale(1.6);
+  }
+}
+
+/* PARTICLES */
+
+.particle {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  background: #8a4e22;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* CONTROLS */
+
+.controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 18px;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.control-group {
+  display: flex;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.btn {
+  width: 78px;
+  height: 58px;
+  border: 3px solid rgba(255,255,255,0.4);
+  border-radius: 18px;
+  background: rgba(0,0,0,0.62);
+  color: white;
+  font-size: 17px;
+  font-weight: 900;
+  box-shadow:
+    0 5px 0 rgba(0,0,0,0.45),
+    0 0 14px rgba(170,255,0,0.18);
+  user-select: none;
+}
+
+.btn:active,
+.btn.active {
+  transform: translateY(4px);
+  box-shadow:
+    0 1px 0 rgba(0,0,0,0.45),
+    0 0 22px rgba(170,255,0,0.45);
+  background: rgba(85, 20, 160, 0.78);
+}
+
+.btn.jump {
+  width: 106px;
+  background: rgba(130, 255, 0, 0.75);
+  color: #111;
+}
+
+.btn.boost {
+  width: 106px;
+  background: rgba(123, 44, 255, 0.75);
+}
+
+/* OVERLAYS */
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.68);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+}
+
+.card {
+  max-width: 520px;
+  background: rgba(5,7,12,0.90);
+  border: 3px solid #aaff00;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow:
+    0 0 32px rgba(170,255,0,0.28),
+    inset 0 0 20px rgba(123,44,255,0.2);
+}
+
+.card h1 {
+  margin: 0 0 8px;
+  color: #aaff00;
+  font-size: 36px;
+  text-shadow: 3px 3px #000;
+}
+
+.card p {
+  line-height: 1.45;
+  color: #e7e7e7;
+}
+
+.start-btn {
+  border: 0;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #aaff00, #7b2cff);
+  color: #111;
+  font-size: 22px;
+  font-weight: 900;
+  padding: 14px 26px;
+  cursor: pointer;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.45);
+}
+
+.start-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.45);
+}
+
+.hidden {
+  display: none;
+}
+
+.message {
+  position: absolute;
+  left: 50%;
+  bottom: 92px;
+  transform: translateX(-50%);
+  z-index: 70;
+  background: rgba(0,0,0,0.62);
+  border: 2px solid rgba(255,255,255,0.25);
+  border-radius: 18px;
+  padding: 8px 16px;
+  font-weight: 900;
+  color: #aaff00;
+  text-shadow: 2px 2px #000;
+  pointer-events: none;
+}
+
+@media (max-width: 700px) {
+  .title {
+    font-size: 18px;
+  }
+
+  .subtitle {
+    display: none;
+  }
+
+  .stat {
+    min-width: 72px;
+    padding: 6px 8px;
+  }
+
+  .stat-value {
+    font-size: 17px;
+  }
+
+  .truck {
+    left: 5vw;
+    width: 260px;
+    height: 170px;
+  }
+
+  .btn {
+    width: 66px;
+    height: 52px;
+    font-size: 14px;
+  }
+
+  .btn.jump,
+  .btn.boost {
+    width: 88px;
+  }
+
+  .message {
+    bottom: 82px;
+    font-size: 13px;
+    width: 82vw;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="game-wrap">
+  <div class="game" id="game">
+
+    <div class="hud">
+      <div class="title-box">
+        <div class="title">MONSTER TRUCK JUMP</div>
+        <div class="subtitle">Rare Ink scrapyard course prototype</div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">SCORE</div>
+          <div class="stat-value" id="score">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">BEST</div>
+          <div class="stat-value" id="best">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">DAMAGE</div>
+          <div class="stat-value" id="damage">0%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="world" id="world">
+      <div class="ground"></div>
+      <div class="ground-line"></div>
+
+      <div class="ramp up big" style="left: 650px;"></div>
+      <div class="crush-car blue" style="left: 1050px;"></div>
+      <div class="crush-car purple" style="left: 1195px;"></div>
+
+      <div class="ramp up small" style="left: 1500px;"></div>
+      <div class="obstacle" style="left: 1850px;">🛢️</div>
+
+      <div class="ramp up big" style="left: 2300px;"></div>
+      <div class="crush-car green" style="left: 2720px;"></div>
+      <div class="crush-car blue" style="left: 2860px;"></div>
+      <div class="crush-car" style="left: 3000px;"></div>
+
+      <div class="ramp up small" style="left: 3420px;"></div>
+      <div class="obstacle" style="left: 3750px;">🪨</div>
+
+      <div class="ramp up big" style="left: 4100px;"></div>
+      <div class="crush-car purple" style="left: 4550px;"></div>
+    </div>
+
+    <div class="truck" id="truck">
+      <div class="truck-shadow" id="truckShadow"></div>
+      <div class="smoke"></div>
+      <img class="truck-img" src="monster_truck_character.png" alt="Monster Truck">
+    </div>
+
+    <div class="message" id="message">Press Start. Use gas, boost, and jump.</div>
+
+    <div class="controls">
+      <div class="control-group">
+        <button class="btn" id="brakeBtn">BRAKE</button>
+        <button class="btn boost" id="boostBtn">BOOST</button>
+      </div>
+
+      <div class="control-group">
+        <button class="btn" id="gasBtn">GAS</button>
+        <button class="btn jump" id="jumpBtn">JUMP</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="startOverlay">
+      <div class="card">
+        <h1>MONSTER TRUCK JUMP</h1>
+        <p>
+          Drive through the scrapyard arena, hit ramps, crush cars, jump obstacles, and keep your truck alive.
+        </p>
+        <p>
+          Keyboard: Arrow Right = Gas, Arrow Left = Brake, Space = Jump, Shift = Boost.
+          Mobile: use the buttons.
+        </p>
+        <button class="start-btn" onclick="startGame()">START GAME</button>
+      </div>
+    </div>
+
+    <div class="overlay hidden" id="gameOverOverlay">
+      <div class="card">
+        <h1>TRUCK WRECKED!</h1>
+        <p id="finalScore">Final Score: 0</p>
+        <button class="start-btn" onclick="restartGame()">PLAY AGAIN</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const game = document.getElementById("game");
+const world = document.getElementById("world");
+const truck = document.getElementById("truck");
+const truckShadow = document.getElementById("truckShadow");
+
+const scoreEl = document.getElementById("score");
+const bestEl = document.getElementById("best");
+const damageEl = document.getElementById("damage");
+const messageEl = document.getElementById("message");
+const startOverlay = document.getElementById("startOverlay");
+const gameOverOverlay = document.getElementById("gameOverOverlay");
+const finalScore = document.getElementById("finalScore");
+
+const gasBtn = document.getElementById("gasBtn");
+const brakeBtn = document.getElementById("brakeBtn");
+const jumpBtn = document.getElementById("jumpBtn");
+const boostBtn = document.getElementById("boostBtn");
+
+let best = Number(localStorage.getItem("monsterTruckBest") || 0);
+bestEl.textContent = best;
+
+let running = false;
+let crashed = false;
+
+let distance = 0;
+let speed = 0;
+let y = 0;
+let vy = 0;
+let rotation = 0;
+let damage = 0;
+let score = 0;
+let onGround = true;
+
+const gravity = 0.72;
+const jumpPower = 15.4;
+const groundBase = 0;
+const maxSpeed = 16;
+const acceleration = 0.18;
+const braking = 0.28;
+const friction = 0.045;
+
+const keys = {
+  gas: false,
+  brake: false,
+  jump: false,
+  boost: false
+};
+
+const ramps = [
+  { x: 650, width: 330, height: 165 },
+  { x: 1500, width: 200, height: 95 },
+  { x: 2300, width: 330, height: 165 },
+  { x: 3420, width: 200, height: 95 },
+  { x: 4100, width: 330, height: 165 }
+];
+
+const hazards = [
+  { x: 1050, w: 130, type: "car" },
+  { x: 1195, w: 130, type: "car" },
+  { x: 1850, w: 70, type: "barrel" },
+  { x: 2720, w: 130, type: "car" },
+  { x: 2860, w: 130, type: "car" },
+  { x: 3000, w: 130, type: "car" },
+  { x: 3750, w: 70, type: "rock" },
+  { x: 4550, w: 130, type: "car" }
+];
+
+let passedHazards = {};
+
+const engineAudio = new Audio("MonsterTruckSound.mp3");
+engineAudio.loop = true;
+engineAudio.volume = 0.16;
+
+function startEngine() {
+  engineAudio.play().catch(function() {
+    console.log("Sound will start after click.");
+  });
+}
+
+function stopEngine() {
+  engineAudio.pause();
+}
+
+function startGame() {
+  startOverlay.classList.add("hidden");
+  running = true;
+  crashed = false;
+  messageEl.textContent = "Hit the gas!";
+  startEngine();
+  requestAnimationFrame(loop);
+}
+
+function restartGame() {
+  distance = 0;
+  speed = 0;
+  y = 0;
+  vy = 0;
+  rotation = 0;
+  damage = 0;
+  score = 0;
+  onGround = true;
+  crashed = false;
+  running = true;
+  passedHazards = {};
+
+  scoreEl.textContent = "0";
+  damageEl.textContent = "0%";
+  messageEl.textContent = "Hit the gas!";
+
+  gameOverOverlay.classList.add("hidden");
+
+  engineAudio.currentTime = 0;
+  startEngine();
+
+  requestAnimationFrame(loop);
+}
+
+function endGame() {
+  running = false;
+  crashed = true;
+  stopEngine();
+
+  if (score > best) {
+    best = score;
+    localStorage.setItem("monsterTruckBest", best);
+    bestEl.textContent = best;
+  }
+
+  finalScore.textContent = "Final Score: " + score;
+  gameOverOverlay.classList.remove("hidden");
+}
+
+function getRampHeight(worldX) {
+  for (let i = 0; i < ramps.length; i++) {
+    const r = ramps[i];
+
+    if (worldX >= r.x && worldX <= r.x + r.width) {
+      const t = (worldX - r.x) / r.width;
+      return Math.sin(t * Math.PI * 0.5) * r.height;
+    }
+  }
+
+  return 0;
+}
+
+function getRampAngle(worldX) {
+  for (let i = 0; i < ramps.length; i++) {
+    const r = ramps[i];
+
+    if (worldX >= r.x && worldX <= r.x + r.width) {
+      return -12;
+    }
+  }
+
+  return 0;
+}
+
+function jump() {
+  if (!running || crashed) return;
+
+  if (onGround) {
+    vy = jumpPower + Math.min(speed * 0.33, 5);
+    onGround = false;
+    messageEl.textContent = "BIG AIR!";
+    createDirtBurst(130, window.innerHeight - window.innerHeight * 0.22);
+  }
+}
+
+function updatePhysics() {
+  if (keys.gas) {
+    speed += acceleration;
+  }
+
+  if (keys.boost) {
+    speed += acceleration * 1.65;
+  }
+
+  if (keys.brake) {
+    speed -= braking;
+  }
+
+  if (!keys.gas && !keys.boost) {
+    speed -= friction;
+  }
+
+  if (speed < 0) speed = 0;
+  if (speed > maxSpeed) speed = maxSpeed;
+
+  distance += speed;
+
+  const truckWorldX = distance + 220;
+  const rampHeight = getRampHeight(truckWorldX);
+  const groundHeight = groundBase + rampHeight;
+
+  if (!onGround) {
+    vy -= gravity;
+    y += vy;
+
+    if (y <= groundHeight) {
+      y = groundHeight;
+      vy = 0;
+      onGround = true;
+
+      if (speed > 9) {
+        score += 10;
+        messageEl.textContent = "Clean landing! +10";
+      } else {
+        messageEl.textContent = "Landed!";
+      }
+
+      createDirtBurst(130, window.innerHeight - window.innerHeight * 0.22);
+    }
+  } else {
+    y = groundHeight;
+
+    if (rampHeight > 80 && speed > 7) {
+      messageEl.textContent = "Ramp climb!";
+    }
+  }
+
+  if (onGround) {
+    rotation = getRampAngle(truckWorldX);
+  } else {
+    rotation += speed > 8 ? 0.22 : 0.10;
+    if (rotation > 14) rotation = 14;
+  }
+
+  checkHazards(truckWorldX);
+  updateScore();
+}
+
+function checkHazards(truckWorldX) {
+  hazards.forEach(function(h, index) {
+    const hitZoneStart = h.x - 40;
+    const hitZoneEnd = h.x + h.w + 40;
+
+    if (truckWorldX > hitZoneStart && truckWorldX < hitZoneEnd) {
+      if (y < 42) {
+        if (!passedHazards[index]) {
+          damage += h.type === "rock" ? 22 : 10;
+          score += h.type === "car" ? 15 : 5;
+          passedHazards[index] = true;
+
+          if (h.type === "car") {
+            messageEl.textContent = "Crushed a car! +15";
+          } else {
+            messageEl.textContent = "Ouch! Watch the course!";
+          }
+
+          createDirtBurst(145, window.innerHeight - window.innerHeight * 0.22);
+
+          if (damage >= 100) {
+            damage = 100;
+            damageEl.textContent = damage + "%";
+            endGame();
+          }
+        }
+      } else {
+        if (!passedHazards[index]) {
+          score += 20;
+          passedHazards[index] = true;
+          messageEl.textContent = "Cleared it! +20";
+        }
+      }
+    }
+  });
+}
+
+function updateScore() {
+  score += Math.floor(speed * 0.035);
+  scoreEl.textContent = score;
+  damageEl.textContent = Math.floor(damage) + "%";
+}
+
+function render() {
+  world.style.transform = "translateX(" + (-distance) + "px)";
+
+  truck.style.bottom = "calc(20vh + " + y + "px)";
+  truck.style.transform = "rotate(" + rotation + "deg)";
+
+  const shadowScale = onGround ? 1 : Math.max(0.45, 1 - y / 420);
+  truckShadow.style.transform = "scaleX(" + shadowScale + ")";
+  truckShadow.style.opacity = onGround ? 1 : 0.45;
+}
+
+function loop() {
+  if (!running || crashed) return;
+
+  updatePhysics();
+  render();
+
+  if (distance > 4700) {
+    messageEl.textContent = "Course cleared! Looping arena!";
+    distance = 0;
+    passedHazards = {};
+    score += 100;
+  }
+
+  requestAnimationFrame(loop);
+}
+
+function createDirtBurst(x, yPos) {
+  for (let i = 0; i < 14; i++) {
+    const p = document.createElement("div");
+    p.className = "particle";
+    p.style.left = x + "px";
+    p.style.top = yPos + "px";
+
+    game.appendChild(p);
+
+    const dx = -Math.random() * 120 - 20;
+    const dy = -Math.random() * 90 - 10;
+    const size = Math.random() * 9 + 4;
+
+    p.style.width = size + "px";
+    p.style.height = size + "px";
+
+    let start = performance.now();
+
+    function animateParticle(now) {
+      const t = (now - start) / 520;
+
+      if (t >= 1) {
+        p.remove();
+        return;
+      }
+
+      p.style.transform =
+        "translate(" + (dx * t) + "px, " + (dy * t + 80 * t * t) + "px)";
+
+      p.style.opacity = String(1 - t);
+
+      requestAnimationFrame(animateParticle);
+    }
+
+    requestAnimationFrame(animateParticle);
+  }
+}
+
+/* KEYBOARD */
+
+document.addEventListener("keydown", function(e) {
+  if (e.code === "ArrowRight" || e.code === "KeyD") {
+    keys.gas = true;
+    gasBtn.classList.add("active");
+  }
+
+  if (e.code === "ArrowLeft" || e.code === "KeyA") {
+    keys.brake = true;
+    brakeBtn.classList.add("active");
+  }
+
+  if (e.code === "Space") {
+    e.preventDefault();
+    jump();
+  }
+
+  if (e.code === "ShiftLeft" || e.code === "ShiftRight") {
+    keys.boost = true;
+    boostBtn.classList.add("active");
+  }
+});
+
+document.addEventListener("keyup", function(e) {
+  if (e.code === "ArrowRight" || e.code === "KeyD") {
+    keys.gas = false;
+    gasBtn.classList.remove("active");
+  }
+
+  if (e.code === "ArrowLeft" || e.code === "KeyA") {
+    keys.brake = false;
+    brakeBtn.classList.remove("active");
+  }
+
+  if (e.code === "ShiftLeft" || e.code === "ShiftRight") {
+    keys.boost = false;
+    boostBtn.classList.remove("active");
+  }
+});
+
+/* MOBILE BUTTONS */
+
+function holdButton(button, keyName) {
+  button.addEventListener("pointerdown", function(e) {
+    e.preventDefault();
+
+    if (keyName === "jump") {
+      jump();
+      return;
+    }
+
+    keys[keyName] = true;
+    button.classList.add("active");
+  });
+
+  button.addEventListener("pointerup", function(e) {
+    e.preventDefault();
+    keys[keyName] = false;
+    button.classList.remove("active");
+  });
+
+  button.addEventListener("pointerleave", function() {
+    keys[keyName] = false;
+    button.classList.remove("active");
+  });
+
+  button.addEventListener("pointercancel", function() {
+    keys[keyName] = false;
+    button.classList.remove("active");
+  });
+}
+
+holdButton(gasBtn, "gas");
+holdButton(brakeBtn, "brake");
+holdButton(boostBtn, "boost");
+holdButton(jumpBtn, "jump");
+
+game.addEventListener("pointerdown", function(e) {
+  if (
+    e.target.classList.contains("btn") ||
+    e.target.classList.contains("start-btn")
+  ) {
+    return;
+  }
+
+  if (running && !crashed) {
+    jump();
+  }
+});
+</script>
+
+</body>
+</html>
