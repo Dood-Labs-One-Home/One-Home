@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Rollies Skate and Surf</title>
+<style>
+*{box-sizing:border-box;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#05070b;font-family:Arial,sans-serif;position:fixed;inset:0}
+canvas{position:fixed;inset:0;width:100vw;height:100dvh;display:block}
+#overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:white;padding:16px;z-index:5}
+.panel{background:rgba(0,0,0,.78);border:4px solid white;border-radius:26px;padding:18px;width:min(670px,92vw);max-height:82dvh;overflow:hidden;box-shadow:0 20px 60px #000}
+h1{font-size:clamp(32px,8vw,68px);margin:0}
+p{font-size:clamp(15px,4.5vw,22px);margin:8px 0}
+.goal{color:#ffd33d;font-weight:bold}
+#controls{position:fixed;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom));display:flex;justify-content:space-between;padding:0 16px;pointer-events:none;z-index:10}
+.group{display:flex;gap:12px}
+.btn{width:72px;height:72px;border-radius:50%;border:3px solid white;background:rgba(255,255,255,.2);color:white;font-size:32px;font-weight:bold;display:flex;align-items:center;justify-content:center;pointer-events:auto}
+.chooser{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+.chooseTitle{font-weight:bold;color:#ffd33d;margin:6px 0 2px}
+.charRow{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.charCard{width:96px;min-height:118px;border:3px solid rgba(255,255,255,.65);border-radius:16px;background:rgba(255,255,255,.12);color:white;font-weight:bold;font-size:13px;padding:6px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;cursor:pointer;pointer-events:auto}
+.charCard.selected{border-color:#ffd33d;background:rgba(255,211,61,.25)}
+.charCard img{max-width:78px;max-height:76px;object-fit:contain;display:block}
+.charCard span{line-height:1.05}
+@media(max-height:680px){.panel{padding:12px}.charCard{width:82px;min-height:96px;font-size:11px}.charCard img{max-width:64px;max-height:58px}p{margin:5px 0}}
+@media(min-width:900px){#controls{display:none}}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="overlay">
+  <div class="panel" id="panel">
+    <h1>Rollies Skate and Surf</h1>
+    <p>Choose your skater and surfer.</p>
+    <p class="goal">Goal: collect stars, build combos, and survive the full ride.</p>
+    <div class="chooser">
+      <div class="chooseTitle">Skater</div>
+      <div class="charRow" id="skaterChoices"></div>
+      <div class="chooseTitle">Surfer</div>
+      <div class="charRow" id="surferChoices"></div>
+    </div>
+    <p>Tap anywhere outside the cards to play. Music starts after your tap.</p>
+  </div>
+</div>
+
+<div id="controls">
+  <div class="group">
+    <div class="btn" id="left">◀</div>
+    <div class="btn" id="right">▶</div>
+  </div>
+  <div class="btn" id="jump">⬆</div>
+</div>
+
+<script>
+document.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});
+document.addEventListener("gesturestart",e=>e.preventDefault());
+document.addEventListener("gesturechange",e=>e.preventDefault());
+document.addEventListener("gestureend",e=>e.preventDefault());
+let lastTouchEnd=0;
+document.addEventListener("touchend",e=>{
+  const now=Date.now();
+  if(now-lastTouchEnd<=350)e.preventDefault();
+  lastTouchEnd=now;
+},{passive:false});
+
+const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
+const overlay=document.getElementById("overlay"),panel=document.getElementById("panel");
+
+let W,H,DPR,S;
+function resize(){
+  DPR=devicePixelRatio||1;
+  W=canvas.width=Math.floor(innerWidth*DPR);
+  H=canvas.height=Math.floor(innerHeight*DPR);
+  S=Math.min(W/1150,H/700);
+}
+addEventListener("resize",resize);resize();
+
+// Character images for Rollies Skate and Surf.
+// This version is extra forgiving with filenames because Grandmaster G was falling
+// back to the old bowling-pin placeholder when his exact riding filename was not found.
+// It tries character/, characters/, assets/character/, and assets/characters/.
+// It also tries underscores, spaces, dashes, and "pose" versions of each name.
+function makeSmartImageFromBases(bases,version="20260530ridingposefix"){
+  const image=new Image();
+  image.loaded=false;
+  image.failed=false;
+  image.tried=[];
+  let index=0;
+  const unique=[...new Set(bases.filter(Boolean))];
+  function tryNext(){
+    if(index>=unique.length){image.failed=true;return}
+    const next=unique[index++];
+    image.tried.push(next);
+    image.src=next + (next.includes("?")?"&":"?") + "v=" + version;
+  }
+  image.onload=()=>{image.loaded=true;image.failed=false};
+  image.onerror=tryNext;
+  tryNext();
+  return image;
+}
+function textVariants(name){
+  const clean=String(name||"").trim();
+  if(!clean)return [];
+  const spaced=clean.replace(/[_-]+/g," ").replace(/\s+/g," ").trim();
+  const underscored=spaced.replace(/\s+/g,"_");
+  const dashed=spaced.replace(/\s+/g,"-");
+  const compact=spaced.replace(/\s+/g,"");
+  const title=spaced.split(" ").map(w=>w?w.charAt(0).toUpperCase()+w.slice(1):w).join(" ");
+  const titleUnder=title.replace(/\s+/g,"_");
+  const titleDash=title.replace(/\s+/g,"-");
+  return [...new Set([clean,underscored,dashed,spaced,compact,title,titleUnder,titleDash])];
+}
+function addPoseVariants(characterBases,poseWords){
+  const out=[];
+  for(const base of characterBases){
+    out.push(base);
+    for(const pose of poseWords){
+      for(const b of textVariants(base)){
+        out.push(`${b}_${pose}`);
+        out.push(`${b}-${pose}`);
+        out.push(`${b} ${pose}`);
+        out.push(`${b}_${pose}_pose`);
+        out.push(`${b}-${pose}-pose`);
+        out.push(`${b} ${pose} pose`);
+      }
+    }
+  }
+  return [...new Set(out)];
+}
+function characterPaths(baseNames){
+  const folders=["character/","characters/","assets/character/","assets/characters/","assets/","images/character/","images/characters/",""];
+  const exts=[".png",".jpg",".jpeg",".webp",".PNG",".JPG",".JPEG",".WEBP"];
+  const paths=[];
+  for(const folder of folders){
+    for(const base of baseNames){
+      for(const variant of textVariants(base)){
+        for(const ext of exts){
+          paths.push(folder+variant+ext);
+          // Some browsers handle spaces, but this also tries URL-encoded spaces for GitHub Pages.
+          if(variant.includes(" "))paths.push(folder+variant.replaceAll(" ","%20")+ext);
+        }
+      }
+    }
+  }
+  return [...new Set(paths)];
+}
+function strictCharacterPosePaths(fileBases){
+  // IMPORTANT: for gameplay poses, do not try the bare character name first.
+  // Grandmaster G has an older/base image that was being found before
+  // grandmaster_g_riding.png, so this helper prioritizes the exact pose files.
+  const folders=["character/","characters/","assets/character/","assets/characters/","assets/","images/character/","images/characters/",""];
+  const exts=[".png",".jpg",".jpeg",".webp",".PNG",".JPG",".JPEG",".WEBP"];
+  const paths=[];
+  for(const folder of folders){
+    for(const base of fileBases){
+      for(const ext of exts){
+        paths.push(folder+base+ext);
+      }
+    }
+  }
+  return [...new Set(paths)];
+}
+function exactPoseFiles(def,type,pose){
+  const id=def.id;
+  if(type==="surf"){
+    return [id];
+  }
+  const map={
+    standing:[`${id}_standing`],
+    riding:[`${id}_riding`],
+    jump:[`${id}_jump_ollie`,`${id}_jump_ollie_pose`,`${id}_ollie`],
+    celebration:[`${id}_celebration`]
+  };
+  return map[pose]||[id];
+}
+function pretty(name){return name.split("_").map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(" ")}
+const skaterDefs=[
+  {id:"ollie_olivia",label:"Ollie Olivia",aliases:["ollie_olivia","ollie olivia","ollie-olivia","ollie"]},
+  {id:"rails_riley",label:"Rails Riley",aliases:["rails_riley","rails riley","rails-riley","riley"]},
+  {id:"grandmaster_g",label:"Grandmaster G",aliases:["grandmaster_g","grandmaster g","grandmaster-g","grand_master_g","grand master g","grand-master-g","grandmasterg","grandmaster","grandmaster_g_skater","grandmaster g skater","g"]}
+];
+const surferDefs=[
+  {id:"surfer_girl",label:"Surfer Girl",aliases:["surfer_girl","surfer girl","surfer-girl"]},
+  {id:"surfer_dood",label:"Surfer Dood",aliases:["surfer_dood","surfer dood","surfer-dood","surfer_dude","surfer dude","surfer-dude"]}
+];
+function makeCharacter(def,type){
+  const bases=def.aliases&&def.aliases.length?def.aliases:[def.id];
+  const poseNames={
+    standing:addPoseVariants(bases,["standing","stand","home","select"]),
+    riding:addPoseVariants(bases,type==="skate"?["riding","riding_pose","ride","ride_pose","skating","skate"]:["riding","riding_pose","ride","ride_pose","surfing","surf"]),
+    jump:addPoseVariants(bases,type==="skate"?["jump_ollie","jump ollie","jump-ollie","jump_ollie_pose","ollie","ollie_pose","jump","jump_pose","air"]:["riding","ride","surfing","surf"]),
+    celebration:addPoseVariants(bases,["celebration","celebrate","happy","win","winner"])
+  };
+  // Exact filenames from the character folder are tried first:
+  // grandmaster_g_riding.png, grandmaster_g_jump_ollie.png, etc.
+  // This prevents Grandmaster G from loading the old/base image during gameplay.
+  return {
+    ...def,
+    type,
+    images:{
+      standing:makeSmartImageFromBases([...strictCharacterPosePaths(exactPoseFiles(def,type,"standing")),...characterPaths(poseNames.standing)],"20260530exactgrandmaster"),
+      riding:makeSmartImageFromBases([...strictCharacterPosePaths(exactPoseFiles(def,type,"riding")),...characterPaths(poseNames.riding)],"20260530exactgrandmaster"),
+      jump:makeSmartImageFromBases([...strictCharacterPosePaths(exactPoseFiles(def,type,"jump")),...characterPaths(poseNames.jump)],"20260530exactgrandmaster"),
+      celebration:makeSmartImageFromBases([...strictCharacterPosePaths(exactPoseFiles(def,type,"celebration")),...characterPaths(poseNames.celebration)],"20260530exactgrandmaster")
+    }
+  };
+}
+const skaters=skaterDefs.map(d=>makeCharacter(d,"skate"));
+const surfers=surferDefs.map(d=>makeCharacter(d,"surf"));
+let selectedSkater=skaters[0];
+let selectedSurfer=surfers[0];
+function characterImageForPlay(){
+  const c=mode==="skate"?selectedSkater:selectedSurfer;
+
+  // Use the jump/ollie pose ONLY while the character is visibly airborne.
+  // Grandmaster G was staying in his jump pose because the old check used p.jump,
+  // which can remain true briefly even when he is already back near the ground.
+  const groundY=p.ground-p.h*S;
+  const visiblyAirborne=state==="wipe" || (p.y < groundY-10*S && p.vy!==0);
+  const wanted=visiblyAirborne?"jump":"riding";
+
+  // When riding, never fall forward into the jump pose. If a riding filename is
+  // missing, use standing as a safer fallback so the game does not look like he
+  // is doing an ollie the whole time. When jumping, jump can still fall back to
+  // riding if the jump image is missing.
+  const order=wanted==="jump"?["jump","riding","standing","celebration"]:["riding","standing","celebration"];
+  for(const key of order){
+    const im=c.images[key];
+    if(im&&im.loaded&&im.naturalWidth)return im;
+  }
+  return c.images[wanted]||c.images.riding||c.images.standing;
+}
+function drawCharacterImage(image,x,y,w,h){
+  if(!image||!image.loaded||!image.naturalWidth)return false;
+  ctx.drawImage(image,x,y,w,h);
+  return true;
+}
+function characterImageForPose(character,pose){
+  if(!character||!character.images)return null;
+  const order=pose==="celebration"?["celebration","riding","standing","jump"]:[pose,"riding","standing","celebration","jump"];
+  for(const key of order){
+    const im=character.images[key];
+    if(im&&im.loaded&&im.naturalWidth)return im;
+  }
+  return null;
+}
+function setupCharacterChoices(){
+  const skaterBox=document.getElementById("skaterChoices");
+  const surferBox=document.getElementById("surferChoices");
+  if(!skaterBox||!surferBox)return;
+  function build(box,list,kind){
+    box.innerHTML="";
+    list.forEach(c=>{
+      const card=document.createElement("button");
+      card.type="button";
+      card.className="charCard";
+      card.dataset.id=c.id;
+      const preview=document.createElement("img");
+      preview.alt=c.label;
+      preview.src=characterPaths([`${c.id}_standing`,`${c.id}_stand`,c.id])[0];
+      preview.onerror=function(){
+        const options=characterPaths([`${c.id}_standing`,`${c.id}_stand`,c.id]);
+        let current=options.indexOf(this.getAttribute("src"));
+        current=current<0?0:current+1;
+        if(current<options.length)this.src=options[current];
+        else this.style.display="none";
+      };
+      const label=document.createElement("span");
+      label.textContent=c.label;
+      card.appendChild(preview);
+      card.appendChild(label);
+      card.addEventListener("pointerdown",e=>{
+        e.preventDefault();e.stopPropagation();
+        if(kind==="skate")selectedSkater=c; else selectedSurfer=c;
+        refreshCharacterChoices();
+      });
+      box.appendChild(card);
+    });
+  }
+  build(skaterBox,skaters,"skate");
+  build(surferBox,surfers,"surf");
+  refreshCharacterChoices();
+}
+function refreshCharacterChoices(){
+  document.querySelectorAll("#skaterChoices .charCard").forEach(el=>el.classList.toggle("selected",el.dataset.id===selectedSkater.id));
+  document.querySelectorAll("#surferChoices .charCard").forEach(el=>el.classList.toggle("selected",el.dataset.id===selectedSurfer.id));
+}
+setupCharacterChoices();
+
+// Background images for this week's Rollies Skate and Surf build.
+// This tries BOTH the /assets folder and the main/root folder, and it tries
+// png/jpg/jpeg/webp plus the _background versions so the game still finds
+// your files even if GitHub has them saved slightly differently.
+function makeSmartImage(nameList){
+  const image=new Image();
+  image.loaded=false;
+  image.failed=false;
+  let index=0;
+  function tryNext(){
+    if(index>=nameList.length){image.failed=true;return}
+    image.src=nameList[index++] + "?v=20260530musicpolish";
+  }
+  image.onload=()=>{image.loaded=true};
+  image.onerror=tryNext;
+  tryNext();
+  return image;
+}
+const skateBg=makeSmartImage([
+  "assets/happy_birthday_g_skate.png",
+  "assets/happy_birthday_g_skate.jpg",
+  "assets/happy_birthday_g_skate.jpeg",
+  "assets/happy_birthday_g_skate.webp",
+  "assets/happy_birthday_g_skate_background.png",
+  "assets/happy_birthday_g_skate_background.jpg",
+  "assets/happy_birthday_g_skate_background.jpeg",
+  "assets/happy_birthday_g_skate_background.webp",
+  "happy_birthday_g_skate.png",
+  "happy_birthday_g_skate.jpg",
+  "happy_birthday_g_skate.jpeg",
+  "happy_birthday_g_skate.webp",
+  "happy_birthday_g_skate_background.png",
+  "happy_birthday_g_skate_background.jpg",
+  "happy_birthday_g_skate_background.jpeg",
+  "happy_birthday_g_skate_background.webp"
+]);
+const surfBg=makeSmartImage([
+  "assets/happy_birthday_g_surf.png",
+  "assets/happy_birthday_g_surf.jpg",
+  "assets/happy_birthday_g_surf.jpeg",
+  "assets/happy_birthday_g_surf.webp",
+  "assets/happy_birthday_g_surf_background.png",
+  "assets/happy_birthday_g_surf_background.jpg",
+  "assets/happy_birthday_g_surf_background.jpeg",
+  "assets/happy_birthday_g_surf_background.webp",
+  "happy_birthday_g_surf.png",
+  "happy_birthday_g_surf.jpg",
+  "happy_birthday_g_surf.jpeg",
+  "happy_birthday_g_surf.webp",
+  "happy_birthday_g_surf_background.png",
+  "happy_birthday_g_surf_background.jpg",
+  "happy_birthday_g_surf_background.jpeg",
+  "happy_birthday_g_surf_background.webp"
+]);
+
+// Skate obstacle artwork from the assets folder.
+// These names match the files shown in your screenshot:
+// neon_parking_block.png, palm_tree_planter_ledge.png,
+// rollies_graffiti_grind_box.png, rollies_picnic_table.png,
+// rollies_skate_bench.png, taco_truck_service_rail.png
+function obstacleImagePaths(base){
+  const folders=["assets/","asset/","assets/obstacles/","assets/obstacle/","obstacles/","obstacle/",""];
+  const exts=[".png",".jpg",".jpeg",".webp",".PNG",".JPG",".JPEG",".WEBP"];
+  const paths=[];
+  for(const folder of folders){
+    for(const ext of exts){
+      paths.push(folder+base+ext);
+    }
+  }
+  return paths;
+}
+const skateObstacleDefs=[
+  {type:"neon_parking_block", file:"neon_parking_block", w:112, h:72},
+  {type:"palm_tree_planter_ledge", file:"palm_tree_planter_ledge", w:138, h:105},
+  {type:"rollies_graffiti_grind_box", file:"rollies_graffiti_grind_box", w:132, h:84},
+  {type:"rollies_picnic_table", file:"rollies_picnic_table", w:150, h:100},
+  {type:"rollies_skate_bench", file:"rollies_skate_bench", w:150, h:86},
+  {type:"taco_truck_service_rail", file:"taco_truck_service_rail", w:150, h:92}
+];
+const skateObstacleImages={};
+for(const def of skateObstacleDefs){
+  skateObstacleImages[def.type]=makeSmartImage(obstacleImagePaths(def.file));
+}
+function drawObstacleImage(o){
+  const image=skateObstacleImages[o.type];
+  if(!image||!image.loaded||!image.naturalWidth)return false;
+  ctx.drawImage(image,0,0,o.w,o.h);
+  return true;
+}
+
+function drawCover(image){
+  const iw=image.naturalWidth,ih=image.naturalHeight;
+  if(!iw||!ih)return false;
+  const scale=Math.max(W/iw,H/ih);
+  const dw=iw*scale,dh=ih*scale;
+  ctx.drawImage(image,(W-dw)/2,(H-dh)/2,dw,dh);
+  return true;
+}
+function missingBackgroundNotice(which){
+  // This is intentionally obvious so we do not accidentally hide a broken path
+  // behind the old painted placeholder background again.
+  ctx.fillStyle=which==="skate"?"#26364a":"#166c96";
+  ctx.fillRect(0,0,W,H);
+  ctx.fillStyle="rgba(0,0,0,.68)";
+  ctx.fillRect(W*.08,H*.30,W*.84,H*.27);
+  ctx.fillStyle="white";
+  ctx.font=`${34*S}px Arial Black`;
+  ctx.fillText(`Missing ${which} background image`,W*.12,H*.40);
+  ctx.font=`${22*S}px Arial`;
+  ctx.fillText(`Add happy_birthday_g_${which}.png or .jpg to your assets folder`,W*.12,H*.47);
+  ctx.fillText(`Gameplay was not changed. This message only shows if the image path is wrong.`,W*.12,H*.52);
+}
+
+// Background music for Rollies Skate and Surf.
+// Music files shown in your video:
+//   music/arcade-sunramp.m4a
+//   music/tide-arcade.m4a
+// Skate mode plays arcade-sunramp. Surf mode plays tide-arcade.
+// Optional skatepark ambience can be added later as:
+//   music/skatepark-background-noise.mp3 or .m4a
+const MUSIC_VERSION="20260530musicpolish";
+function audioPathList(names){
+  const folders=["music/","Music/","assets/music/","assets/audio/","audio/",""];
+  const paths=[];
+  for(const folder of folders){
+    for(const name of names){
+      paths.push(folder+name+"?v="+MUSIC_VERSION);
+    }
+  }
+  return [...new Set(paths)];
+}
+function makeAudioSource(names,volume=0.35,loop=true){
+  const audio=new Audio();
+  audio.preload="auto";
+  audio.loop=loop;
+  audio.volume=volume;
+  audio.playsInline=true;
+  const paths=audioPathList(names);
+  let index=0;
+  audio.addEventListener("error",()=>{
+    index++;
+    if(index<paths.length){audio.src=paths[index];audio.load();}
+  });
+  audio.src=paths[index];
+  return audio;
+}
+const skateMusic=makeAudioSource(["arcade-sunramp.m4a","arcade-sunramp.mp3","arcade_sunramp.m4a","arcade_sunramp.mp3"],0.34,true);
+const surfMusic=makeAudioSource(["tide-arcade.m4a","tide-arcade.mp3","tide_arcade.m4a","tide_arcade.mp3"],0.36,true);
+const skateAmbience=makeAudioSource([
+  "skatepark-background-noise.mp3","skatepark-background-noise.m4a",
+  "skatepark_background_noise.mp3","skatepark_background_noise.m4a",
+  "skatepark-ambience.mp3","skatepark-ambience.m4a"
+],0.16,true);
+let musicUnlocked=false;
+let activeMusicMode="";
+function pauseAudio(a){try{a.pause()}catch(e){}}
+function playAudio(a){
+  try{
+    const p=a.play();
+    if(p&&p.catch)p.catch(()=>{});
+  }catch(e){}
+}
+function unlockAndStartMusic(){
+  musicUnlocked=true;
+  startMusicForMode(mode);
+}
+function startMusicForMode(nextMode){
+  if(!musicUnlocked)return;
+  if(activeMusicMode===nextMode)return;
+  activeMusicMode=nextMode;
+  pauseAudio(skateMusic);
+  pauseAudio(surfMusic);
+  pauseAudio(skateAmbience);
+  if(nextMode==="surf"){
+    surfMusic.currentTime=surfMusic.currentTime||0;
+    playAudio(surfMusic);
+  }else{
+    skateMusic.currentTime=skateMusic.currentTime||0;
+    playAudio(skateMusic);
+    // Optional low skatepark atmosphere only plays if you add the file later.
+    playAudio(skateAmbience);
+  }
+}
+function softenMusicForEnd(){
+  try{skateMusic.volume=.22;surfMusic.volume=.24;skateAmbience.volume=.10}catch(e){}
+}
+function restoreMusicVolume(){
+  try{skateMusic.volume=.34;surfMusic.volume=.36;skateAmbience.volume=.16}catch(e){}
+}
+
+let audioCtx=null;
+function sound(type){
+  try{
+    if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.connect(g);g.connect(audioCtx.destination);
+    let f=220,d=.12,v=.08;
+    if(type==="jump"){f=420;d=.09;v=.06}
+    if(type==="star"){f=760;d=.11;v=.07}
+    if(type==="hit"){f=120;d=.18;v=.09}
+    if(type==="wipe"){f=70;d=.45;v=.12}
+    if(type==="win"){f=880;d=.35;v=.08}
+    o.frequency.setValueAtTime(f,audioCtx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(Math.max(45,f*.55),audioCtx.currentTime+d);
+    g.gain.setValueAtTime(v,audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+d);
+    o.start();o.stop(audioCtx.currentTime+d);
+  }catch(e){}
+}
+function buzz(n){if(navigator.vibrate)navigator.vibrate(n)}
+
+let state="start",mode="skate";
+const SKATE_TO_SURF_CELEBRATION_MS=5000; // under 15 seconds
+let transitionStart=0;
+let score=0,stars=0,lives=5,distance=0,speed=6.1,combo=1,best=Number(localStorage.bbBest||0);
+let keys={left:false,right:false};
+let obs=[],items=[],fx=[],waveFoam=[];
+let obsTimer=50,itemTimer=70;
+let wipe={x:0,y:0,vy:0,ang:0,spin:0};
+
+const p={x:0,y:0,w:92,h:158,vy:0,jump:false,ground:0};
+function ground(){return mode==="skate"?H*.78:H*.58}
+
+function reset(){
+  state="play";mode="skate";score=0;stars=0;lives=5;distance=0;speed=6.1;combo=1;
+  obs=[];items=[];fx=[];waveFoam=[];obsTimer=45;itemTimer=65;
+  p.x=W*.18;p.ground=ground();p.y=p.ground-p.h*S;p.vy=0;p.jump=false;
+  overlay.style.display="none";
+  restoreMusicVolume();
+  unlockAndStartMusic();
+  sound("jump");
+}
+
+function end(win){
+  state=win?"win":"over";
+  if(score>best){best=score;localStorage.bbBest=best}
+  if(win)sound("win");
+  softenMusicForEnd();
+  overlay.style.display="flex";
+  panel.innerHTML=`
+    <h1>${win?"You Made It!":"WIPEOUT!"}</h1>
+    <p>${win?"Your rider conquered the street and the sea!":"Your rider took a tumble!"}</p>
+    <p class="goal">Final Score: ${score}</p>
+    <p>Stars: ${stars} • Best: ${best}</p>
+    <p>Beat your score, collect more stars, and survive longer.</p>
+    <p>Tap anywhere to restart.</p>
+  `;
+}
+
+function jump(){
+  if(state!=="play"||p.jump)return;
+  p.vy=-24*S;p.jump=true;buzz(35);sound("jump");
+  burst(p.x+p.w*S/2,p.ground,12,"dust");
+}
+
+function burst(x,y,n,type){
+  for(let i=0;i<n;i++){
+    fx.push({x,y,life:type==="water"?55:35,vx:(Math.random()-.5)*(type==="water"?16:10)*S,vy:(Math.random()-.9)*(type==="water"?12:8)*S,type});
+  }
+}
+
+function startWipe(){
+  state="wipe";
+  wipe={x:p.x,y:p.y,vy:-11*S,ang:0,spin:.24};
+  burst(p.x+p.w*S/2,p.ground,45,mode==="surf"?"water":"dust");
+  buzz(220);sound("wipe");
+}
+
+function spawnObs(){
+  const types=mode==="skate"?skateObstacleDefs.map(o=>o.type):["rolling_wave","foam_wave","curl_wave","big_wave"];
+  const type=types[Math.floor(Math.random()*types.length)];
+  let w=72*S,h=72*S,y=p.ground-h;
+  if(mode==="skate"){
+    const def=skateObstacleDefs.find(o=>o.type===type);
+    if(def){
+      w=def.w*S;
+      h=def.h*S;
+      y=p.ground-h+8*S;
+    }
+  }
+  if(mode==="surf"){
+    // Surf week: no boats, sharks, buoys, or random ocean objects.
+    // The only surf hazards now are moving wave sections to ride through.
+    if(type==="rolling_wave"){w=170*S;h=86*S;y=p.ground-h+26*S}
+    if(type==="foam_wave"){w=150*S;h=62*S;y=p.ground-h+34*S}
+    if(type==="curl_wave"){w=190*S;h=108*S;y=p.ground-h+16*S}
+    if(type==="big_wave"){w=220*S;h=132*S;y=p.ground-h+6*S}
+  }
+  obs.push({x:W+140,y,w,h,type,phase:Math.random()*Math.PI*2});
+}
+
+function spawnItem(){
+  items.push({x:W+100,y:mode==="skate"?p.ground-(190+Math.random()*110)*S:H*.35+Math.random()*H*.17,r:21*S});
+}
+
+function update(){
+  if(state==="wipe"){
+    wipe.vy+=1.2*S;wipe.y+=wipe.vy;wipe.x-=3*S;wipe.ang+=wipe.spin;
+    if(mode==="surf"&&Math.random()<.5)burst(wipe.x+p.w*S/2,H*.59,2,"water");
+    if(wipe.y>H+230*S)end(false);
+    return;
+  }
+  if(state==="skateComplete"){
+    fx.forEach(f=>{f.x+=f.vx;f.y+=f.vy;f.vy+=.18*S;f.life--});
+    fx=fx.filter(f=>f.life>0);
+    if(performance.now()-transitionStart>=SKATE_TO_SURF_CELEBRATION_MS){
+      mode="surf";
+      state="play";
+      speed=7.2;
+      startMusicForMode("surf");
+      p.ground=ground();
+      p.y=p.ground-p.h*S;
+      p.vy=0;
+      p.jump=false;
+      obs=[];
+      items=[];
+      waveFoam=[];
+      obsTimer=45;
+      itemTimer=55;
+      burst(W*.5,H*.58,55,"water");
+      sound("star");
+    }
+    return;
+  }
+  if(state!=="play")return;
+
+  distance+=speed;score+=combo;
+
+  if(distance>13000&&mode==="skate"){
+    state="skateComplete";
+    transitionStart=performance.now();
+    burst(p.x+p.w*S/2,p.ground,40,"star");
+    buzz(150);
+    sound("win");
+    return;
+  }
+
+  if(distance>52000)end(true);
+
+  if(keys.left)p.x-=8.5*S;
+  if(keys.right)p.x+=8.5*S;
+  p.x=Math.max(30*S,Math.min(W-p.w*S-30*S,p.x));
+
+  p.vy+=1.08*S;p.y+=p.vy;
+  let gy=p.ground-p.h*S;
+  if(p.y>=gy){
+    if(p.jump&&mode==="surf")burst(p.x+p.w*S/2,p.ground+8*S,18,"water");
+    if(p.jump&&mode==="skate")burst(p.x+p.w*S/2,p.ground+8*S,10,"dust");
+    p.y=gy;p.vy=0;p.jump=false;
+  }
+
+  if(mode==="surf"&&!p.jump){
+    p.y+=Math.sin(Date.now()/180)*.45*S;
+    if(Math.random()<.45)waveFoam.push({x:p.x+p.w*S/2+(Math.random()-.5)*90*S,y:p.ground+16*S,life:28});
+  }
+
+  obsTimer--;itemTimer--;
+  if(obsTimer<=0){spawnObs();obsTimer=mode==="skate"?95+Math.random()*75:92+Math.random()*70}
+  if(itemTimer<=0){spawnItem();itemTimer=70+Math.random()*80}
+
+  obs.forEach(o=>o.x-=speed*S);
+  items.forEach(c=>c.x-=speed*S);
+  fx.forEach(f=>{f.x+=f.vx;f.y+=f.vy;f.vy+=.25*S;f.life--});
+  waveFoam.forEach(f=>{f.x-=speed*.5*S;f.life--});
+
+  obs=obs.filter(o=>o.x>-190*S);
+  items=items.filter(c=>c.x>-90*S);
+  fx=fx.filter(f=>f.life>0);
+  waveFoam=waveFoam.filter(f=>f.life>0);
+
+  let px=p.x+24*S,py=p.y+18*S,pw=p.w*S-48*S,ph=p.h*S-24*S;
+  for(let i=obs.length-1;i>=0;i--){
+    let o=obs[i];
+    if(px<o.x+o.w&&px+pw>o.x&&py<o.y+o.h&&py+ph>o.y){
+      obs.splice(i,1);lives--;combo=1;buzz(130);sound("hit");
+      burst(px+pw/2,py+ph/2,22,mode==="surf"?"water":"dust");
+      if(lives<=0)startWipe();
+    }
+  }
+  for(let i=items.length-1;i>=0;i--){
+    let c=items[i];
+    if(px<c.x+c.r*2&&px+pw>c.x&&py<c.y+c.r*2&&py+ph>c.y){
+      items.splice(i,1);stars++;combo=Math.min(combo+1,5);score+=100*combo;buzz(25);sound("star");
+      burst(c.x,c.y,16,"star");
+    }
+  }
+}
+
+function bg(){
+  const which=(mode==="skate"||state==="start")?"skate":"surf";
+  const image=which==="skate"?skateBg:surfBg;
+
+  // Draw the actual birthday skate/surf background image.
+  // No gameplay changes are made here. This replaces the old canvas-painted
+  // placeholder backgrounds that kept showing before.
+  if(image.loaded&&drawCover(image)){
+    return;
+  }
+
+  missingBackgroundNotice(which);
+}
+
+function drawFallbackPin(w,h){
+  ctx.fillStyle="white";ctx.strokeStyle="black";ctx.lineWidth=6*S;
+  ctx.beginPath();ctx.ellipse(0,-h*.20,w*.36,h*.32,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.roundRect(-w*.3,-h*.03,w*.6,h*.49,24*S);ctx.fill();ctx.stroke();
+  ctx.strokeStyle="#d40a32";ctx.lineWidth=8*S;
+  ctx.beginPath();ctx.moveTo(-w*.25,-h*.03);ctx.lineTo(w*.25,-h*.03);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-w*.25,h*.05);ctx.lineTo(w*.25,h*.05);ctx.stroke();
+}
+
+function drawBoardAndPin(x,y,ang){
+  let w=p.w*S,h=p.h*S;
+  ctx.save();
+  ctx.translate(x+w/2,y+h/2);
+  ctx.rotate(ang);
+
+  // The character artwork now includes the skateboard/surfboard.
+  // Do NOT draw the old canvas skateboard or surfboard underneath.
+  const charImg=characterImageForPlay();
+  const drawW=mode==="skate"?w+70*S:w+104*S;
+  const drawH=mode==="skate"?h+54*S:h+86*S;
+  const drawX=-drawW/2;
+  const drawY=mode==="skate"?-h/2-38*S:-h/2+22*S; // lower surfer into the wave
+
+  if(!drawCharacterImage(charImg,drawX,drawY,drawW,drawH)){
+    drawFallbackPin(w,h);
+  }
+  ctx.restore();
+}
+
+function drawPlayer(){
+  if(state==="start"||state==="over"||state==="win"||state==="skateComplete")return;
+  if(state==="wipe")drawBoardAndPin(wipe.x,wipe.y,wipe.ang);
+  else drawBoardAndPin(p.x,p.y,p.jump?Math.sin(Date.now()/100)*.1:Math.sin(Date.now()/180)*.025);
+}
+
+function drawSurfWaveObstacle(o){
+  const t=Date.now()/260+o.phase;
+  ctx.save();
+  ctx.translate(0,Math.sin(t)*3*S);
+
+  // Main wave body
+  const grad=ctx.createLinearGradient(0,0,0,o.h);
+  grad.addColorStop(0,"rgba(115,225,255,.98)");
+  grad.addColorStop(.55,"rgba(12,148,213,.95)");
+  grad.addColorStop(1,"rgba(4,80,148,.96)");
+  ctx.fillStyle=grad;
+  ctx.strokeStyle="rgba(255,255,255,.95)";
+  ctx.lineWidth=4*S;
+
+  ctx.beginPath();
+  ctx.moveTo(0,o.h*.86);
+  ctx.quadraticCurveTo(o.w*.20,o.h*.42,o.w*.43,o.h*.56);
+  ctx.quadraticCurveTo(o.w*.62,o.h*.68,o.w*.70,o.h*.28);
+  ctx.quadraticCurveTo(o.w*.86,o.h*.34,o.w,o.h*.72);
+  ctx.lineTo(o.w,o.h);
+  ctx.lineTo(0,o.h);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Curl lip for bigger waves
+  if(o.type==="curl_wave"||o.type==="big_wave"){
+    ctx.fillStyle="rgba(255,255,255,.92)";
+    ctx.beginPath();
+    ctx.ellipse(o.w*.69,o.h*.30,o.w*.17,o.h*.12,-.35,0,Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle="rgba(40,190,230,.88)";
+    ctx.beginPath();
+    ctx.ellipse(o.w*.63,o.h*.32,o.w*.11,o.h*.07,-.35,0,Math.PI*2);
+    ctx.fill();
+  }
+
+  // Foam line
+  ctx.strokeStyle="rgba(255,255,255,.9)";
+  ctx.lineWidth=3*S;
+  ctx.beginPath();
+  for(let x=0;x<=o.w;x+=18*S){
+    const y=o.h*.78+Math.sin(x*.04+t)*6*S;
+    if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // Foam bubbles
+  ctx.fillStyle="rgba(255,255,255,.88)";
+  for(let i=0;i<7;i++){
+    const bx=(i*.14+.08)*o.w;
+    const by=o.h*(.62+.22*((i%3)/3))+Math.sin(t+i)*4*S;
+    ctx.beginPath();
+    ctx.ellipse(bx,by,(5+(i%3)*3)*S,(3+(i%2)*2)*S,0,0,Math.PI*2);
+    ctx.fill();
+  }
+  ctx.restore();
+  return true;
+}
+
+function drawObs(){
+  if(state==="start")return;
+  for(const o of obs){
+    ctx.save();ctx.translate(o.x,o.y);ctx.strokeStyle="black";ctx.lineWidth=4*S;
+    if(mode==="skate"&&drawObstacleImage(o)){ctx.restore();continue}
+    if(mode==="surf"&&drawSurfWaveObstacle(o)){ctx.restore();continue}
+    if(o.type==="cone"){ctx.fillStyle="#ff7b00";ctx.beginPath();ctx.moveTo(o.w/2,0);ctx.lineTo(o.w,o.h);ctx.lineTo(0,o.h);ctx.closePath();ctx.fill();ctx.stroke()}
+    if(o.type==="ball"){ctx.fillStyle="#111";ctx.beginPath();ctx.arc(o.w/2,o.h/2,o.w/2,0,Math.PI*2);ctx.fill();ctx.stroke()}
+    if(o.type==="cup"){ctx.fillStyle="#fff";ctx.fillRect(o.w*.2,o.h*.15,o.w*.6,o.h*.75);ctx.strokeRect(o.w*.2,o.h*.15,o.w*.6,o.h*.75)}
+    if(o.type==="ramp"){ctx.fillStyle="#b97834";ctx.beginPath();ctx.moveTo(0,o.h);ctx.lineTo(o.w,o.h);ctx.lineTo(o.w,0);ctx.closePath();ctx.fill();ctx.stroke()}
+    if(o.type==="rail"){ctx.strokeStyle="#ddd";ctx.lineWidth=8*S;ctx.beginPath();ctx.moveTo(0,o.h*.45);ctx.lineTo(o.w,o.h*.45);ctx.stroke()}
+    if(o.type==="shark"){ctx.fillStyle="#4c5960";ctx.beginPath();ctx.moveTo(0,o.h*.7);ctx.lineTo(o.w*.55,0);ctx.lineTo(o.w,o.h*.7);ctx.closePath();ctx.fill();ctx.stroke()}
+    if(o.type==="jelly"){ctx.fillStyle="#e76dff";ctx.beginPath();ctx.arc(o.w/2,o.h*.32,o.w*.36,Math.PI,0);ctx.lineTo(o.w*.85,o.h*.65);ctx.lineTo(o.w*.15,o.h*.65);ctx.closePath();ctx.fill();ctx.stroke()}
+    if(o.type==="boat"){ctx.fillStyle="#8b4a22";ctx.beginPath();ctx.moveTo(0,o.h*.55);ctx.lineTo(o.w,o.h*.55);ctx.lineTo(o.w*.75,o.h);ctx.lineTo(o.w*.18,o.h);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle="white";ctx.fillRect(o.w*.42,0,o.w*.1,o.h*.55);ctx.strokeRect(o.w*.42,0,o.w*.1,o.h*.55)}
+    if(o.type==="surfer"){ctx.fillStyle="#ffe066";ctx.beginPath();ctx.ellipse(o.w*.5,o.h*.8,o.w*.48,o.h*.15,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle="#222";ctx.beginPath();ctx.arc(o.w*.5,o.h*.35,o.w*.18,0,Math.PI*2);ctx.fill()}
+    if(o.type==="buoy"){ctx.fillStyle="#ff3030";ctx.beginPath();ctx.arc(o.w/2,o.h/2,o.w*.36,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.strokeStyle="white";ctx.lineWidth=7*S;ctx.beginPath();ctx.moveTo(o.w*.25,o.h*.5);ctx.lineTo(o.w*.75,o.h*.5);ctx.stroke()}
+    if(o.type==="log"){ctx.fillStyle="#7b4a22";ctx.beginPath();ctx.roundRect(0,o.h*.2,o.w,o.h*.55,20*S);ctx.fill();ctx.stroke()}
+    ctx.restore();
+  }
+}
+
+function drawItems(){
+  if(state==="start")return;
+  for(const c of items){
+    ctx.save();ctx.translate(c.x,c.y);ctx.fillStyle="#ffd33d";ctx.strokeStyle="black";ctx.lineWidth=3*S;
+    ctx.beginPath();
+    for(let i=0;i<10;i++){let r=i%2?c.r*.45:c.r,a=-Math.PI/2+i*Math.PI/5;ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r)}
+    ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();
+  }
+}
+
+function drawFx(){
+  if(state==="start")return;
+  for(const f of fx){
+    ctx.globalAlpha=Math.max(0,f.life/55);
+    ctx.fillStyle=f.type==="water"?"white":f.type==="star"?"#ffd33d":"#cfa166";
+    ctx.beginPath();ctx.arc(f.x,f.y,(f.type==="water"?5:4)*S,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=1;
+  }
+  for(const f of waveFoam){
+    ctx.globalAlpha=f.life/28;
+    ctx.fillStyle="white";
+    ctx.beginPath();ctx.ellipse(f.x,f.y,14*S,5*S,0,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=1;
+  }
+}
+
+function drawSkateCompleteScreen(){
+  if(state!=="skateComplete")return;
+  const elapsed=performance.now()-transitionStart;
+  const remaining=Math.max(0,Math.ceil((SKATE_TO_SURF_CELEBRATION_MS-elapsed)/1000));
+
+  ctx.fillStyle="rgba(0,0,0,.46)";
+  ctx.fillRect(0,0,W,H);
+
+  const charImg=characterImageForPose(selectedSkater,"celebration");
+  const drawH=Math.min(H*.56,360*S);
+  const ratio=charImg&&charImg.naturalWidth&&charImg.naturalHeight?charImg.naturalWidth/charImg.naturalHeight:.72;
+  const drawW=drawH*ratio;
+  const x=W*.5-drawW/2;
+  const y=H*.50-drawH/2;
+  if(!drawCharacterImage(charImg,x,y,drawW,drawH)){
+    drawFallbackPin(drawW*.45,drawH*.8);
+  }
+
+  ctx.textAlign="center";
+  ctx.fillStyle="white";
+  ctx.strokeStyle="rgba(0,0,0,.75)";
+  ctx.lineWidth=7*S;
+  ctx.font=`${Math.max(30*S,Math.min(64*S,W*.055))}px Arial Black`;
+  ctx.strokeText("SKATE RUN COMPLETE!",W*.5,H*.18);
+  ctx.fillText("SKATE RUN COMPLETE!",W*.5,H*.18);
+
+  ctx.font=`${Math.max(18*S,Math.min(30*S,W*.032))}px Arial Black`;
+  ctx.strokeText("Get ready to surf the waves",W*.5,H*.25);
+  ctx.fillText("Get ready to surf the waves",W*.5,H*.25);
+
+  ctx.fillStyle="#ffd33d";
+  ctx.strokeText(`Surf starts in ${remaining}`,W*.5,H*.86);
+  ctx.fillText(`Surf starts in ${remaining}`,W*.5,H*.86);
+  ctx.textAlign="left";
+}
+
+function ui(){
+  if(state==="start"||state==="over"||state==="win"||state==="skateComplete")return;
+  ctx.fillStyle="rgba(0,0,0,.45)";ctx.fillRect(0,0,W,84*S);
+  ctx.fillStyle="white";ctx.font=`${24*S}px Arial Black`;
+  ctx.fillText(`Score ${score}`,18*S,32*S);
+  ctx.fillText(`Stars ${stars}`,18*S,66*S);
+  ctx.fillText(`Lives ${lives}`,205*S,32*S);
+  ctx.fillText(`Combo x${combo}`,205*S,66*S);
+  ctx.fillText(mode==="skate"?"SKATE CITY":"SURF THE WAVES",W-310*S,48*S);
+  ctx.fillStyle="rgba(255,255,255,.35)";ctx.fillRect(W*.40,32*S,W*.25,12*S);
+  ctx.fillStyle="#ffd33d";ctx.fillRect(W*.40,32*S,W*.25*Math.min(distance/52000,1),12*S);
+}
+
+function loop(){update();bg();drawObs();drawItems();drawFx();drawPlayer();drawSkateCompleteScreen();ui();requestAnimationFrame(loop)}
+loop();
+
+function start(){if(state!=="play"&&state!=="wipe"&&state!=="skateComplete")reset()}
+document.body.addEventListener("pointerdown",e=>{
+  if(e.target.classList.contains("btn")||e.target.closest(".charCard"))return;
+  start();
+});
+
+addEventListener("keydown",e=>{
+  if(e.code==="ArrowLeft"||e.code==="KeyA")keys.left=true;
+  if(e.code==="ArrowRight"||e.code==="KeyD")keys.right=true;
+  if(e.code==="Space"||e.code==="ArrowUp"||e.code==="KeyW")jump();
+  if(state!=="play"&&state!=="wipe"&&state!=="skateComplete")start();
+});
+addEventListener("keyup",e=>{
+  if(e.code==="ArrowLeft"||e.code==="KeyA")keys.left=false;
+  if(e.code==="ArrowRight"||e.code==="KeyD")keys.right=false;
+});
+
+function hold(id,key){
+  const el=document.getElementById(id);
+  el.addEventListener("pointerdown",e=>{e.preventDefault();keys[key]=true});
+  el.addEventListener("pointerup",e=>{e.preventDefault();keys[key]=false});
+  el.addEventListener("pointercancel",()=>keys[key]=false);
+  el.addEventListener("pointerleave",()=>keys[key]=false);
+}
+hold("left","left");hold("right","right");
+document.getElementById("jump").addEventListener("pointerdown",e=>{e.preventDefault();jump()});
+</script>
+</body>
+</html>
