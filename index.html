@@ -1,0 +1,2025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>$HORDE Yard | Byron Horror Identity Game</title>
+
+  <style>
+    :root {
+      --black: #030303;
+      --black2: #090909;
+      --black3: #141414;
+      --white: #f7f2eb;
+      --paper: #efe7da;
+      --soft: #cfc7bd;
+      --gray: #9b938d;
+      --red: #d71920;
+      --red2: #ff2b2b;
+      --darkred: #65070b;
+      --line: rgba(247, 242, 235, 0.17);
+      --redline: rgba(215, 25, 32, 0.55);
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.72);
+      --redGlow: 0 0 18px rgba(215, 25, 32, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at 18% 12%, rgba(215, 25, 32, 0.16), transparent 24%),
+        radial-gradient(circle at 82% 10%, rgba(247, 242, 235, 0.05), transparent 20%),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+        var(--black);
+      background-size: auto, auto, 46px 46px, 46px 46px;
+      color: var(--white);
+      font-family: Arial, Helvetica, sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(255,255,255,.018),
+          rgba(255,255,255,.018) 1px,
+          transparent 1px,
+          transparent 6px
+        );
+      opacity: .25;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 118%, rgba(118,8,13,.34), transparent 34%),
+        linear-gradient(to bottom, transparent 68%, rgba(0,0,0,.76));
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font-family: inherit;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(3,3,3,.96);
+      border-bottom: 2px solid rgba(215,25,32,.42);
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar-inner {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-transform: uppercase;
+    }
+
+    .brand-mark {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #080808;
+      border: 2px solid var(--red);
+      box-shadow: var(--redGlow);
+      font-size: 23px;
+      flex: 0 0 auto;
+    }
+
+    .brand-title {
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: 26px;
+      line-height: .95;
+      color: var(--white);
+      letter-spacing: .03em;
+      white-space: nowrap;
+    }
+
+    .brand-title span {
+      color: var(--red2);
+    }
+
+    .brand-sub {
+      display: block;
+      margin-top: 5px;
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .15em;
+      line-height: 1.2;
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .nav button,
+    .nav a {
+      border: 1px solid rgba(247,242,235,.12);
+      background: #070707;
+      color: var(--paper);
+      border-radius: 999px;
+      padding: 10px 13px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .nav button.active,
+    .nav button:hover,
+    .nav a:hover {
+      color: var(--white);
+      background: rgba(215,25,32,.18);
+      border-color: var(--redline);
+      box-shadow: var(--redGlow);
+    }
+
+    .page {
+      position: relative;
+      z-index: 2;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 20px 18px 60px;
+    }
+
+    .section {
+      display: none;
+      animation: fadeIn .22s ease both;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.08fr .92fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .hero-main,
+    .card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 26px;
+      border: 1px solid rgba(247,242,235,.16);
+      background:
+        radial-gradient(circle at 18% 16%, rgba(215,25,32,.14), transparent 22%),
+        linear-gradient(180deg, rgba(17,17,17,.98), rgba(0,0,0,.99));
+      box-shadow: var(--shadow);
+    }
+
+    .hero-main {
+      min-height: 540px;
+      padding: 32px;
+    }
+
+    .hero-main::before,
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          -8deg,
+          rgba(255,255,255,.018),
+          rgba(255,255,255,.018) 1px,
+          transparent 1px,
+          transparent 10px
+        );
+      opacity: .38;
+      pointer-events: none;
+    }
+
+    .hero-main::after {
+      content: "$HORDE";
+      position: absolute;
+      right: -36px;
+      bottom: 16px;
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: clamp(90px, 17vw, 190px);
+      line-height: .8;
+      letter-spacing: -.05em;
+      color: rgba(247,242,235,.035);
+      transform: rotate(-6deg);
+      pointer-events: none;
+    }
+
+    .hero-content,
+    .card > * {
+      position: relative;
+      z-index: 2;
+    }
+
+    .kicker {
+      color: var(--red2);
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      font-size: 13px;
+      font-weight: 950;
+      margin-bottom: 16px;
+      line-height: 1.35;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: clamp(70px, 10.8vw, 128px);
+      line-height: .86;
+      letter-spacing: -.035em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-shadow: 4px 4px 0 rgba(215,25,32,.38);
+      white-space: nowrap;
+    }
+
+    h1 span {
+      color: var(--red2);
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: clamp(36px, 5vw, 58px);
+      line-height: .95;
+      letter-spacing: -.025em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-shadow: 3px 3px 0 rgba(215,25,32,.28);
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: 30px;
+      line-height: 1;
+      text-transform: uppercase;
+      letter-spacing: -.015em;
+      color: var(--white);
+    }
+
+    p {
+      margin: 0 0 12px;
+      color: var(--soft);
+      font-size: 16px;
+      font-weight: 750;
+      line-height: 1.55;
+    }
+
+    .ledger {
+      margin-top: 18px;
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      color: var(--white);
+      font-size: clamp(28px, 3.8vw, 46px);
+      line-height: 1;
+      letter-spacing: .015em;
+      text-transform: uppercase;
+    }
+
+    .ledger span {
+      color: var(--red2);
+    }
+
+    .identity-hook {
+      margin-top: 22px;
+      padding: 18px;
+      border-radius: 22px;
+      border: 1px solid rgba(215,25,32,.48);
+      background: rgba(0,0,0,.55);
+      box-shadow: 0 0 18px rgba(215,25,32,.14);
+    }
+
+    .identity-hook-title {
+      color: var(--white);
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: 34px;
+      line-height: 1;
+      text-transform: uppercase;
+      letter-spacing: .01em;
+    }
+
+    .ritual {
+      margin-top: 14px;
+      display: grid;
+      gap: 8px;
+      font-weight: 900;
+      font-size: 15px;
+    }
+
+    .ritual div {
+      color: var(--paper);
+      line-height: 1.35;
+    }
+
+    .ritual div::before {
+      content: "✕ ";
+      color: var(--red2);
+      font-weight: 1000;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      border: 2px solid rgba(247,242,235,.22);
+      background: #080808;
+      color: var(--white);
+      border-radius: 14px;
+      padding: 14px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 1000;
+      text-transform: uppercase;
+      letter-spacing: .055em;
+      line-height: 1;
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: var(--red);
+      box-shadow: var(--redGlow);
+      background: #111;
+    }
+
+    .btn.primary {
+      color: var(--white);
+      border-color: var(--red);
+      background: linear-gradient(180deg, rgba(215,25,32,.34), rgba(62,5,8,.88));
+      box-shadow: var(--redGlow);
+    }
+
+    .btn.white {
+      color: #070707;
+      background: var(--paper);
+      border-color: var(--paper);
+    }
+
+    .btn.dark {
+      color: var(--paper);
+      background: #050505;
+      border-color: rgba(247,242,235,.28);
+    }
+
+    .side-stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .card {
+      padding: 20px;
+      border-radius: 24px;
+    }
+
+    .label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--paper);
+      border: 1px solid rgba(247,242,235,.18);
+      background: rgba(247,242,235,.06);
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-weight: 950;
+      margin-bottom: 14px;
+      line-height: 1;
+    }
+
+    .label.red {
+      color: var(--white);
+      border-color: rgba(215,25,32,.45);
+      background: rgba(215,25,32,.16);
+    }
+
+    .wallet-status {
+      padding: 14px;
+      border-radius: 16px;
+      background: #050505;
+      border: 2px solid rgba(215,25,32,.45);
+      color: var(--paper);
+      font-weight: 950;
+      word-break: break-word;
+      margin-bottom: 14px;
+      box-shadow: 0 0 14px rgba(215,25,32,.16);
+      font-size: 16px;
+    }
+
+    .qr-box {
+      display: none;
+      margin-top: 14px;
+      text-align: center;
+      border: 2px solid rgba(215,25,32,.32);
+      background: rgba(0,0,0,.58);
+      padding: 14px;
+      border-radius: 20px;
+    }
+
+    .qr-box img {
+      width: min(260px, 86vw);
+      background: white;
+      padding: 10px;
+      border-radius: 16px;
+    }
+
+    .tiny {
+      color: var(--gray);
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .stat {
+      background: #050505;
+      border: 1px solid rgba(247,242,235,.15);
+      border-radius: 16px;
+      padding: 14px 10px;
+      text-align: center;
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--white);
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: 30px;
+      line-height: 1;
+      letter-spacing: .01em;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 6px;
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    .identity-card {
+      border-color: rgba(215,25,32,.45);
+      background:
+        radial-gradient(circle at 80% 12%, rgba(215,25,32,.16), transparent 28%),
+        linear-gradient(180deg, rgba(14,14,14,.98), rgba(0,0,0,.99));
+    }
+
+    .quick-list {
+      display: grid;
+      gap: 0;
+      margin-top: 14px;
+      border-top: 1px solid rgba(247,242,235,.10);
+    }
+
+    .quick-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(247,242,235,.10);
+      padding: 11px 0;
+      color: var(--soft);
+      font-weight: 850;
+      line-height: 1.35;
+    }
+
+    .quick-item strong {
+      color: var(--white);
+      text-align: right;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      border: 2px solid rgba(215,25,32,.38);
+      display: grid;
+      place-items: center;
+      color: var(--paper);
+      background: rgba(215,25,32,.11);
+      box-shadow: 0 0 14px rgba(215,25,32,.18);
+      font-size: 23px;
+      margin-bottom: 14px;
+    }
+
+    .yard-layout {
+      display: grid;
+      grid-template-columns: 1.42fr .58fr;
+      gap: 18px;
+      align-items: start;
+      margin-top: 0;
+    }
+
+    .yard-scene {
+      position: relative;
+      overflow: hidden;
+      min-height: 610px;
+      border-radius: 28px;
+      border: 1px solid rgba(247,242,235,.16);
+      background:
+        radial-gradient(circle at 14% 75%, rgba(215,25,32,.24), transparent 18%),
+        radial-gradient(circle at 80% 18%, rgba(247,242,235,.07), transparent 22%),
+        linear-gradient(180deg, rgba(13,13,13,.98), rgba(0,0,0,.99));
+      box-shadow: var(--shadow);
+      isolation: isolate;
+    }
+
+    .yard-scene::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px);
+      background-size: 44px 44px;
+      opacity: .75;
+      z-index: 0;
+    }
+
+    .sky {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        radial-gradient(circle at 25% 18%, rgba(215,25,32,.16), transparent 18%),
+        radial-gradient(circle at 84% 12%, rgba(247,242,235,.07), transparent 18%);
+    }
+
+    .wall {
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 62%;
+      z-index: 2;
+      background:
+        linear-gradient(90deg, rgba(215,25,32,.08), transparent, rgba(247,242,235,.04)),
+        repeating-linear-gradient(
+          0deg,
+          rgba(255,255,255,.045),
+          rgba(255,255,255,.045) 2px,
+          transparent 2px,
+          transparent 34px
+        );
+      border-bottom: 4px solid rgba(0,0,0,.72);
+    }
+
+    .floor {
+      position: absolute;
+      left: -8%;
+      right: -8%;
+      bottom: 0;
+      height: 45%;
+      z-index: 3;
+      background:
+        radial-gradient(ellipse at center top, rgba(215,25,32,.10), transparent 52%),
+        repeating-linear-gradient(100deg, rgba(255,255,255,.04), rgba(255,255,255,.04) 2px, transparent 2px, transparent 48px),
+        #080808;
+      transform: perspective(400px) rotateX(18deg);
+      transform-origin: top;
+    }
+
+    .graffiti {
+      position: absolute;
+      z-index: 4;
+      left: 9%;
+      top: 22%;
+      color: rgba(247,242,235,.13);
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: 58px;
+      line-height: .75;
+      transform: rotate(-8deg);
+      text-transform: uppercase;
+    }
+
+    .neon {
+      position: absolute;
+      z-index: 6;
+      padding: 10px 14px;
+      border-radius: 16px;
+      background: rgba(0,0,0,.62);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      font-weight: 950;
+      animation: flicker 3s infinite;
+    }
+
+    .neon.horde {
+      left: 6%;
+      top: 8%;
+      color: var(--paper);
+      border: 2px solid rgba(247,242,235,.34);
+    }
+
+    .neon.warn {
+      right: 8%;
+      top: 12%;
+      color: #ffd5d5;
+      border: 2px solid rgba(215,25,32,.65);
+      box-shadow: var(--redGlow);
+    }
+
+    @keyframes flicker {
+      0%, 19%, 21%, 63%, 65%, 100% { opacity: 1; }
+      20%, 64% { opacity: .58; }
+    }
+
+    .dumpster {
+      position: absolute;
+      z-index: 7;
+      right: 7%;
+      bottom: 22%;
+      width: 160px;
+      height: 88px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #1b1b1b, #050505);
+      border: 3px solid rgba(247,242,235,.20);
+      box-shadow: 0 12px 0 rgba(0,0,0,.48);
+    }
+
+    .dumpster::before {
+      content: "$HORDE";
+      position: absolute;
+      left: 17px;
+      top: 29px;
+      color: rgba(247,242,235,.70);
+      transform: rotate(-8deg);
+      letter-spacing: .08em;
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    }
+
+    .barrel {
+      position: absolute;
+      z-index: 8;
+      left: 12%;
+      bottom: 20%;
+      width: 72px;
+      height: 94px;
+      border-radius: 12px 12px 18px 18px;
+      background: linear-gradient(90deg, #2b090c, #8d1016, #1b0506);
+      border: 2px solid rgba(215,25,32,.56);
+      display: none;
+      box-shadow: var(--redGlow);
+    }
+
+    .barrel.unlocked {
+      display: block;
+    }
+
+    .fire {
+      position: absolute;
+      left: 9px;
+      top: -44px;
+      width: 52px;
+      height: 54px;
+      border-radius: 50% 50% 45% 45%;
+      background: radial-gradient(circle, #fff5a6 0 20%, #ff8b22 42%, #d71920 70%, transparent 72%);
+      animation: flame .8s infinite alternate ease-in-out;
+    }
+
+    @keyframes flame {
+      from { transform: scale(.9) translateY(3px); opacity: .82; }
+      to { transform: scale(1.1) translateY(-4px); opacity: 1; }
+    }
+
+    .zombie {
+      position: absolute;
+      z-index: 10;
+      width: 84px;
+      height: 118px;
+      bottom: 16%;
+      display: none;
+      animation: bob 2.4s infinite ease-in-out;
+      transform-origin: bottom center;
+      filter: grayscale(.72) contrast(1.2);
+    }
+
+    .zombie.unlocked {
+      display: block;
+    }
+
+    .zombie .head {
+      width: 58px;
+      height: 52px;
+      margin: 0 auto;
+      border-radius: 45%;
+      background: linear-gradient(135deg, #f4eadf, #9f9690);
+      border: 3px solid rgba(0,0,0,.48);
+      position: relative;
+    }
+
+    .zombie .head::before,
+    .zombie .head::after {
+      content: "";
+      position: absolute;
+      top: 19px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #050505;
+      box-shadow: 0 0 8px rgba(215,25,32,.9);
+    }
+
+    .zombie .head::before { left: 15px; }
+    .zombie .head::after { right: 15px; }
+
+    .zombie .body {
+      width: 64px;
+      height: 58px;
+      margin: -2px auto 0;
+      border-radius: 18px 18px 12px 12px;
+      background: linear-gradient(135deg, #7b0d12, #171717);
+      border: 3px solid rgba(0,0,0,.48);
+      position: relative;
+    }
+
+    .zombie .body::before,
+    .zombie .body::after {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 46px;
+      top: 5px;
+      background: #d9d1c7;
+      border-radius: 12px;
+      border: 2px solid rgba(0,0,0,.35);
+    }
+
+    .zombie .body::before {
+      left: -18px;
+      transform: rotate(18deg);
+    }
+
+    .zombie .body::after {
+      right: -18px;
+      transform: rotate(-18deg);
+    }
+
+    .zombie .legs {
+      width: 54px;
+      height: 28px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .zombie .legs span {
+      width: 20px;
+      height: 32px;
+      background: #111;
+      border-radius: 0 0 10px 10px;
+    }
+
+    .z1 { left: 22%; }
+    .z2 { left: 45%; bottom: 13%; animation-delay: .4s; transform: scale(.92); }
+    .z3 { left: 64%; bottom: 15%; animation-delay: .8s; transform: scale(1.04); }
+    .z4 { left: 34%; bottom: 10%; animation-delay: 1.2s; transform: scale(.86); }
+
+    @keyframes bob {
+      0%, 100% { translate: 0 0; rotate: -1deg; }
+      50% { translate: 0 -10px; rotate: 2deg; }
+    }
+
+    .rare {
+      position: absolute;
+      right: 30%;
+      top: 34%;
+      z-index: 11;
+      display: none;
+      font-size: 66px;
+      filter: grayscale(.6) drop-shadow(0 0 18px rgba(215,25,32,.55));
+      animation: floaty 2.8s infinite ease-in-out;
+    }
+
+    .rare.unlocked {
+      display: block;
+    }
+
+    .boss {
+      position: absolute;
+      right: 8%;
+      bottom: 16%;
+      z-index: 12;
+      display: none;
+      font-size: 120px;
+      filter: grayscale(.7) drop-shadow(0 0 28px rgba(215,25,32,.52));
+      animation: boss 1.8s infinite ease-in-out;
+    }
+
+    .boss.unlocked {
+      display: block;
+    }
+
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0) rotate(-3deg); }
+      50% { transform: translateY(-16px) rotate(4deg); }
+    }
+
+    @keyframes boss {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .fog {
+      position: absolute;
+      left: -20%;
+      right: -20%;
+      bottom: 0;
+      height: 42%;
+      z-index: 15;
+      background:
+        radial-gradient(ellipse at 20% 70%, rgba(247,242,235,.08), transparent 34%),
+        radial-gradient(ellipse at 65% 62%, rgba(215,25,32,.13), transparent 28%),
+        radial-gradient(ellipse at 80% 80%, rgba(247,242,235,.05), transparent 28%);
+      animation: fog 8s infinite alternate ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes fog {
+      from { transform: translateX(-4%); opacity: .65; }
+      to { transform: translateX(4%); opacity: .92; }
+    }
+
+    .yard-title {
+      position: absolute;
+      left: 18px;
+      bottom: 18px;
+      z-index: 30;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 2px solid rgba(215,25,32,.38);
+      background: rgba(0,0,0,.76);
+      backdrop-filter: blur(10px);
+      max-width: 86%;
+    }
+
+    .yard-title strong {
+      display: block;
+      color: var(--paper);
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: 24px;
+      line-height: 1;
+      text-transform: uppercase;
+      letter-spacing: .02em;
+    }
+
+    .yard-title span {
+      display: block;
+      color: var(--soft);
+      font-size: 14px;
+      font-weight: 750;
+      margin-top: 5px;
+      line-height: 1.35;
+    }
+
+    .meter {
+      height: 16px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(247,242,235,.18);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .meter-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--paper), var(--red2), var(--darkred));
+      border-radius: inherit;
+      transition: width .35s ease;
+    }
+
+    .unlock-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .unlock {
+      padding: 11px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(247,242,235,.12);
+      background: rgba(0,0,0,.44);
+      color: var(--soft);
+      font-weight: 850;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      line-height: 1.3;
+    }
+
+    .unlock.on {
+      color: var(--paper);
+      border-color: rgba(215,25,32,.48);
+      background: rgba(215,25,32,.13);
+    }
+
+    .leaderboard-table-wrap {
+      overflow-x: auto;
+      border-radius: 20px;
+      border: 2px solid rgba(215,25,32,.28);
+      background: rgba(0,0,0,.50);
+      margin-top: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    th,
+    td {
+      padding: 14px 12px;
+      border-bottom: 1px solid rgba(247,242,235,.10);
+      text-align: left;
+      color: var(--soft);
+      font-weight: 850;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    th {
+      color: var(--paper);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      font-size: 12px;
+      background: rgba(215,25,32,.16);
+    }
+
+    td:first-child {
+      color: var(--red2);
+      font-weight: 1000;
+    }
+
+    td:last-child {
+      color: var(--paper);
+      font-weight: 950;
+    }
+
+    .leaderboard-status {
+      color: var(--paper);
+      font-weight: 900;
+      margin-top: 12px;
+      line-height: 1.4;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(247,242,235,.14);
+      background: rgba(0,0,0,.46);
+      color: var(--soft);
+      font-size: 14px;
+      font-weight: 760;
+      line-height: 1.5;
+    }
+
+    .identity-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .badge {
+      border: 1px solid rgba(247,242,235,.18);
+      background: rgba(247,242,235,.07);
+      color: var(--paper);
+      border-radius: 999px;
+      padding: 8px 11px;
+      font-weight: 900;
+      font-size: 13px;
+      line-height: 1;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%) translateY(80px);
+      z-index: 99;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.96);
+      border: 1px solid rgba(215,25,32,.48);
+      color: var(--paper);
+      font-weight: 950;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transition: .25s ease;
+      text-align: center;
+      width: max-content;
+      max-width: 92vw;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 920px) {
+      .topbar-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .nav {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .nav button,
+      .nav a {
+        font-size: 11px;
+        padding: 11px 6px;
+      }
+
+      .hero,
+      .yard-layout,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-main {
+        min-height: auto;
+        padding: 24px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .yard-scene {
+        min-height: 560px;
+      }
+
+      .boss {
+        font-size: 88px;
+      }
+
+      .zombie {
+        width: 76px;
+      }
+
+      .z1 { left: 18%; }
+      .z2 { left: 41%; }
+      .z3 { left: 62%; }
+      .z4 { left: 30%; }
+
+      h1 {
+        font-size: clamp(58px, 18vw, 108px);
+        white-space: nowrap;
+      }
+
+      .ledger {
+        font-size: clamp(28px, 9vw, 42px);
+      }
+
+      .identity-hook-title {
+        font-size: 30px;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 430px) {
+      h1 {
+        font-size: clamp(50px, 16vw, 74px);
+      }
+
+      .brand-title {
+        font-size: 22px;
+      }
+
+      .brand-sub {
+        font-size: 9px;
+        letter-spacing: .11em;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-mark">☠️</div>
+        <div>
+          <div class="brand-title"><span>$H</span>ORDE</div>
+          <small class="brand-sub">BYRON HORROR IDENTITY • XRPL</small>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="active" onclick="showSection('about', this)">About</button>
+        <button onclick="showSection('yard', this)">Yard</button>
+        <button onclick="showSection('identity', this)">Identity</button>
+        <button onclick="showSection('leaderboard', this)">Ranks</button>
+        <button onclick="showSection('rewards', this)">Rewards</button>
+        <a href="https://horizonxrpl.com/" target="_blank" rel="noopener">Buy</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page">
+    <section id="about" class="section active">
+      <div class="hero">
+        <div class="hero-main">
+          <div class="hero-content">
+            <div class="kicker">A dark community movement created by Byron</div>
+
+            <h1><span>$H</span>ORDE</h1>
+
+            <div class="ledger">
+              <span>XRPL Horror Identity</span>
+            </div>
+
+            <div class="identity-hook">
+              <div class="identity-hook-title">Your wallet wakes the dead.</div>
+              <p>
+                HORDE Yard gives holders their own undead identity. Connect Xaman, enter the yard,
+                grow your Horde, unlock your title, and climb the ranks.
+              </p>
+
+              <div class="ritual">
+                <div>Your wallet is the key.</div>
+                <div>Your collection feeds the yard.</div>
+                <div>Your rank becomes your identity.</div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" onclick="connectXaman()">🔑 Connect Xaman</button>
+              <button class="btn white" onclick="showSectionById('yard')">☠️ Enter the Yard</button>
+              <button class="btn dark" onclick="showSectionById('identity')">🩸 View Identity</button>
+              <button class="btn dark" onclick="showSectionById('leaderboard')">🏆 Ranks</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="side-stack">
+          <div class="card">
+            <div class="label red">Wallet Status</div>
+            <div id="walletStatus" class="wallet-status">Wallet not connected</div>
+
+            <p>
+              Connect your Xaman wallet. Scan the QR code or open the mobile link.
+            </p>
+
+            <div id="qrBox" class="qr-box">
+              <p id="qrText">Waiting for Xaman...</p>
+              <img id="qrImage" alt="Xaman SignIn QR Code" />
+              <div class="actions" style="justify-content:center;">
+                <a id="mobileLink" class="btn white" href="#" target="_blank" rel="noopener">Open in Xaman</a>
+              </div>
+              <div class="tiny">After signing, this page updates automatically.</div>
+            </div>
+
+            <div class="stats">
+              <div class="stat">
+                <strong id="homeHorde">0</strong>
+                <span>$HORDE Held</span>
+              </div>
+              <div class="stat">
+                <strong id="homeNfts">0</strong>
+                <span>NFTs Held</span>
+              </div>
+              <div class="stat">
+                <strong id="homePoints">0</strong>
+                <span>Points</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card identity-card">
+            <div class="label red">Created by Byron</div>
+            <h3>Horror Identity</h3>
+            <p>
+              This is not just a score screen. The goal is to let each connected wallet become a
+              Horde character with its own title, badges, rank, and undead yard.
+            </p>
+
+            <div class="quick-list">
+              <div class="quick-item"><span>Style</span><strong>$HORDE</strong></div>
+              <div class="quick-item"><span>Artist</span><strong>Byron</strong></div>
+              <div class="quick-item"><span>Wallet</span><strong>Xaman</strong></div>
+              <div class="quick-item"><span>Chain</span><strong>XRPL</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="feature-icon">☠️</div>
+          <div class="label red">About</div>
+          <h3>$HORDE Yard</h3>
+          <p>
+            A wallet-connected zombie collector yard where holdings and activity become visual identity.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="feature-icon">🩸</div>
+          <div class="label red">Identity</div>
+          <h3>Holder Titles</h3>
+          <p>
+            Players unlock titles like Freshly Bitten, Grave Walker, Horde Brute, and Lord of the Yard.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="feature-icon">🏆</div>
+          <div class="label red">Leaderboard</div>
+          <h3>Top Horde</h3>
+          <p>
+            Connected wallets save to a live Supabase leaderboard. Real $HORDE balance scanning comes next.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="yard" class="section">
+      <div class="yard-layout">
+        <div class="yard-scene">
+          <div class="sky"></div>
+          <div class="wall"></div>
+          <div class="graffiti">$H<br>ORDE</div>
+          <div class="floor"></div>
+
+          <div class="neon horde">$HORDE</div>
+          <div class="neon warn">BITE ZONE</div>
+
+          <div class="dumpster"></div>
+
+          <div id="barrel" class="barrel">
+            <div class="fire"></div>
+          </div>
+
+          <div id="z1" class="zombie z1">
+            <div class="head"></div>
+            <div class="body"></div>
+            <div class="legs"><span></span><span></span></div>
+          </div>
+
+          <div id="z2" class="zombie z2">
+            <div class="head"></div>
+            <div class="body"></div>
+            <div class="legs"><span></span><span></span></div>
+          </div>
+
+          <div id="z3" class="zombie z3">
+            <div class="head"></div>
+            <div class="body"></div>
+            <div class="legs"><span></span><span></span></div>
+          </div>
+
+          <div id="z4" class="zombie z4">
+            <div class="head"></div>
+            <div class="body"></div>
+            <div class="legs"><span></span><span></span></div>
+          </div>
+
+          <div id="rare" class="rare">☠️✨</div>
+          <div id="boss" class="boss">🧟‍♂️</div>
+          <div class="fog"></div>
+
+          <div class="yard-title">
+            <strong id="yardLevel">Empty Yard</strong>
+            <span id="yardMessage">Connect Xaman and earn Horde Points.</span>
+          </div>
+        </div>
+
+        <aside class="side-stack">
+          <div class="card">
+            <div class="label red">Yard Growth</div>
+            <h3>Feed the Yard</h3>
+            <p id="playInstruction">
+              Connect your Xaman wallet, then use demo boosts to test the holder progression.
+            </p>
+
+            <div class="meter">
+              <div id="meterFill" class="meter-fill"></div>
+            </div>
+
+            <div class="stats">
+              <div class="stat">
+                <strong id="points">0</strong>
+                <span>Points</span>
+              </div>
+              <div class="stat">
+                <strong id="nfts">0</strong>
+                <span>NFTs</span>
+              </div>
+              <div class="stat">
+                <strong id="lp">0</strong>
+                <span>LP</span>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" onclick="addPoints(100)">🩸 Earn Points</button>
+              <button class="btn white" onclick="addNFT()">☠️ Add NFT</button>
+              <button class="btn dark" onclick="addLP()">🏆 Add LP</button>
+              <button class="btn dark" onclick="resetYard()">Reset</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="label red">Unlocks</div>
+            <h3>Progression</h3>
+
+            <div class="unlock-list">
+              <div id="u100" class="unlock"><span>100</span><span>First Bite</span></div>
+              <div id="u300" class="unlock"><span>300</span><span>Fire Barrel</span></div>
+              <div id="u500" class="unlock"><span>500</span><span>More Horde</span></div>
+              <div id="u1000" class="unlock"><span>1000</span><span>Rare Visitor</span></div>
+              <div id="u2500" class="unlock"><span>2500</span><span>Boss Zombie</span></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="label red">Rank</div>
+            <h3>Save Score</h3>
+            <p>
+              Scores save automatically after wallet connect and point changes.
+            </p>
+
+            <div class="actions">
+              <button class="btn white" onclick="saveLeaderboard()">Save</button>
+              <button class="btn primary" onclick="showSectionById('leaderboard')">Ranks</button>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="footer-note">
+        Current scoring uses demo boosts. The next upgrade will scan the connected wallet for real $HORDE held and use that balance to build the yard automatically.
+      </div>
+    </section>
+
+    <section id="identity" class="section">
+      <div class="hero">
+        <div class="card identity-card">
+          <div class="label red">Your Horde Identity</div>
+          <h2 id="identityTitle">Unbitten Stranger</h2>
+          <p id="identityDescription">
+            Connect your Xaman wallet and grow your points to reveal your Horde identity.
+          </p>
+
+          <div class="stats">
+            <div class="stat">
+              <strong id="identityPoints">0</strong>
+              <span>Points</span>
+            </div>
+            <div class="stat">
+              <strong id="identityRank">—</strong>
+              <span>Title</span>
+            </div>
+            <div class="stat">
+              <strong id="identityWallet">—</strong>
+              <span>Wallet</span>
+            </div>
+          </div>
+
+          <div class="identity-badges" id="identityBadges">
+            <div class="badge">No bite marks yet</div>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" onclick="showSectionById('yard')">Grow Yard</button>
+            <button class="btn white" onclick="showSectionById('leaderboard')">View Ranks</button>
+          </div>
+        </div>
+
+        <div class="side-stack">
+          <div class="card">
+            <div class="label red">Identity System</div>
+            <h3>How It Works</h3>
+            <p>
+              Every wallet should feel like its own character. The more $HORDE, NFTs,
+              LP boosts, and event participation a wallet has, the stronger the identity becomes.
+            </p>
+
+            <div class="quick-list">
+              <div class="quick-item"><span>0 Points</span><strong>Unbitten Stranger</strong></div>
+              <div class="quick-item"><span>100 Points</span><strong>Freshly Bitten</strong></div>
+              <div class="quick-item"><span>500 Points</span><strong>Grave Walker</strong></div>
+              <div class="quick-item"><span>1000 Points</span><strong>Horde Brute</strong></div>
+              <div class="quick-item"><span>2500 Points</span><strong>Lord of the Yard</strong></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="label red">Next Phase</div>
+            <h3>Real Holdings</h3>
+            <p>
+              Once we have the official $HORDE issuer and currency code, identities can be created from real wallet balances.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="leaderboard" class="section">
+      <div class="card">
+        <div class="label red">$HORDE Leaderboard</div>
+        <h2>Top Horde</h2>
+        <p>
+          Live from HORDE Yard prototype. Connect Xaman, grow your identity, and climb the Horde.
+        </p>
+
+        <div class="actions">
+          <button class="btn primary" onclick="loadLeaderboard()">Refresh</button>
+          <button class="btn white" onclick="saveLeaderboard()">Save My Score</button>
+        </div>
+
+        <div id="leaderboardStatus" class="leaderboard-status">
+          Loading live ranks...
+        </div>
+
+        <div class="leaderboard-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Identity</th>
+                <th>Wallet</th>
+                <th>$HORDE</th>
+                <th>NFTs</th>
+                <th>LP</th>
+                <th>Points</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody">
+              <tr>
+                <td colspan="7">Loading...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="footer-note">
+          This leaderboard currently tracks HORDE Yard prototype scores. Real $HORDE wallet-balance ranking is the next upgrade.
+        </div>
+      </div>
+    </section>
+
+    <section id="rewards" class="section">
+      <div class="grid">
+        <div class="card">
+          <div class="feature-icon">🔑</div>
+          <div class="label red">Wallet Key</div>
+          <h3>Xaman Connected</h3>
+          <p>
+            Wallet connection is live. Your XRPL identity can enter the HORDE Yard.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="feature-icon">🩸</div>
+          <div class="label red">Identity</div>
+          <h3>Holder Titles</h3>
+          <p>
+            Titles, badges, and yard unlocks make every wallet feel different.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="feature-icon">📈</div>
+          <div class="label red">Coming Next</div>
+          <h3>Real Holdings</h3>
+          <p>
+            The next phase reads actual $HORDE trustline balances and HORDE NFT holdings.
+          </p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top: 16px;">
+        <div class="label red">Created by Byron</div>
+        <h2>The Horde on XRPL</h2>
+        <p>
+          A horror identity experience built around Byron’s zombie universe and the $HORDE community.
+        </p>
+
+        <div class="actions">
+          <a class="btn primary" href="https://hordeonxrpl.com/" target="_blank" rel="noopener">Learn More</a>
+          <a class="btn white" href="https://horizonxrpl.com/" target="_blank" rel="noopener">Buy $HORDE</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast">Ready</div>
+
+  <script>
+    const SUPABASE_CREATE_SIGNIN_URL =
+      "https://jfoeizcbadtxcjuajdnf.supabase.co/functions/v1/xaman-create-signin";
+
+    const SUPABASE_CHECK_SIGNIN_URL =
+      "https://jfoeizcbadtxcjuajdnf.supabase.co/functions/v1/xaman-check-signin";
+
+    const LEADERBOARD_SUBMIT_URL =
+      "https://jfoeizcbadtxcjuajdnf.supabase.co/functions/v1/horde-leaderboard-submit";
+
+    const LEADERBOARD_LIST_URL =
+      "https://jfoeizcbadtxcjuajdnf.supabase.co/functions/v1/horde-leaderboard-list";
+
+    let state = {
+      connected: false,
+      account: "",
+      points: 0,
+      nfts: 0,
+      lp: 0,
+      horde: 0
+    };
+
+    let signinTimer = null;
+    let saveTimer = null;
+
+    function showSection(id, btn) {
+      document.querySelectorAll(".section").forEach(section => {
+        section.classList.remove("active");
+      });
+
+      document.getElementById(id).classList.add("active");
+
+      document.querySelectorAll(".nav button").forEach(button => {
+        button.classList.remove("active");
+      });
+
+      if (btn && btn.tagName === "BUTTON") {
+        btn.classList.add("active");
+      } else {
+        const labels = {
+          about: "About",
+          yard: "Yard",
+          identity: "Identity",
+          leaderboard: "Ranks",
+          rewards: "Rewards"
+        };
+
+        const found = Array.from(document.querySelectorAll(".nav button"))
+          .find(button => button.textContent.trim() === labels[id]);
+
+        if (found) found.classList.add("active");
+      }
+
+      if (id === "leaderboard") {
+        loadLeaderboard();
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showSectionById(id) {
+      showSection(id);
+    }
+
+    async function connectXaman() {
+      try {
+        setWalletStatus("Creating Xaman SignIn request...");
+        document.getElementById("qrBox").style.display = "block";
+        document.getElementById("qrText").textContent = "Creating QR code...";
+        document.getElementById("qrImage").removeAttribute("src");
+        document.getElementById("mobileLink").href = "#";
+
+        const response = await fetch(SUPABASE_CREATE_SIGNIN_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.uuid) {
+          console.error("Create SignIn error:", data);
+          throw new Error(data.error || "Could not create Xaman SignIn request.");
+        }
+
+        document.getElementById("qrImage").src = data.qr_png;
+        document.getElementById("mobileLink").href = data.next;
+        document.getElementById("qrText").textContent = "Scan with Xaman or open in Xaman.";
+
+        setWalletStatus("Waiting for Xaman approval...");
+
+        if (signinTimer) clearInterval(signinTimer);
+
+        signinTimer = setInterval(async () => {
+          await checkXamanSignin(data.uuid);
+        }, 2500);
+
+      } catch (error) {
+        console.error(error);
+        setWalletStatus("Wallet error: " + error.message);
+        showToast("Xaman connection error.");
+      }
+    }
+
+    async function checkXamanSignin(uuid) {
+      try {
+        const response = await fetch(
+          SUPABASE_CHECK_SIGNIN_URL + "?uuid=" + encodeURIComponent(uuid)
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          console.error("Check SignIn error:", data);
+          throw new Error(data.error || "Could not check SignIn.");
+        }
+
+        if (data.expired) {
+          clearInterval(signinTimer);
+          setWalletStatus("SignIn expired. Try connecting again.");
+          document.getElementById("qrText").textContent = "Expired. Click Connect Xaman again.";
+          return;
+        }
+
+        if (data.resolved && !data.signed) {
+          clearInterval(signinTimer);
+          setWalletStatus("SignIn rejected. Try again.");
+          document.getElementById("qrText").textContent = "Rejected. Click Connect Xaman again.";
+          return;
+        }
+
+        if (data.signed && data.account) {
+          clearInterval(signinTimer);
+
+          state.connected = true;
+          state.account = data.account;
+
+          state.points = Math.max(state.points, 420);
+          state.nfts = Math.max(state.nfts, 2);
+          state.horde = Math.max(state.horde, 2600);
+
+          document.getElementById("qrText").textContent = "Connected successfully.";
+          setWalletStatus("Wallet Connected: " + shortenAccount(data.account));
+
+          document.getElementById("playInstruction").textContent =
+            "Connected wallet: " + shortenAccount(data.account) + ". Demo boosts are active. Real $HORDE balance scanning comes next.";
+
+          updateUI();
+          await saveLeaderboard();
+          await loadLeaderboard();
+          showSectionById("identity");
+          showToast("Xaman wallet connected.");
+        }
+
+      } catch (error) {
+        console.error(error);
+        clearInterval(signinTimer);
+        setWalletStatus("Check error: " + error.message);
+      }
+    }
+
+    function setWalletStatus(text) {
+      document.getElementById("walletStatus").textContent = text;
+    }
+
+    function shortenAccount(account) {
+      if (!account || account.length < 12) return account;
+      return account.slice(0, 6) + "..." + account.slice(-6);
+    }
+
+    function getIdentityTitle(points) {
+      if (points >= 2500) return "Lord of the Yard";
+      if (points >= 1000) return "Horde Brute";
+      if (points >= 500) return "Grave Walker";
+      if (points >= 100) return "Freshly Bitten";
+      return "Unbitten Stranger";
+    }
+
+    function getIdentityDescription(points) {
+      if (points >= 2500) return "The alley recognizes you. The Horde follows your shadow.";
+      if (points >= 1000) return "You are no longer visiting the Horde. You are part of it.";
+      if (points >= 500) return "The grave dirt is on your boots and the yard is waking.";
+      if (points >= 100) return "The bite took. Your Horde identity has started to form.";
+      return "No bite marks yet. Connect, collect, and feed the yard.";
+    }
+
+    function getIdentityBadges() {
+      const badges = [];
+
+      if (state.connected) badges.push("Wallet Key");
+      if (state.points >= 100) badges.push("First Bite");
+      if (state.points >= 300) badges.push("Fire Keeper");
+      if (state.points >= 500) badges.push("Yard Walker");
+      if (state.points >= 1000) badges.push("Rare Visitor");
+      if (state.points >= 2500) badges.push("Boss Blood");
+      if (state.nfts > 0) badges.push("Collector");
+      if (state.lp > 0) badges.push("Liquidity Scar");
+
+      if (!badges.length) badges.push("No bite marks yet");
+
+      return badges;
+    }
+
+    function addPoints(amount) {
+      state.points += amount;
+      state.horde += amount * 5;
+      updateUI();
+      showToast("+" + amount + " Horde Points");
+      scheduleLeaderboardSave();
+    }
+
+    function addNFT() {
+      state.nfts += 1;
+      state.points += 250;
+      updateUI();
+      showToast("NFT holding added.");
+      scheduleLeaderboardSave();
+    }
+
+    function addLP() {
+      state.lp += 1;
+      state.points += 500;
+      updateUI();
+      showToast("LP boost added.");
+      scheduleLeaderboardSave();
+    }
+
+    function resetYard() {
+      state.points = 0;
+      state.nfts = 0;
+      state.lp = 0;
+      state.horde = 0;
+      updateUI();
+      showToast("Demo yard reset.");
+      scheduleLeaderboardSave();
+    }
+
+    function scheduleLeaderboardSave() {
+      if (!state.connected) return;
+
+      if (saveTimer) clearTimeout(saveTimer);
+
+      saveTimer = setTimeout(() => {
+        saveLeaderboard();
+      }, 600);
+    }
+
+    async function saveLeaderboard() {
+      if (!state.connected || !state.account) {
+        showToast("Connect Xaman first to save your rank.");
+        return;
+      }
+
+      try {
+        const response = await fetch(LEADERBOARD_SUBMIT_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            wallet: state.account,
+            wallet_short: shortenAccount(state.account),
+            horde_held: state.horde,
+            nfts_held: state.nfts,
+            lp_added: state.lp,
+            horde_points: state.points
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          console.error("Leaderboard save error:", data);
+          throw new Error(data.error || "Could not save leaderboard score.");
+        }
+
+        showToast("Score saved to leaderboard.");
+        loadLeaderboard();
+
+      } catch (error) {
+        console.error(error);
+        showToast("Leaderboard save error.");
+      }
+    }
+
+    async function loadLeaderboard() {
+      const status = document.getElementById("leaderboardStatus");
+      const body = document.getElementById("leaderboardBody");
+
+      if (!status || !body) return;
+
+      status.textContent = "Loading live ranks...";
+      body.innerHTML = `<tr><td colspan="7">Loading...</td></tr>`;
+
+      try {
+        const response = await fetch(LEADERBOARD_LIST_URL);
+        const data = await response.json();
+
+        if (!response.ok) {
+          console.error("Leaderboard load error:", data);
+          throw new Error(data.error || "Could not load leaderboard.");
+        }
+
+        const players = data.players || [];
+
+        if (!players.length) {
+          status.textContent = "No Horde ranks yet. Connect Xaman and save the first score.";
+          body.innerHTML = `<tr><td colspan="7">No scores yet.</td></tr>`;
+          return;
+        }
+
+        status.textContent = "Live leaderboard loaded.";
+
+        const topTen = players.slice(0, 10);
+
+        body.innerHTML = topTen.map((player, index) => {
+          const points = Number(player.horde_points || 0);
+          const identity = getIdentityTitle(points);
+
+          return `
+            <tr>
+              <td>#${index + 1}</td>
+              <td>${escapeHtml(identity)}</td>
+              <td>${escapeHtml(player.wallet_short || shortenAccount(player.wallet))}</td>
+              <td>${Number(player.horde_held || 0).toLocaleString()}</td>
+              <td>${Number(player.nfts_held || 0).toLocaleString()}</td>
+              <td>${Number(player.lp_added || 0).toLocaleString()}</td>
+              <td>${points.toLocaleString()}</td>
+            </tr>
+          `;
+        }).join("");
+
+      } catch (error) {
+        console.error(error);
+        status.textContent = "Could not load leaderboard.";
+        body.innerHTML = `<tr><td colspan="7">Leaderboard error. Check Supabase function settings.</td></tr>`;
+      }
+    }
+
+    function updateUI() {
+      document.getElementById("points").textContent = state.points;
+      document.getElementById("nfts").textContent = state.nfts;
+      document.getElementById("lp").textContent = state.lp;
+
+      document.getElementById("homePoints").textContent = state.points;
+      document.getElementById("homeNfts").textContent = state.nfts;
+      document.getElementById("homeHorde").textContent = state.horde.toLocaleString();
+
+      document.getElementById("identityPoints").textContent = state.points.toLocaleString();
+      document.getElementById("identityRank").textContent = getIdentityTitle(state.points);
+      document.getElementById("identityWallet").textContent = state.connected ? shortenAccount(state.account) : "—";
+      document.getElementById("identityTitle").textContent = getIdentityTitle(state.points);
+      document.getElementById("identityDescription").textContent = getIdentityDescription(state.points);
+
+      const badgeBox = document.getElementById("identityBadges");
+      badgeBox.innerHTML = getIdentityBadges().map(badge => {
+        return `<div class="badge">${escapeHtml(badge)}</div>`;
+      }).join("");
+
+      const pct = Math.min(100, (state.points / 2500) * 100);
+      document.getElementById("meterFill").style.width = pct + "%";
+
+      toggle("z1", state.points >= 100);
+      toggle("barrel", state.points >= 300);
+      toggle("z2", state.points >= 500);
+      toggle("z3", state.points >= 500);
+      toggle("rare", state.points >= 1000);
+      toggle("z4", state.points >= 1000);
+      toggle("boss", state.points >= 2500);
+
+      unlock("u100", state.points >= 100);
+      unlock("u300", state.points >= 300);
+      unlock("u500", state.points >= 500);
+      unlock("u1000", state.points >= 1000);
+      unlock("u2500", state.points >= 2500);
+
+      const yardLevel = document.getElementById("yardLevel");
+      const yardMessage = document.getElementById("yardMessage");
+
+      if (state.points >= 2500) {
+        yardLevel.textContent = "Lord of the Yard";
+        yardMessage.textContent = "The Horde follows your shadow.";
+      } else if (state.points >= 1000) {
+        yardLevel.textContent = "Horde Brute";
+        yardMessage.textContent = "Something legendary is lurking in the fog.";
+      } else if (state.points >= 500) {
+        yardLevel.textContent = "Grave Walker";
+        yardMessage.textContent = "The yard is filling with undead energy.";
+      } else if (state.points >= 300) {
+        yardLevel.textContent = "Fire Keeper";
+        yardMessage.textContent = "The barrel is lit. More of the Horde is coming.";
+      } else if (state.points >= 100) {
+        yardLevel.textContent = "Freshly Bitten";
+        yardMessage.textContent = "The bite took. Your identity is forming.";
+      } else {
+        yardLevel.textContent = "Empty Yard";
+        yardMessage.textContent = "Connect Xaman and earn Horde Points.";
+      }
+    }
+
+    function toggle(id, on) {
+      document.getElementById(id).classList.toggle("unlocked", on);
+    }
+
+    function unlock(id, on) {
+      document.getElementById(id).classList.toggle("on", on);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 1800);
+    }
+
+    updateUI();
+    loadLeaderboard();
+  </script>
+</body>
+</html>
