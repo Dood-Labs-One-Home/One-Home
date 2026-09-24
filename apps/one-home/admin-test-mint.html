@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script src="/shared/onehome-global-appearance-v1467200.js?v=1467200"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+<title>Opening Test Mint</title>
+  <link rel="stylesheet" href="/shared/onehome-global-appearance-v1467142.css?v=1467141">
+</head>
+<body style="margin:0;background:#050708;color:#fff;font:600 16px/1.4 system-ui;display:grid;place-items:center;min-height:100vh">
+<p>Opening test mint…</p>
+<script>
+(function(){
+  const p=new URLSearchParams(location.search);
+  const campaign=String(p.get('campaign')||'').trim();
+  const network=String(p.get('network')||'testnet').toLowerCase();
+  if(/^[0-9a-f-]{36}$/i.test(campaign) && network==='testnet'){
+    p.set('campaign',campaign);
+    p.set('network','testnet');
+    location.replace('/test-mint.html?'+p.toString());
+  }else{
+    location.replace('/mint-studio.html');
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script src="/shared/onehome-global-appearance-v1467200.js?v=1467200"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Burn to Build · One Home</title>
+  <link rel="icon" href="/favicon.png">
+  <script src="/shared/onehome-supabase-lite.js?v=1225"></script>
+  <style>
+    :root{--bg:#050607;--panel:#101114;--line:#334038;--pink:#f326d1;--green:#a8ff35;--muted:#c8c8c8;--red:#ff4a55;--gold:#fff568}
+    *{box-sizing:border-box}
+    body{margin:0;background-color:#050607;background-image:linear-gradient(180deg,rgba(9,5,3,.54),rgba(3,3,3,.74)),url('/assets/one-home-room-pc-background.webp?v=1231');background-position:center top;background-size:cover;background-repeat:no-repeat;background-attachment:fixed;color:#fff;font-family:Inter,system-ui,sans-serif;min-height:100vh}
+    .shell{width:min(1080px,calc(100% - 28px));margin:auto;padding:24px 0 70px}
+    .top{display:flex;align-items:center;gap:12px;margin-bottom:20px}.top img{width:64px}.top a{color:#fff}
+    .panel{background:rgba(12,13,16,.96);border:1px solid var(--line);border-radius:24px;padding:24px;margin:16px 0}
+    .hero h1{font-size:clamp(44px,7vw,76px);line-height:1;margin:14px 0;color:var(--pink)}
+    .hero p{font-size:17px;line-height:1.55;margin:0}
+    .hidden{display:none!important}.muted{color:var(--muted)}
+    .btn,button{display:inline-block;border:1px solid var(--pink);background:#77166f;color:#fff;border-radius:999px;padding:13px 20px;font-weight:900;cursor:pointer;text-decoration:none}
+    .btn.secondary,button.secondary{background:#151519;border-color:#555}.btn:disabled,button:disabled{opacity:.5;cursor:not-allowed}
+    .notice{padding:14px;border-radius:14px;border:1px solid #6f4e21;background:#26190b;margin:12px 0}.notice.good{border-color:#2d793b;background:#0b2c14}.notice.bad{border-color:#8a3038;background:#2d1014}
+    .wallet-actions{display:flex;gap:12px;flex-wrap:wrap}.wallet-actions button{min-width:190px}
+    .agreement{display:flex;gap:12px;margin:12px 0;align-items:flex-start;padding:12px 14px;border:1px solid #34383b;border-radius:16px;background:#0d0f11}.agreement input{width:18px;height:18px;margin-top:3px;flex:0 0 auto}
+    .links{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0}.links a{color:var(--green);font-weight:800}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.nft{border:1px solid #344038;border-radius:18px;padding:12px;background:#0a0b0d;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s}.nft:hover{border-color:#777;transform:translateY(-1px)}.nft.selected{border:3px solid var(--pink);box-shadow:0 0 0 4px rgba(243,38,209,.18)}.nft img{width:100%;aspect-ratio:1;object-fit:contain;background:#000;border-radius:12px}.nft h3{font-size:16px;margin:10px 0 4px}
+    .label{display:inline-block;border:1px solid #80760b;color:var(--gold);border-radius:999px;padding:6px 10px;font-size:11px;font-weight:900;text-transform:uppercase}
+    .status{white-space:pre-wrap}.qr{max-width:220px;border-radius:14px;background:#fff;padding:8px;margin-top:12px}
+    .network-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.network-choice{border:1px solid #4b554e;background:#111317;border-radius:18px;padding:18px;text-align:left}.network-choice.active{border-color:var(--pink);background:#3a1037}.network-choice strong{display:block;font-size:18px;margin-bottom:5px}.network-choice span{color:var(--muted);font-weight:500}
+    @media(max-width:760px){.network-choices{grid-template-columns:1fr}body{background-image:linear-gradient(180deg,rgba(8,4,2,.48),rgba(3,3,3,.70)),url('/assets/one-home-room-mobile-background.webp?v=1231');background-position:center top;background-size:cover;background-attachment:scroll}.grid{grid-template-columns:1fr}.panel{padding:18px}.desktop-wallet{display:none!important}}
+  </style>
+  <link rel="stylesheet" href="/shared/onehome-choice-header-v146780.css?v=146780">
+  <script defer src="/shared/onehome-choice-header-v1467200.js?v=1467200"></script>
+
+<link rel="stylesheet" href="/shared/onehome-interior-shell-v1467141.css?v=1467141">
+  <link rel="stylesheet" href="/shared/onehome-global-appearance-v1467142.css?v=1467141">
+</head>
+<body>
+<main class="shell">
+  <div class="top"><a href="/one-home/"><img src="/assets/one-home-logo.png" alt="One Home"></a><a href="/one-home/">Back to One Home</a></div>
+
+  <section id="hero" class="panel hero">
+    <div id="heroLabel" class="label">OWNERSHIP</div>
+    <h1 id="heroTitle">Burn to Build</h1>
+    <p id="heroIntro" class="muted">Preserve what came before, release the old ownership, and use that transition to help build something new.</p>
+  </section>
+
+  <section id="networkPanel" class="panel">
+    <h2>Choose the XRP Ledger network</h2>
+    <div class="network-choices">
+      <button type="button" class="network-choice" data-network="testnet"><strong>Testnet</strong><span>Use practice NFTs for testing.</span></button>
+      <button type="button" class="network-choice" data-network="mainnet"><strong>Mainnet</strong><span>Use real NFTs on the live XRP Ledger.</span></button>
+    </div>
+    <div id="networkNote" class="notice hidden"></div>
+  </section>
+
+  <section id="agreementPanel" class="panel">
+    <h2 id="agreementHeading">Read and agree</h2>
+    <p id="participationRule" class="muted">Burn to Build accepts NFTs only from projects approved by One Home.</p>
+    <div id="policyLinks" class="links">
+      <a href="/burn-to-build-terms.html" target="_blank" rel="noopener">Read Burn to Build Terms</a>
+      <a href="/time-capsule-policy.html" target="_blank" rel="noopener">Read Time Capsule Policy</a>
+    </div>
+    <label class="agreement"><input id="agree1" type="checkbox"><span id="agree1Text">I understand that burning an NFT is permanent and cannot be reversed.</span></label>
+    <label class="agreement"><input id="agree2" type="checkbox"><span id="agree2Text">I authorize One Home to preserve the approved historical Time Capsule record for this NFT.</span></label>
+    <label class="agreement"><input id="agree3" type="checkbox"><span id="agree3Text">I understand rewards are issued only after independent XRPL verification.</span></label>
+    <button id="acceptTerms">Accept &amp; Continue</button>
+    <div id="termsNote" class="notice hidden"></div>
+  </section>
+
+  <section id="connectPanel" class="panel hidden">
+    <h2 id="connectHeading">Connect a wallet</h2>
+    <div class="wallet-actions">
+      <button id="connectWallet" disabled>Connect Xaman</button>
+      <button id="connectCrossmark" class="desktop-wallet" disabled>Connect Crossmark</button>
+    </div>
+    <div id="walletStatus" class="notice hidden"></div>
+    <img id="walletQr" class="qr hidden" alt="Xaman QR">
+  </section>
+
+  <section id="choosePanel" class="panel hidden">
+    <h2 id="chooseHeading">Choose an approved NFT</h2>
+    <p id="chooseText" class="muted">Only NFTs from approved projects appear here.</p>
+    <div id="nftGrid" class="grid"><p id="chooseEmpty" class="muted">Connect a wallet to view eligible NFTs.</p></div>
+  </section>
+
+  <section id="confirmPanel" class="panel hidden">
+    <h2 id="confirmHeading">Confirm the permanent burn</h2>
+    <div id="selection" class="muted">No NFT selected.</div>
+    <label class="agreement"><input id="finalConfirm" type="checkbox"><span id="finalConfirmText">I understand this NFT will be permanently removed from the XRP Ledger.</span></label>
+    <button id="burnButton" disabled>Open Permanent Burn in Xaman</button>
+    <div id="burnStatus" class="notice hidden status"></div>
+    <img id="burnQr" class="qr hidden" alt="Burn QR">
+  </section>
+</main>
+
+<!-- Burn flow build v12.83 -->
+<script>
+(()=>{
+'use strict';
+const SUPABASE_URL='https://fshvettlltcujmwvikfq.supabase.co';
+const SUPABASE_KEY='sb_publishable_ARrX-vYhy8l-yhs6384S_g_n6214taB';
+const STORAGE_KEY='sb-fshvettlltcujmwvikfq-auth-token';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{storageKey:STORAGE_KEY}});
+const $=id=>document.getElementById(id);
+let session=null,pool=null,wallet='',walletProvider='',connectUuid='',selected=null,intentId='',blocks=[];
+const queryNetwork=new URLSearchParams(location.search).get('network');
+let selectedNetwork=queryNetwork==='testnet'?'testnet':'mainnet';
+
+const esc=s=>String(s??'').replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]||m));
+function note(id,msg,type=''){const el=$(id);if(!el)return;el.textContent=msg||'';el.className='notice '+type;el.classList.toggle('hidden',!msg)}
+function byLabel(label){return blocks.find(b=>String(b.label||'')===label)||null}
+function byOrder(order){return blocks.find(b=>Number(b.sort_order)===Number(order))||null}
+function block(label,order){return byLabel(label)||byOrder(order)}
+function blockText(label,order,fallback,preferLink=false){const b=block(label,order);if(!b)return fallback;const primary=preferLink?(b.link_text||b.content):(b.content||b.link_text);return String(primary||'').trim()||fallback}
+function applyText(id,label,order,fallback,preferLink=false){const el=$(id);if(el)el.textContent=blockText(label,order,fallback,preferLink)}
+function decodeJwtSub(token){try{const payload=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(atob(payload)).sub||''}catch{return''}}
+function userId(){return session?.user?.id||decodeJwtSub(session?.access_token||'')}
+
+
+function decodeBase64Text(value){
+  try{
+    const normalized=String(value||'').replace(/-/g,'+').replace(/_/g,'/');
+    const padded=normalized+'='.repeat((4-normalized.length%4)%4);
+    const bytes=Uint8Array.from(atob(padded),c=>c.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+  }catch{return''}
+}
+
+function parseStoredValue(value){
+  let current=value;
+  for(let i=0;i<4;i++){
+    if(current&&typeof current==='object')break;
+    if(typeof current!=='string'||!current)break;
+    if(current.startsWith('base64-')) current=decodeBase64Text(current.slice(7));
+    try{current=JSON.parse(current)}catch{break}
+  }
+  return current;
+}
+
+function normalizeStoredSession(value){
+  const parsed=parseStoredValue(value);
+  if(!parsed)return null;
+  if(parsed.access_token)return parsed;
+  if(parsed.session?.access_token)return parsed.session;
+  if(parsed.currentSession?.access_token)return parsed.currentSession;
+  if(parsed.data?.session?.access_token)return parsed.data.session;
+  if(Array.isArray(parsed)){
+    const found=parsed.find(item=>item&&typeof item==='object'&&item.access_token);
+    if(found)return found;
+  }
+  return null;
+}
+
+function readStorageSession(storage){
+  try{
+    const exact=normalizeStoredSession(storage.getItem(STORAGE_KEY));
+    if(exact)return exact;
+
+    const matching=[];
+    for(let i=0;i<storage.length;i++){
+      const key=storage.key(i)||'';
+      if(key.includes('fshvettlltcujmwvikfq')&&key.includes('auth-token')) matching.push(key);
+    }
+
+    for(const key of matching){
+      if(/\.\d+$/.test(key))continue;
+      const direct=normalizeStoredSession(storage.getItem(key));
+      if(direct)return direct;
+    }
+
+    const bases=[...new Set(matching.map(key=>key.replace(/\.\d+$/,'')))];
+    for(const base of bases){
+      let combined='';
+      for(let part=0;part<20;part++){
+        const chunk=storage.getItem(`${base}.${part}`);
+        if(chunk==null)break;
+        combined+=chunk;
+      }
+      const chunked=normalizeStoredSession(combined);
+      if(chunked)return chunked;
+    }
+  }catch{}
+  return null;
+}
+
+function sessionExpiry(value){
+  const direct=Number(value?.expires_at||0);
+  if(direct)return direct;
+  try{
+    const payload=value.access_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    return Number(JSON.parse(atob(payload)).exp||0);
+  }catch{return 0}
+}
+
+function saveNormalizedSession(value){
+  if(!value?.access_token)return;
+  if(!value.user){
+    const id=decodeJwtSub(value.access_token);
+    if(id)value.user={id};
+  }
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(value))}catch{}
+}
+
+async function refreshStoredSession(value){
+  if(!value?.refresh_token)return value;
+  try{
+    const response=await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY},
+      body:JSON.stringify({refresh_token:value.refresh_token})
+    });
+    const refreshed=await response.json().catch(()=>null);
+    if(response.ok&&refreshed?.access_token){
+      saveNormalizedSession(refreshed);
+      return refreshed;
+    }
+  }catch{}
+  return value;
+}
+
+async function ensureOneHomeSession(){
+  let found=null;
+  try{found=(await sb.auth.getSession()).data.session||null}catch{}
+  if(!found)found=readStorageSession(localStorage);
+  if(!found)found=readStorageSession(sessionStorage);
+  if(!found)return null;
+
+  const expiresAt=sessionExpiry(found);
+  if(expiresAt&&expiresAt*1000<Date.now()+60000) found=await refreshStoredSession(found);
+  if(!found?.access_token)return null;
+
+  saveNormalizedSession(found);
+  session=found;
+  return found;
+}
+
+function returnToOneHomeEntrance(){
+  try{
+    sessionStorage.setItem('onehome_passport_destination','onehome-start');
+    localStorage.setItem('onehome_passport_destination','onehome-start');
+  }catch{}
+  location.href='/?passport=entry&from=onehome-start';
+}
+
+
+function resolveXamanSignUrl(data){
+  const candidates=[data?.sign_url,data?.next?.always,data?.next?.no_push_msg_received];
+  for(const candidate of candidates){
+    try{
+      const parsed=new URL(String(candidate||''));
+      if((parsed.hostname==='xumm.app'||parsed.hostname==='xaman.app')&&parsed.protocol==='https:')return parsed.href;
+    }catch{}
+  }
+  throw new Error('Xaman did not return a valid signing link.');
+}
+
+function goToXaman(data){
+  const url=resolveXamanSignUrl(data);
+  try{
+    if(window.top&&window.top!==window.self){
+      window.top.location.assign(url);
+      return;
+    }
+  }catch{}
+  window.location.assign(url);
+}
+
+function findCrossmarkSdk(){
+  const browserWindows=[window];
+  try{if(window.parent&&window.parent!==window)browserWindows.push(window.parent)}catch(_error){}
+  try{if(window.top&&window.top!==window&&window.top!==window.parent)browserWindows.push(window.top)}catch(_error){}
+  for(const browserWindow of browserWindows){
+    try{
+      const sdk=browserWindow.xrpl?.crossmark||browserWindow.crossmark||browserWindow.CROSSMARK||null;
+      if(sdk)return sdk;
+    }catch(_error){}
+  }
+  return null;
+}
+
+function crossmarkAddress(result){
+  const candidates=[
+    result?.response?.data?.address,
+    result?.response?.address,
+    result?.response?.data?.resp?.address,
+    result?.data?.address,
+    result?.address
+  ];
+  return String(candidates.find(Boolean)||'').trim();
+}
+
+function normalizeCrossmarkNetwork(value){
+  const network=String(typeof value==='object'?(value?.name||value?.type||value?.id||''):value||'').toLowerCase();
+  if(network.includes('test'))return'testnet';
+  if(network.includes('dev'))return'devnet';
+  if(network.includes('main')||network==='xrpl')return'mainnet';
+  return network||'unknown';
+}
+
+function crossmarkNetwork(sdk,result){
+  const candidates=[
+    result?.response?.data?.network,
+    result?.response?.network,
+    result?.data?.network,
+    result?.network
+  ];
+  let network=normalizeCrossmarkNetwork(candidates.find(value=>value!==undefined&&value!==null&&value!==''));
+  try{
+    if(network==='unknown'&&sdk?.session?.network)network=normalizeCrossmarkNetwork(sdk.session.network);
+  }catch(_error){}
+  return network;
+}
+
+function crossmarkTransactionHash(result){
+  const candidates=[
+    result?.response?.data?.resp?.result?.hash,
+    result?.response?.data?.resp?.hash,
+    result?.response?.data?.resp?.result?.tx_json?.hash,
+    result?.response?.data?.hash,
+    result?.response?.hash,
+    result?.data?.resp?.result?.hash,
+    result?.data?.hash,
+    result?.result?.hash,
+    result?.hash
+  ];
+  return String(candidates.find(value=>/^[A-F0-9]{64}$/i.test(String(value||'')))||'').toUpperCase();
+}
+
+async function crossmarkSignIn(sdk){
+  if(typeof sdk?.methods?.signInAndWait==='function')return sdk.methods.signInAndWait();
+  if(typeof sdk?.async?.signInAndWait==='function')return sdk.async.signInAndWait();
+  if(typeof sdk?.signInAndWait==='function')return sdk.signInAndWait();
+  throw new Error('Crossmark is available, but its wallet verification could not be opened.');
+}
+
+async function crossmarkSignAndSubmit(sdk,transaction){
+  if(typeof sdk?.methods?.signAndSubmitAndWait==='function')return sdk.methods.signAndSubmitAndWait(transaction);
+  if(typeof sdk?.async?.signAndSubmitAndWait==='function')return sdk.async.signAndSubmitAndWait(transaction);
+  if(typeof sdk?.signAndSubmitAndWait==='function')return sdk.signAndSubmitAndWait(transaction);
+  throw new Error('Crossmark is available, but transaction signing could not be opened.');
+}
+
+async function invoke(name,body){
+  const current=await ensureOneHomeSession();
+  const token=current?.access_token;
+  if(!token){returnToOneHomeEntrance();throw new Error('Please enter One Home again.');}
+  const response=await fetch(`${SUPABASE_URL}/functions/v1/${name}`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`,'apikey':SUPABASE_KEY},body:JSON.stringify(body)});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok||data.error)throw new Error(data.error||'Request failed.');
+  return data;
+}
+
+async function invokeCrossmarkBurn(action,extra={}){
+  return invoke('crossmark-burn-xrpl',{action,...extra});
+}
+
+async function loadContent(){
+  try{
+    const pageResult=await sb.from('onehome_pages').select('*').eq('slug','burn-to-build').eq('status','published').limit(1);
+    const page=Array.isArray(pageResult.data)?pageResult.data[0]:null;
+    if(!page)return;
+    const blockResult=await sb.from('onehome_page_blocks').select('*').eq('page_id',page.id).eq('is_visible',true).order('sort_order',{ascending:true});
+    if(blockResult.error||!Array.isArray(blockResult.data))return;
+    blocks=blockResult.data;
+
+    const heroBlock=block('Ownership',10);
+    $('heroLabel').textContent=String(heroBlock?.label||'OWNERSHIP').toUpperCase();
+    applyText('heroTitle','Ownership',10,'Burn to Build');
+    applyText('heroIntro','Introduction',20,'Preserve what came before, release the old ownership, and use that transition to help build something new.');
+    applyText('agreementHeading','Agreement section',30,'Read and agree');
+    applyText('participationRule','Participation rule',40,'Burn to Build accepts NFTs only from projects approved by One Home.');
+    applyText('agree1Text','Agreement 1',70,'I understand that burning an NFT is permanent and cannot be reversed.');
+    applyText('agree2Text','Agreement 2',80,'I authorize One Home to preserve the approved historical Time Capsule record for this NFT.');
+    applyText('agree3Text','Agreement 3',90,'I understand rewards are issued only after independent XRPL verification.');
+    applyText('acceptTerms','Continue button',100,'Accept & Continue',true);
+    $('connectHeading').textContent='Connect a wallet';
+    applyText('connectWallet','Connect button',180,'Connect Xaman',true);
+    applyText('chooseHeading','Choose heading',190,'Choose an approved NFT');
+    applyText('chooseText','Choose text',200,'Only NFTs from approved projects appear here.');
+    $('chooseEmpty').textContent='Connect a wallet to view eligible NFTs.';
+    applyText('confirmHeading','Confirm heading',220,'Confirm the permanent burn');
+    applyText('selection','No selection text',230,'No NFT selected.');
+    applyText('finalConfirmText','Final confirmation',240,'I understand this NFT will be permanently removed from the XRP Ledger.');
+    applyText('burnButton','Burn button',250,'Open Permanent Burn in Xaman',true);
+
+    const links=block('Policy links',60);
+    if(links){
+      const firstUrl=links.link_url||'/burn-to-build-terms.html';
+      const firstText=links.link_text||'Read Burn to Build Terms';
+      const secondUrl=links.settings?.second_url||'/time-capsule-policy.html';
+      const secondText=links.settings?.second_text||'Read Time Capsule Policy';
+      $('policyLinks').innerHTML=`<a href="${esc(firstUrl)}" target="_blank" rel="noopener">${esc(firstText)}</a><a href="${esc(secondUrl)}" target="_blank" rel="noopener">${esc(secondText)}</a>`;
+    }
+  }catch(error){console.error('Burn page content load failed:',error)}
+}
+
+async function loadPool(){
+  try{
+    const result=await sb.from('burn_pools').select('*').eq('chain','xrpl').eq('network',selectedNetwork).order('created_at',{ascending:false});
+    const rows=Array.isArray(result.data)?result.data:[];
+    pool=rows.find(row=>row.status==='open')||null;
+    document.querySelectorAll('.network-choice').forEach(button=>button.classList.toggle('active',button.dataset.network===selectedNetwork));
+    note('networkNote',pool?`${selectedNetwork==='testnet'?'Testnet':'Mainnet'} burn is available.`:`No open ${selectedNetwork==='testnet'?'Testnet':'Mainnet'} burn pool is available.`,pool?'good':'bad');
+  }catch(error){console.error('Burn pool load failed:',error);pool=null;note('networkNote','Burn to Build is not available right now.','bad')}
+}
+
+async function checkExistingAcceptance(){
+  if(!session||!pool)return false;
+  const uid=userId();
+  if(!uid)return false;
+  try{
+    const result=await sb.from('burn_terms_acceptances').select('id').eq('user_id',uid).eq('terms_version',pool.terms_version).eq('policy_version',pool.policy_version).limit(1);
+    return Array.isArray(result.data)&&result.data.length>0;
+  }catch{return false}
+}
+
+function updateAvailability(accepted=false){
+  const open=pool?.status==='open';
+  const ready=!!session&&open;
+  $('connectPanel').classList.toggle('hidden',!ready);
+  $('choosePanel').classList.toggle('hidden',!ready);
+  $('confirmPanel').classList.toggle('hidden',!ready);
+  $('connectWallet').disabled=!accepted;
+  $('connectCrossmark').disabled=!accepted;
+  if(session&&!open){const message=blockText('Unavailable message',160,'');note('termsNote',message,'')}
+  if(accepted){$('agree1').checked=true;$('agree2').checked=true;$('agree3').checked=true;note('termsNote','You can now connect Xaman or Crossmark.','good')}
+}
+
+$('acceptTerms').onclick=async()=>{
+  session=await ensureOneHomeSession();
+  if(!session){returnToOneHomeEntrance();return}
+  if(!$('agree1').checked||!$('agree2').checked||!$('agree3').checked)return note('termsNote',blockText('Agreement required message',260,'Please check all agreement statements before continuing.'),'bad');
+  if(!pool)return note('termsNote','Burn to Build is not available right now.','bad');
+  const uid=userId();
+  if(!uid){returnToOneHomeEntrance();return}
+  const result=await sb.from('burn_terms_acceptances').upsert({user_id:uid,terms_version:pool.terms_version,policy_version:pool.policy_version,user_agent:navigator.userAgent},{onConflict:'user_id,terms_version,policy_version'});
+  if(result.error)return note('termsNote',result.error.message,'bad');
+  updateAvailability(true);
+};
+
+$('connectWallet').onclick=async()=>{
+  try{
+    if(!pool||pool.status!=='open')throw new Error(blockText('Unavailable message',160,'Burn to Build is not available right now.'));
+    $('connectWallet').disabled=true;
+    $('connectCrossmark').disabled=true;
+    walletProvider='';
+    sessionStorage.removeItem('onehome-burn-connect-uuid');
+    note('walletStatus','Creating your secure Xaman connection…');
+    const data=await invoke('burn-xrpl-connect',{pool_id:pool.id,network:selectedNetwork});
+    connectUuid=String(data.uuid||'');
+    sessionStorage.setItem('onehome-burn-connect-uuid',connectUuid);
+    sessionStorage.setItem('onehome-burn-network',selectedNetwork);
+    sessionStorage.setItem('onehome-burn-pool-id',pool.id);
+    $('walletQr').src=data.qr_png||'';
+    $('walletQr').classList.toggle('hidden',!data.qr_png);
+    note('walletStatus',blockText('Xaman approval message',280,'Approve the connection in Xaman.'));
+    goToXaman(data);
+  }catch(error){
+    $('connectWallet').disabled=false;
+    $('connectCrossmark').disabled=false;
+    note('walletStatus',error.message,'bad');
+  }
+};
+
+async function pollWallet(){
+  for(let i=0;i<15;i++){
+    if(i>0)await new Promise(resolve=>setTimeout(resolve,2000));
+    try{
+      const data=await invoke('burn-xrpl-check-wallet',{uuid:connectUuid,pool_id:pool.id});
+      if(data.waiting)continue;
+      if(data.cancelled||data.expired){
+        sessionStorage.removeItem('onehome-burn-connect-uuid');
+        $('connectWallet').disabled=false;
+        $('connectCrossmark').disabled=false;
+        note('walletStatus',data.cancelled?blockText('Connection cancelled message',290,'Connection cancelled.'):blockText('Connection expired message',300,'Connection expired.'),'bad');
+        return;
+      }
+      wallet=data.wallet;
+      walletProvider='xaman';
+      sessionStorage.removeItem('onehome-burn-connect-uuid');
+      $('connectWallet').disabled=false;
+      $('connectCrossmark').disabled=false;
+      note('walletStatus',blockText('Wallet connected message',310,'Wallet connected. {count} eligible NFT(s) found.').replace('{count}',String((data.nfts||[]).length)),'good');
+      renderNfts(data.nfts||[]);
+      return;
+    }catch(error){
+      $('connectWallet').disabled=false;
+      $('connectCrossmark').disabled=false;
+      note('walletStatus',error.message,'bad');
+      return;
+    }
+  }
+  sessionStorage.removeItem('onehome-burn-connect-uuid');
+  $('connectWallet').disabled=false;
+  $('connectCrossmark').disabled=false;
+  note('walletStatus',blockText('Connection timeout message',320,'Connection timed out. Try again.'),'bad');
+}
+
+$('connectCrossmark').onclick=async()=>{
+  const button=$('connectCrossmark');
+  try{
+    if(!pool||pool.status!=='open')throw new Error(blockText('Unavailable message',160,'Burn to Build is not available right now.'));
+    const sdk=findCrossmarkSdk();
+    if(!sdk)throw new Error('Crossmark was not found. Install or unlock Crossmark, then refresh this page.');
+    button.disabled=true;
+    $('connectWallet').disabled=true;
+    walletProvider='';
+    selected=null;
+    $('finalConfirm').checked=false;
+    $('burnButton').disabled=true;
+    note('walletStatus','Opening Crossmark… Approve the wallet connection in the extension.');
+    const signIn=await crossmarkSignIn(sdk);
+    const address=crossmarkAddress(signIn);
+    if(!/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(address))throw new Error('Crossmark did not return a valid XRPL wallet.');
+    const network=crossmarkNetwork(sdk,signIn);
+    if(network!=='unknown'&&network!==selectedNetwork)throw new Error(`Switch Crossmark to ${selectedNetwork==='mainnet'?'Mainnet':'Testnet'}, then connect again.`);
+    note('walletStatus',`Crossmark connected. Loading approved NFTs from ${selectedNetwork==='mainnet'?'XRPL Mainnet':'XRPL Testnet'}…`);
+    const data=await invokeCrossmarkBurn('list',{pool_id:pool.id,wallet_address:address});
+    wallet=String(data.wallet||address);
+    walletProvider='crossmark';
+    note('walletStatus',`Crossmark connected. ${(data.nfts||[]).length} eligible NFT(s) found.`,'good');
+    renderNfts(data.nfts||[]);
+  }catch(error){
+    const message=String(error?.message||error||'Crossmark could not be connected.');
+    note('walletStatus',/cancel|reject/i.test(message)?'The Crossmark connection was cancelled.':message,'bad');
+  }finally{
+    button.disabled=false;
+    $('connectWallet').disabled=false;
+  }
+};
+
+function renderNfts(nfts){
+  $('nftGrid').innerHTML=nfts.map((n,i)=>`<article class="nft" data-i="${i}" tabindex="0" role="button" aria-label="Choose ${esc(n.name||'Untitled NFT')}"><img src="${esc(n.image||'/assets/one-home-logo.png')}" alt=""><h3>${esc(n.name||'Untitled NFT')}</h3><div class="muted">${esc(n.project_name||'')}</div><button type="button" data-i="${i}" class="secondary choose">${esc(blockText('Choose NFT button',330,'Choose',true))}</button></article>`).join('')||`<p class="muted">${esc(blockText('No eligible NFTs message',340,'No eligible NFTs were found in this wallet.'))}</p>`;
+  const chooseNft=(index)=>{
+    selected=nfts[Number(index)];
+    $('nftGrid').querySelectorAll('.nft').forEach(card=>card.classList.toggle('selected',Number(card.dataset.i)===Number(index)));
+    $('finalConfirm').checked=false;
+    $('burnButton').disabled=true;
+    $('burnButton').textContent=walletProvider==='crossmark'?'Open Permanent Burn in Crossmark':blockText('Burn button',250,'Open Permanent Burn in Xaman',true);
+    $('selection').textContent=blockText('Selected NFT message',350,'Selected: {name}').replace('{name}',selected.name||'Untitled NFT');
+    note('burnStatus','');
+    $('confirmPanel').scrollIntoView({behavior:'smooth',block:'start'});
+    setTimeout(()=>$('finalConfirm').focus(),450);
+  };
+  $('nftGrid').querySelectorAll('.nft').forEach(card=>{
+    card.onclick=(event)=>{if(event.target.closest('button'))return;chooseNft(card.dataset.i)};
+    card.onkeydown=(event)=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();chooseNft(card.dataset.i)}};
+  });
+  $('nftGrid').querySelectorAll('.choose').forEach(button=>button.onclick=()=>chooseNft(button.dataset.i));
+}
+
+$('finalConfirm').onchange=()=>{$('burnButton').disabled=!selected||!$('finalConfirm').checked};
+$('burnButton').onclick=async()=>{
+  try{
+    if(!selected)throw new Error(blockText('Choose first message',360,'Choose an NFT first.'));
+    if(!walletProvider)throw new Error('Connect Xaman or Crossmark first.');
+    $('burnButton').disabled=true;
+    sessionStorage.removeItem('onehome-burn-intent-id');
+    if(walletProvider==='crossmark'){
+      const sdk=findCrossmarkSdk();
+      if(!sdk)throw new Error('Crossmark was not found. Install or unlock Crossmark, then refresh this page.');
+      note('burnStatus',`Confirm the same ${selectedNetwork==='mainnet'?'Mainnet':'Testnet'} wallet in Crossmark.`);
+      const signIn=await crossmarkSignIn(sdk);
+      const currentAddress=crossmarkAddress(signIn);
+      if(currentAddress.toLowerCase()!==wallet.toLowerCase())throw new Error('Switch Crossmark back to the wallet that owns this NFT, then try again.');
+      const network=crossmarkNetwork(sdk,signIn);
+      if(network!=='unknown'&&network!==selectedNetwork)throw new Error(`Switch Crossmark to ${selectedNetwork==='mainnet'?'Mainnet':'Testnet'}, then try again.`);
+      note('burnStatus','Preparing the permanent Crossmark burn…');
+      const prepared=await invokeCrossmarkBurn('prepare',{pool_id:pool.id,wallet_address:wallet,nftoken_id:selected.nftoken_id});
+      if(prepared.verified){
+        note('burnStatus','This NFT burn is already verified.','good');
+        return;
+      }
+      intentId=String(prepared.intent_id||'');
+      if(!intentId||!prepared.transaction)throw new Error('One Home did not receive a complete Crossmark burn request.');
+      note('burnStatus','Review the permanent NFT burn in Crossmark. This cannot be reversed.');
+      const signed=await crossmarkSignAndSubmit(sdk,prepared.transaction);
+      const transactionHash=crossmarkTransactionHash(signed);
+      if(!transactionHash)throw new Error('Crossmark did not return the submitted transaction hash.');
+      note('burnStatus',`Crossmark submitted the burn. One Home is confirming it on ${selectedNetwork==='mainnet'?'XRPL Mainnet':'XRPL Testnet'}…`);
+      let verified=null;
+      for(let attempt=0;attempt<20;attempt++){
+        verified=await invokeCrossmarkBurn('verify',{intent_id:intentId,transaction_hash:transactionHash});
+        if(verified.verified||!verified.pending)break;
+        await new Promise(resolve=>setTimeout(resolve,2500));
+      }
+      if(verified?.verified){
+        note('burnStatus',blockText('Burn success message',400,'Burn verified. Transaction: {transaction}').replace('{transaction}',verified.transaction_hash||transactionHash),'good');
+        return;
+      }
+      note('burnStatus','The Crossmark burn was submitted and is still being confirmed. Wait a moment, then reconnect Crossmark to refresh your NFTs.','good');
+      return;
+    }
+
+    note('burnStatus','Creating your secure Xaman burn request…');
+    const data=await invoke('burn-xrpl-create',{pool_id:pool.id,wallet,nftoken_id:selected.nftoken_id});
+    intentId=String(data.intent_id||'');
+    sessionStorage.setItem('onehome-burn-intent-id',intentId);
+    sessionStorage.setItem('onehome-burn-network',selectedNetwork);
+    sessionStorage.setItem('onehome-burn-pool-id',pool.id);
+    $('burnQr').src=data.qr_png||'';
+    $('burnQr').classList.toggle('hidden',!data.qr_png);
+    note('burnStatus',blockText('Burn review message',370,'Review the permanent burn in Xaman.'));
+    goToXaman(data);
+  }catch(error){
+    $('burnButton').disabled=!selected||!$('finalConfirm').checked;
+    const message=String(error?.message||error||'The burn could not be completed.');
+    note('burnStatus',walletProvider==='crossmark'&&/cancel|reject/i.test(message)?'The Crossmark burn was cancelled. Nothing was destroyed.':message,'bad');
+  }
+};
+
+async function pollBurn(){
+  for(let i=0;i<30;i++){
+    if(i>0)await new Promise(resolve=>setTimeout(resolve,2000));
+    try{
+      const data=await invoke('burn-xrpl-finalize',{intent_id:intentId});
+      if(data.waiting)continue;
+      if(data.cancelled||data.expired){
+        sessionStorage.removeItem('onehome-burn-intent-id');
+        $('burnButton').disabled=false;
+        note('burnStatus',data.cancelled?blockText('Burn cancelled message',380,'Burn cancelled. Nothing was destroyed.'):blockText('Burn expired message',390,'Burn request expired. Nothing was destroyed.'),'bad');
+        return;
+      }
+      if(data.verified||data.ok){
+        sessionStorage.removeItem('onehome-burn-intent-id');
+        note('burnStatus',blockText('Burn success message',400,'Burn verified. Transaction: {transaction}').replace('{transaction}',data.transaction_hash||''),'good');
+        return;
+      }
+    }catch(error){
+      $('burnButton').disabled=false;
+      note('burnStatus',error.message,'bad');
+      return;
+    }
+  }
+  $('burnButton').disabled=false;
+  note('burnStatus',blockText('Verification timeout message',410,'Verification is taking longer than expected. Please return later.'),'bad');
+}
+
+document.querySelectorAll('.network-choice').forEach(button=>button.onclick=async()=>{
+  selectedNetwork=button.dataset.network==='testnet'?'testnet':'mainnet';
+  history.replaceState({},'',`/burn-to-build.html?network=${selectedNetwork}`);
+  pool=null;wallet='';walletProvider='';connectUuid='';selected=null;intentId='';
+  $('walletStatus').classList.add('hidden');$('burnStatus').classList.add('hidden');$('walletQr').classList.add('hidden');$('burnQr').classList.add('hidden');
+  $('nftGrid').innerHTML='<p class="muted">Connect a wallet to view eligible NFTs.</p>';
+  $('burnButton').textContent=blockText('Burn button',250,'Open Permanent Burn in Xaman',true);
+  await loadPool();
+  const accepted=await checkExistingAcceptance();
+  updateAvailability(accepted);
+});
+
+(async()=>{
+  await loadContent();
+  await loadPool();
+  session=await ensureOneHomeSession();
+  const accepted=await checkExistingAcceptance();
+  updateAvailability(accepted);
+  const params=new URLSearchParams(location.search);
+  const returnedUuid=params.get('xaman')||sessionStorage.getItem('onehome-burn-connect-uuid')||'';
+  const returnedIntent=params.get('burn')||sessionStorage.getItem('onehome-burn-intent-id')||'';
+  const returnedNetwork=params.get('network')||sessionStorage.getItem('onehome-burn-network');
+  if(returnedNetwork==='testnet'||returnedNetwork==='mainnet') selectedNetwork=returnedNetwork;
+  if(params.has('xaman')||params.has('burn')||params.has('pool')){
+    history.replaceState({},'',`/burn-to-build.html?network=${selectedNetwork}`);
+  }
+  if(returnedUuid&&pool&&accepted){
+    connectUuid=returnedUuid;
+    note('walletStatus','Checking your Xaman connection…');
+    $('connectPanel').classList.remove('hidden');
+    pollWallet();
+  }
+  if(returnedIntent&&pool&&accepted){
+    intentId=returnedIntent;
+    sessionStorage.setItem('onehome-burn-intent-id',intentId);
+    $('confirmPanel').classList.remove('hidden');
+    note('burnStatus','Checking your signed burn…');
+    pollBurn();
+  }
+})();
+})();
+</script>
+
+<script defer src="/shared/onehome-interior-shell-v1467141.js?v=1467200"></script>
+</body>
+</html>

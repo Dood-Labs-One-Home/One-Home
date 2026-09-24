@@ -1,0 +1,159 @@
+<!doctype html>
+<!-- One Home v14.67.114: authoritative multichain creator preview + collection artwork fallback -->
+<html lang="en">
+<head>
+  <script src="/shared/onehome-global-appearance-v1467200.js?v=1467200"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mint Preview | One Home</title>
+<link rel="icon" href="/favicon.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/shared/onehome-chain-identity-v1467114.js?v=1467276"></script>
+<style>
+:root{color-scheme:dark;--panel:rgba(9,13,15,.94);--line:#34463f;--muted:#b8c1bd;--accent:#9f0b8f;--accent2:#d332bd}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;color:#fff;background:#0a0d0e url('/assets/one-home-pc-background-v1467200.webp') center/cover fixed no-repeat}body:before{content:"";position:fixed;inset:0;background:rgba(0,0,0,.57);z-index:-1}.shell{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:26px 0 64px}.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:22px}.brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:.04em}.brand img{width:62px;height:62px;object-fit:contain}.preview-chip{border:1px solid #7a6b1f;background:#302a0d;color:#ffe990;padding:8px 12px;border-radius:999px;font-weight:800;font-size:.82rem}.hero{display:grid;grid-template-columns:minmax(300px,.88fr) minmax(340px,1.12fr);gap:28px;background:var(--panel);border:1px solid var(--line);border-radius:26px;padding:28px;box-shadow:0 22px 70px rgba(0,0,0,.42)}.art{aspect-ratio:1/1;border-radius:20px;overflow:hidden;background:#111717;border:1px solid #35443f;display:flex;align-items:center;justify-content:center}.art img{width:100%;height:100%;object-fit:cover}.art .empty{padding:28px;text-align:center;color:var(--muted)}.kicker{color:#ef72df;font-weight:900;letter-spacing:.11em;font-size:.8rem;text-transform:uppercase}.title{font-size:clamp(2rem,5vw,4.3rem);line-height:.96;margin:12px 0 14px}.description{color:#d6dcda;font-size:1.05rem;line-height:1.65;white-space:pre-wrap}.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:24px 0}.stat{border:1px solid #30423b;background:#0c1212;border-radius:16px;padding:15px}.stat small{display:block;color:#9daaa5;margin-bottom:6px}.stat strong{font-size:1.12rem}.status{border:1px solid #285e37;background:#0e2b16;border-radius:14px;padding:14px 16px;color:#c8f6d2;font-weight:750;margin-top:15px}.actions{display:flex;flex-wrap:wrap;gap:11px;margin-top:24px}.btn{appearance:none;border:0;border-radius:999px;padding:13px 20px;font:inherit;font-weight:900;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2));cursor:pointer}.btn.alt{background:#25313d}.inventory{margin-top:26px;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:24px}.inventory h2{margin:0 0 8px}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-top:18px}.item{background:#0c1212;border:1px solid #30423b;border-radius:14px;padding:13px}.item strong{display:block}.item span{display:block;color:#9daaa5;margin-top:5px;font-size:.86rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.more-wrap{display:flex;justify-content:center;margin-top:18px}.loading,.error{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px;text-align:center}.error{border-color:#7a3434;color:#ffd2d2}.embedded-preview{background-color:#080b0d}.embedded-preview .shell{width:min(1180px,calc(100% - 24px));padding-top:18px}.embedded-preview .top{display:none}@media(max-width:800px){.hero{grid-template-columns:1fr;padding:18px}.top{align-items:flex-start}.stats{grid-template-columns:1fr}.shell{width:min(100% - 20px,1180px)}}
+</style>
+
+<link rel="stylesheet" href="/shared/onehome-interior-shell-v1467141.css?v=1467141">
+  <link rel="stylesheet" href="/shared/onehome-global-appearance-v1467142.css?v=1467141">
+</head>
+<body>
+<main class="shell">
+ <header class="top"><div class="brand"><img src="/favicon.png" alt="One Home"><span>ONE HOME · RARE INK STUDIO</span></div><span class="preview-chip">CREATOR PREVIEW</span></header>
+ <div id="screen" class="loading">Loading your mint preview…</div>
+</main>
+<script>
+(function(){
+ const SUPABASE_URL='https://fshvettlltcujmwvikfq.supabase.co';
+ const SUPABASE_KEY='sb_publishable_ARrX-vYhy8l-yhs6384S_g_n6214taB';
+ const STORAGE_KEY='sb-fshvettlltcujmwvikfq-auth-token';
+ const HIDDEN_MINTS_KEY='onehome_hidden_mint_campaigns_v1365';
+ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{storageKey:STORAGE_KEY,persistSession:true,autoRefreshToken:true}});
+ const previewParams=new URLSearchParams(location.search);
+ const campaignId=previewParams.get('campaign')||'';
+ const returnSource=previewParams.get('source')==='my-mints'?'my-mints':'open-mint';
+ const embedded=previewParams.get('embedded')==='1';
+ const screen=document.getElementById('screen');
+ if(embedded)document.body.classList.add('embedded-preview');
+ const esc=value=>String(value??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+ const short=value=>{const s=String(value||'');return s.length>22?`${s.slice(0,10)}…${s.slice(-8)}`:s||'—'};
+ async function api(action,extra={}){
+  const session=(await sb.auth.getSession())?.data?.session;
+  if(!session?.access_token)throw new Error('Sign in to One Home to view this private preview.');
+  const response=await fetch(`${SUPABASE_URL}/functions/v1/admin-mint-manager`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${session.access_token}`},body:JSON.stringify({action,...extra})});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok||data.success===false)throw new Error(typeof data.error==='string'?data.error:'The mint preview could not be loaded.');
+  return data;
+ }
+ async function evmStatus(){
+  const session=(await sb.auth.getSession())?.data?.session;
+  if(!session?.access_token)return null;
+  const response=await fetch(`${SUPABASE_URL}/functions/v1/evm-campaign-mint`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${session.access_token}`},body:JSON.stringify({action:'status',campaign_id:campaignId})});
+  const data=await response.json().catch(()=>({}));
+  return response.ok&&data?.ok!==false?data:null;
+ }
+ async function fillArtworkFromCollection(c){
+  try{
+   const {data,error}=await sb.rpc('onehome_public_mint_cover',{p_campaign_id:campaignId});
+   if(!error&&data?.cover_image_url)c.cover_image_url=String(data.cover_image_url);
+  }catch(_coverError){}
+  if(String(c?.cover_image_url||'').trim()||!c?.source_collection_id)return c;
+  try{
+   const {data,error}=await sb.from('nft_collection_files').select('storage_bucket,storage_path,file_role,is_public').eq('collection_id',c.source_collection_id).eq('is_public',true).in('file_role',['cover','source_artwork']);
+   if(error)throw error;
+   const files=Array.isArray(data)?data:[];
+   const chosen=files.find(file=>file?.file_role==='cover')||files.filter(file=>file?.file_role==='source_artwork').sort((a,b)=>String(a?.storage_path||'').localeCompare(String(b?.storage_path||''),undefined,{numeric:true}))[0];
+   if(chosen?.storage_path)c.cover_image_url=sb.storage.from(chosen.storage_bucket||'nft-public').getPublicUrl(chosen.storage_path).data.publicUrl;
+  }catch(_error){}
+  return c;
+ }
+ function render(c,evm){
+  const inventory=Array.isArray(c.inventory)?c.inventory:[];
+  const counts=c.inventory_counts||{};
+  const descriptor=window.OneHomeChainIdentity.describe(evm?{...c,ecosystem:'evm',network:evm.network,chain_key:evm?.network?.chain_key,native_symbol:evm?.network?.native_symbol||evm?.mint?.native_symbol}:c);
+  const isEvm=descriptor.ecosystem==='evm';
+  const available=Number(counts.available||inventory.filter(x=>x.status==='available').length||0);
+  const mintedInventory=inventory.filter(x=>x.nftoken_id);
+  const minted=isEvm?Number(evm?.mint?.minted||0):mintedInventory.length;
+  const image=String(c.cover_image_url||evm?.campaign?.cover_image_url||c.artwork_url||evm?.campaign?.artwork_url||'').trim();
+  const currency=String(evm?.mint?.native_symbol||descriptor.symbol||c.payment_currency_code||'Native asset').trim();
+  const networkLabel=String(evm?.network?.label||descriptor.label)+(descriptor.testOnly&&!String(evm?.network?.label||'').includes('TEST ONLY')?' · TEST ONLY':'');
+  let visibleCount=48;
+  const itemMarkup=item=>`<div class="item"><strong>NFT #${esc(item.inventory_number||'—')}</strong><span>${esc(item.status||'minted')}</span><span title="${esc(item.nftoken_id||'')}">${esc(short(item.nftoken_id))}</span></div>`;
+  screen.className='';
+  screen.innerHTML=`
+   <section class="hero">
+    <div class="art">${image?`<img src="${esc(image)}" alt="${esc(c.name||'Mint artwork')}">`:'<div class="empty">Collection artwork preview</div>'}</div>
+    <div>
+     <div class="kicker">${esc(networkLabel)}</div>
+     <h1 class="title">${esc(c.name||'Untitled Mint')}</h1>
+     <div class="description">${esc(c.description||'No collection description has been added yet.')}</div>
+     <div class="stats">
+      <div class="stat"><small>Mint price</small><strong>${esc(Number(c.price||0))} ${esc(currency)}</strong></div>
+      <div class="stat"><small>Collection size</small><strong>${esc(c.total_supply||0)} NFTs</strong></div>
+      <div class="stat"><small>Minted on-chain</small><strong>${esc(minted)}</strong></div>
+      <div class="stat"><small>Distribution</small><strong>${esc(c.distribution_mode==='randomized'?'Randomized':c.distribution_mode==='custom'?'Custom order':'Upload order')}</strong></div>
+     </div>
+     <div class="status">${minted} minted NFTs found · ${available} currently marked available in inventory.</div>
+     <div class="actions"><button class="btn alt" id="backBtn">${returnSource==='my-mints'?'Back to My Mints':'Back to Open Mint'}</button>${['active','open','live'].includes(String(c.status||'').toLowerCase())?`<button class="btn" id="publicBtn">View Live Mint</button>`:''}<button class="btn alt" id="removeBtn">Remove from My Mints</button></div>
+    </div>
+   </section>
+   <section class="inventory"><h2>Minted NFT Inventory</h2><div class="muted" id="inventorySummary"></div><div class="grid" id="inventoryGrid"></div><div class="more-wrap" id="moreWrap"></div></section>`;
+  const draw=()=>{
+   const shown=mintedInventory.slice(0,visibleCount);
+   document.getElementById('inventoryGrid').innerHTML=shown.map(itemMarkup).join('')||'<div class="item"><strong>No minted inventory records found</strong></div>';
+   document.getElementById('inventorySummary').textContent=`Showing ${shown.length} of ${minted} minted NFTs.`;
+   const moreWrap=document.getElementById('moreWrap');
+   moreWrap.innerHTML='';
+   if(visibleCount<minted){
+    const more=document.createElement('button');more.className='btn alt';more.textContent='Load More NFTs';more.onclick=()=>{visibleCount+=48;draw()};moreWrap.appendChild(more);
+   }
+  };
+  draw();
+  document.getElementById('backBtn').onclick=()=>{
+   if(embedded&&window.parent&&window.parent!==window){
+    window.parent.postMessage({type:'onehome-close-mint-preview',campaign_id:campaignId,source:returnSource},location.origin);
+    return;
+   }
+   const fallback=returnSource==='my-mints'
+    ?'/mint-studio.html?v=1369#my-mints'
+    :`/mint-studio.html?campaign=${encodeURIComponent(campaignId)}&preview_return=1&v=1369`;
+   location.replace(fallback);
+  };
+  document.getElementById('removeBtn').onclick=()=>{
+   if(!window.confirm(`Remove ${c.name||'this mint'} from My Mints?
+
+This removes it from the My Mints list connected to your signed-in One Home ID. It does not delete NFTs, burn NFTs, undo ledger transactions, or remove the collection from its blockchain.`))return;
+   Promise.resolve().then(async()=>{
+    let hidden=[];try{hidden=JSON.parse(localStorage.getItem(HIDDEN_MINTS_KEY)||'[]')}catch(_error){}
+    const session=(await sb.auth.getSession())?.data?.session;const saved=session?.user?.user_metadata?.onehome_hidden_mint_campaigns;
+    const ids=new Set((Array.isArray(hidden)?hidden:[]).map(String));if(Array.isArray(saved))saved.forEach(value=>ids.add(String(value)));ids.add(String(campaignId));
+    const values=Array.from(ids);
+    const updated=await sb.auth.updateUser({data:{onehome_hidden_mint_campaigns:values}});if(updated.error)throw updated.error;
+    localStorage.setItem(HIDDEN_MINTS_KEY,JSON.stringify(values));
+    const drafts=(()=>{try{return JSON.parse(localStorage.getItem('onehome_public_mints')||'[]')}catch(_error){return[]}})().filter(item=>String(item.campaignId||'')!==String(campaignId));
+    localStorage.setItem('onehome_public_mints',JSON.stringify(drafts));
+    location.href='/mint-studio.html?v=1369#my-mints';
+   }).catch(error=>window.alert(error?.message||'This mint could not be removed from My Mints.'));
+  };
+  const publicBtn=document.getElementById('publicBtn');if(publicBtn)publicBtn.onclick=()=>{const id=encodeURIComponent(c.id||campaignId);if(descriptor.key&&descriptor.ecosystem!=='xrpl'){location.href=`/mint/${id}?chain=${encodeURIComponent(descriptor.key)}&v=1467114`;return}if(descriptor.ecosystem==='xrpl'){location.href=`/mint/${id}?network=${encodeURIComponent(descriptor.environment==='mainnet'?'mainnet':'testnet')}&v=1467114`;return}location.href=`/mint/${id}?v=1467114`;};
+ }
+ async function start(){
+  try{
+   if(!campaignId)throw new Error('The mint campaign was not provided.');
+   const result=await api('get_campaign',{campaign_id:campaignId});
+   const campaign=await fillArtworkFromCollection(result.campaign||{});
+   let evm=null;
+   const initialDescriptor=window.OneHomeChainIdentity.describe(campaign);
+   if(initialDescriptor.ecosystem==='evm')evm=await evmStatus().catch(()=>null);
+   render(campaign,evm);
+  }catch(error){screen.className='error';screen.textContent=error.message;}
+ }
+ if(location.hash==='#my-mints'){}
+ start();
+})();
+</script>
+
+<script defer src="/shared/onehome-interior-shell-v1467141.js?v=1467200"></script>
+</body>
+</html>

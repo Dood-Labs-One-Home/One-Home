@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script src="/shared/onehome-global-appearance-v1467200.js?v=1467200"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="description" content="Mint this collectible on One Home.">
+<!-- One Home v14.67.219: Safari/Xaman mobile user-tap deeplink restoration; preserves authoritative pricing/availability, same-mint continuation, v14.67.213 backend safeguards, and v14.67.211 redemption. -->
+<title>One Home Mint</title>
+
+<link rel="icon" href="/favicon.png">
+<link rel="stylesheet" href="/passport/entrance.css?v=146795">
+<style>
+html,body{margin:0;min-height:100%;background:#000}body{overflow-x:hidden}.page-view{display:none}.page-view.active{display:block}
+html.rare-routes-public-mint #onehomeFounderMintPage .founder-mint-stage{
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.66) 0%,rgba(0,0,0,.14) 35%,rgba(0,0,0,.12) 67%,rgba(0,0,0,.64) 100%),
+    linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.48)),
+    url('/assets/spooky-time-main-entry-pc-v1467200.webp') center/cover no-repeat fixed!important;
+}
+html.rare-routes-public-mint #founderMintArtwork{background:#f6ead8;object-fit:contain!important;}
+html.rare-routes-public-mint #founderMintArtworkStage{background:rgba(246,234,216,.96);border-radius:8px;}
+
+/* v14.67.154 — every Mint uses the current One Home interior background. */
+#onehomeFounderMintPage .founder-mint-stage{
+  background-color:#080503!important;
+  background-image:
+    linear-gradient(90deg,rgba(0,0,0,.66) 0%,rgba(0,0,0,.14) 35%,rgba(0,0,0,.12) 67%,rgba(0,0,0,.64) 100%),
+    linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.48)),
+    var(--onehome-mint-campaign-bg,var(--onehome-interior-bg-desktop,url('/assets/spooky-time-main-entry-pc-v1467200.webp')))!important;
+  background-position:center top!important;
+  background-size:cover!important;
+  background-repeat:no-repeat!important;
+  background-attachment:fixed!important;
+}
+/* The artwork scene may not consume the whole left column when the creator
+   description is placed underneath it. The full description must remain in flow. */
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-crate-scene{
+  height:auto!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-art>.founder-mint-intro{
+  max-height:none!important;
+  overflow:visible!important;
+  white-space:normal!important;
+  -webkit-line-clamp:unset!important;
+}
+@media(max-width:780px){
+  #onehomeFounderMintPage .founder-mint-stage{
+    background-image:
+      linear-gradient(180deg,rgba(8,4,2,.34),rgba(3,3,3,.56)),
+      var(--onehome-mint-campaign-bg,var(--onehome-interior-bg-mobile,url('/assets/spooky-time-main-entry-mobile-v1467200.webp')))!important;
+    background-position:center top!important;
+    background-size:cover!important;
+    background-attachment:scroll!important;
+  }
+}
+/* v14.67.104: explicit collector wallet choice; public mint may grow and scroll when wallet choices expand. */
+@media(min-width:781px){
+  html,body{height:auto!important;min-height:100%!important;overflow-y:auto!important;}
+  #onehomeFounderMintPage.active{height:auto!important;min-height:100dvh!important;overflow:visible!important;}
+  #onehomeFounderMintPage .founder-mint-stage{height:auto!important;min-height:100dvh!important;overflow:visible!important;}
+  #onehomeFounderMintPage .founder-mint-content{height:auto!important;min-height:calc(100dvh - 74px)!important;}
+  #onehomeFounderMintPage .founder-mint-shell{max-height:none!important;}
+}
+
+/* v14.67.105 — calmer collector mint page. */
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-shell{
+  width:min(980px,100%);
+  grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);
+  border-radius:12px;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-art{
+  padding:18px;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-art-topline,
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-art-caption{
+  display:none!important;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-crate-scene{
+  min-height:0;
+  height:100%;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-live-art{
+  max-height:560px!important;
+  width:100%;
+  object-fit:contain!important;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-details{
+  padding:22px;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-brandline{
+  margin-bottom:6px;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-brandline img,
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-brandline .passport-eyebrow{
+  display:none!important;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-brandline h1{
+  font-size:clamp(30px,3.2vw,44px)!important;
+  line-height:.92!important;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-intro{
+  margin-bottom:10px!important;
+  font-size:12px!important;
+  line-height:1.4!important;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-ready-banner{
+  display:none!important;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-stats{
+  grid-template-columns:1fr 1fr;
+  margin-bottom:9px;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-stats > div:nth-child(3),
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-stats > div:nth-child(4){
+  display:none!important;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-stats div{
+  padding:8px;
+  background:rgba(255,255,255,.035);
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-includes{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:8px;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-includes div{
+  padding:5px 7px;
+  border:1px solid rgba(255,255,255,.1);
+  border-left:1px solid rgba(255,255,255,.1);
+  border-radius:999px;
+  background:rgba(255,255,255,.025);
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-includes span{display:none}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-includes strong{
+  font-size:9px;
+  font-weight:700;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-payment-note[hidden]{display:none!important}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-payment-note{
+  display:block;
+  margin:10px 0 12px;
+  padding:10px 12px;
+  border:1px solid rgba(255,255,255,.22);
+  border-radius:10px;
+  background:rgba(0,0,0,.28);
+  font-weight:700;
+  line-height:1.45;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-quantity-control{
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:8px;
+  margin-bottom:9px;
+  padding:9px 10px;
+  border-radius:8px;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-quantity-summary{
+  display:none!important;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-quantity-copy strong{
+  font-size:10px;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-quantity-copy small{
+  font-size:9px;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-quantity-stepper button{
+  width:34px;height:34px;font-size:20px;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-quantity-stepper strong{
+  font-size:19px;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-actions{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+  margin-bottom:8px;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-actions::before{
+  content:"Choose wallet app";
+  grid-column:1/-1;
+  color:#bdb4aa;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-button{
+  min-height:50px;
+  gap:7px;
+  padding:7px 8px!important;
+  border-color:rgba(255,255,255,.16)!important;
+  border-radius:8px!important;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-button:hover:not(:disabled){
+  border-color:#fff!important;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-button img{
+  width:29px;height:29px;flex-basis:29px;border-radius:7px;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-button small{
+  font-size:7px;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-button strong{
+  font-size:10px;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-status{
+  margin-top:2px;
+  padding:8px 9px;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-status[hidden]{
+  display:none!important;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-fineprint{
+  margin-top:6px!important;
+  font-size:8px!important;
+}
+html.onehome-simple-public-mint #onehomeFounderMintPage #founderMintShareXBtn{
+  min-height:40px!important;
+  margin-top:7px!important;
+  padding:8px 12px!important;
+  background:transparent!important;
+  border-color:rgba(255,255,255,.16)!important;
+  color:#d9d2ca!important;
+  font-size:9px!important;
+}
+@media(max-width:780px){
+  html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-content{
+    padding:10px 10px 24px!important;
+  }
+  html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-shell{
+    grid-template-columns:1fr;
+  }
+  html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-art{
+    padding:10px 12px 8px;
+    border-bottom:1px solid rgba(255,255,255,.09);
+  }
+  html.onehome-simple-public-mint #onehomeFounderMintPage .founder-crate-scene{
+    max-height:260px;
+  }
+  html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-live-art{
+    max-height:250px!important;
+  }
+  html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-details{
+    padding:14px 12px 16px;
+  }
+  html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-brandline h1{
+    font-size:32px!important;
+  }
+  html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-actions{
+    grid-template-columns:1fr;
+  }
+  html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-button{
+    min-height:48px;
+    justify-content:flex-start;
+    padding-left:18px!important;
+  }
+  html.onehome-simple-public-mint #onehomeFounderMintPage .founder-mint-quantity-control{
+    grid-template-columns:1fr auto;
+  }
+}
+
+
+/* v14.67.207 — one continuous public XRPL mint flow on desktop and mobile. */
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-content{
+  place-items:start center!important;
+  padding:24px 16px 42px!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-shell{
+  width:min(760px,100%)!important;
+  grid-template-columns:1fr!important;
+  overflow:hidden!important;
+  border-radius:18px!important;
+  background:linear-gradient(180deg,rgba(13,13,13,.96),rgba(5,5,5,.97))!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-art{
+  padding:16px 18px 14px!important;
+  border-right:0!important;
+  border-bottom:1px solid rgba(255,255,255,.10)!important;
+  background:rgba(5,5,5,.68)!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-art::before,
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-art::after{display:none!important}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-crate-scene{
+  width:100%!important;
+  min-height:0!important;
+  height:auto!important;
+  aspect-ratio:16/8.8;
+  overflow:hidden!important;
+  border-radius:12px!important;
+  background:rgba(0,0,0,.32)!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-live-art{
+  width:100%!important;
+  height:100%!important;
+  max-height:none!important;
+  object-fit:cover!important;
+  border-radius:12px!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-art>.founder-mint-intro{
+  margin:12px 2px 0!important;
+  color:#d8d2cb!important;
+  font-size:12px!important;
+  line-height:1.5!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-details{
+  padding:20px 18px 22px!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-brandline{
+  margin:0 0 12px!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-brandline h1{
+  margin:0!important;
+  font-size:clamp(30px,5vw,46px)!important;
+  line-height:.95!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-stats{
+  gap:10px!important;
+  margin:0 0 12px!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-stats div{
+  min-height:68px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  padding:10px 12px!important;
+  border:1px solid rgba(255,255,255,.16)!important;
+  border-radius:10px!important;
+  background:rgba(255,255,255,.025)!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-quantity-control{
+  align-items:center!important;
+  gap:14px!important;
+  margin:0 0 12px!important;
+  padding:12px 14px!important;
+  border:1px solid rgba(255,255,255,.16)!important;
+  border-radius:10px!important;
+  background:rgba(255,255,255,.02)!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-quantity-copy small{
+  max-width:430px!important;
+  line-height:1.4!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .onehome-mint-wallet-choice{
+  gap:10px!important;
+  margin:0!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .onehome-mint-wallet-field select,
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .onehome-mint-primary,
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .onehome-mint-entitlement{
+  border-radius:10px!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .onehome-mint-primary{
+  min-height:50px!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .onehome-mint-wallet-steps{
+  margin:0!important;
+  padding:9px 11px!important;
+  border-left:2px solid rgba(226,18,26,.78)!important;
+  border-radius:0 8px 8px 0!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .onehome-mint-progress{
+  margin:12px 0 6px!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-status{
+  margin:0!important;
+  border-radius:9px!important;
+}
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage #founderMintedNftsBtn,
+html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage #founderMintShareXBtn{
+  min-height:42px!important;
+  margin-top:8px!important;
+  padding:9px 12px!important;
+  border-radius:9px!important;
+  font-size:9px!important;
+}
+html.onehome-mint-error-state #onehomeFounderMintPage .founder-mint-shell{
+  width:min(680px,100%)!important;
+  grid-template-columns:1fr!important;
+}
+html.onehome-mint-error-state #onehomeFounderMintPage .founder-mint-art{
+  display:none!important;
+}
+html.onehome-mint-error-state #onehomeFounderMintPage .founder-mint-details{
+  padding:28px!important;
+}
+html.onehome-mint-error-state #onehomeFounderMintPage .founder-mint-actions{
+  display:none!important;
+}
+@media(max-width:780px){
+  html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-content{
+    padding:12px 10px 30px!important;
+  }
+  html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-shell{
+    border-radius:14px!important;
+  }
+  html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-art{
+    padding:10px 10px 12px!important;
+  }
+  html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-crate-scene{
+    aspect-ratio:16/9!important;
+    max-height:235px!important;
+  }
+  html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-details{
+    padding:16px 14px 18px!important;
+  }
+  html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-brandline h1{
+    font-size:30px!important;
+  }
+  html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-stats div{
+    min-height:62px!important;
+    padding:8px 9px!important;
+  }
+  html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .founder-mint-quantity-control{
+    grid-template-columns:minmax(0,1fr) auto!important;
+    padding:10px 11px!important;
+  }
+  html.onehome-simple-public-mint.onehome-xrpl-public-mint #onehomeFounderMintPage .onehome-mint-wallet-steps{
+    font-size:8px!important;
+    line-height:1.4!important;
+  }
+}
+
+</style>
+<script>try{if(new URLSearchParams(location.search).get('route')==='rare-routes')document.documentElement.classList.add('rare-routes-public-mint')}catch(_e){}</script>
+<script src="/shared/onehome-auth-storage-v146746.js?v=146746"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/shared/onehome-mint-source-v146766.js?v=146766"></script>
+<script src="/shared/onehome-x-mobile-handoff-v146747.js?v=146747"></script>
+
+<link rel="stylesheet" href="/shared/onehome-interior-shell-v1467141.css?v=1467141">
+  <link rel="stylesheet" href="/shared/onehome-global-appearance-v1467142.css?v=1467141">
+</head>
+<body>
+<div class="page-view active" id="onehomeFounderMintPage" aria-label="Published mint page">
+  <section class="founder-mint-stage">
+    <header class="passport-site-strip" aria-label="One Home mint page">
+      <div class="passport-site-brand">
+        <button class="passport-onehome-nav-button" type="button" id="founderMintOptionsBtn" aria-label="Return to One Home" title="Return to One Home">
+          <img src="/assets/one-home-logo.png?v=1369" alt="One Home — EST. 1978">
+        </button>
+        <span class="passport-site-path">ONE HOME <i>→</i> <span id="founderMintPathSection">PUBLIC MINT</span> <i>→</i> <span id="founderMintHeaderPath">MINT</span></span>
+      </div>
+    </header>
+
+    <main class="founder-mint-content">
+      <section class="founder-mint-shell" aria-labelledby="founderMintHeading">
+        <div class="founder-mint-art" aria-label="Published collection artwork">
+          <div class="founder-mint-art-topline">
+            <span id="founderMintDropLabel">PUBLISHED MINT</span>
+            <span id="founderMintSealStatus">LOADING</span>
+          </div>
+
+          <div class="founder-crate-scene" id="founderMintArtworkStage">
+            <img id="founderMintArtwork" class="founder-mint-live-art" src="/assets/one-home-image-placeholder.png?v=1369" data-default-src="/assets/one-home-image-placeholder.png?v=1369" alt="Published mint artwork is loading">
+            <div id="founderMintCrateFallback" class="founder-mint-fallback-art" aria-hidden="true" hidden>
+              <div class="founder-crate-shadow"></div>
+              <div class="founder-crate">
+                <div class="founder-crate-plank founder-crate-plank-one"></div>
+                <div class="founder-crate-plank founder-crate-plank-two"></div>
+                <div class="founder-crate-plank founder-crate-plank-three"></div>
+                <div class="founder-crate-brace founder-crate-brace-left"></div>
+                <div class="founder-crate-brace founder-crate-brace-right"></div>
+                <div class="founder-crate-stamp">
+                  <small>ONE HOME</small><strong>MINT</strong><b>COLLECTION</b><span id="founderMintCrateSupply">— / —</span>
+                </div>
+                <div class="founder-crate-seal">88</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="founder-art-caption">
+            <p class="passport-eyebrow" id="founderMintArtEyebrow">Published on One Home</p>
+            <h2 id="founderMintRevealTitle">LOADING COLLECTION</h2>
+            <p id="founderMintRevealCopy" hidden></p>
+          </div>
+        </div>
+
+        <div class="founder-mint-details">
+          <div class="founder-mint-brandline">
+            <img src="/assets/one-home-logo.png?v=1369" alt="One Home">
+            <div><p class="passport-eyebrow" id="founderMintAccessLabel">One Home Mint</p><h1 id="founderMintHeading"><span id="founderMintName">LOADING MINT</span></h1></div>
+          </div>
+
+          <p class="founder-mint-intro" id="founderMintDescription">Loading the collection information saved by the creator.</p>
+
+          <div class="founder-ready-banner" id="founderMintReadyBanner">
+            <span class="founder-ready-check" id="founderMintReadyIcon">…</span>
+            <div><strong id="founderMintReadyTitle">Checking your entry</strong><small id="founderMintWallet">Sign in and verify the receiving wallet to continue.</small></div>
+          </div>
+
+          <div class="founder-mint-stats" aria-label="Published mint details">
+            <div><small>PRICE</small><strong id="founderMintPrice">—</strong></div>
+            <div><small>REMAINING</small><strong id="founderMintSupply">—</strong></div>
+            <div><small>STATUS</small><strong id="founderMintStatusLabel">LOADING</strong></div>
+            <div><small>LIMIT</small><strong id="founderMintQuantity">—</strong></div>
+          </div>
+
+          <div class="founder-includes" id="founderMintIncludes"><div><span>•</span><strong>Loading collection features</strong></div></div>
+          <p class="founder-payment-note" id="founderMintPaymentNote">The saved mint price and collection requirements will appear here.</p>
+
+          <div class="founder-mint-actions">
+            <button class="founder-mint-button" id="founderMintXamanBtn" type="button" disabled>
+              <img src="/assets/wallets/xaman.svg" alt="" aria-hidden="true"><span><small>MINT WITH</small><strong>XAMAN</strong></span>
+            </button>
+            <button class="founder-mint-button" id="founderMintCrossmarkBtn" type="button" disabled>
+              <img src="/assets/wallets/crossmark.png" alt="" aria-hidden="true"><span><small>MINT WITH</small><strong>CROSSMARK</strong></span>
+            </button>
+            <button class="founder-mint-button" id="founderMintJoeyBtn" type="button" disabled hidden>
+              <span aria-hidden="true" style="font-size:22px;font-weight:1000;line-height:1">J</span><span><small>MINT WITH</small><strong>JOEY WALLET</strong></span>
+            </button>
+            <button class="founder-mint-button" id="founderMintMetaMaskBtn" type="button" disabled hidden style="grid-column:1/-1">
+              <span><small>MINT WITH</small><strong>METAMASK · EVM TEST NETWORK</strong></span>
+            </button>
+          </div>
+
+          <div class="onehome-mint-progress" id="onehomeMintProgress" aria-label="Mint progress" hidden>
+            <span data-mint-step="wallet">Wallet</span>
+            <span data-mint-step="access">Access</span>
+            <span data-mint-step="prepare">Prepare</span>
+            <span data-mint-step="approve">Approve</span>
+            <span data-mint-step="complete">Complete</span>
+          </div>
+          <div class="founder-mint-status is-preparing" id="founderMintStatus" role="status" aria-live="polite">
+            <strong>LOADING PUBLISHED MINT</strong><span>One Home is retrieving this campaign’s published details.</span>
+          </div>
+          <button class="founder-mint-entry-button" id="founderMintVerifyBtn" type="button" hidden>Sign In and Verify Access</button>
+          <p class="founder-mint-fineprint">Your wallet will show the full transaction before anything is approved.</p>
+          <button class="founder-mint-entry-button" id="founderMintedNftsBtn" type="button">Recently Minted</button>
+          <button class="founder-mint-entry-button" id="founderMintShareXBtn" type="button">Share Mint on X</button>
+        </div>
+      </section>
+    </main>
+  </section>
+</div>
+<script type="module" src="/assets/vendor/onehome-joey-wallet-v146799.js"></script>
+<script src="/passport/campaign-mint-page.js?v=1467276"></script>
+
+<script defer src="/shared/onehome-interior-shell-v1467141.js?v=1467200"></script>
+</body>
+</html>

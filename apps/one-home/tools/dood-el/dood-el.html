@@ -2,19 +2,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="/shared/onehome-global-appearance-v1467200.js?v=1467200"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dood-el | Pixel Art Creator</title>
   <meta name="description" content="Create pixel art with Dood-el—our custom XRPL-powered drawing tool. Save, export, animate, and build your Noggin masterpiece." />
   <meta name="keywords" content="doodel, pixel art, 32x32 draw tool, nft art, doodbrand, xrpl, mint NFT, noggins, $dOOd, pixel creator" />
   <meta property="og:title" content="Dood-el | Pixel Creator" />
-  <meta property="og:description" content="Draw, save, animate, and export pixel art. Unlock DOOD MODE for layers + animation." />
+  <meta property="og:description" content="Draw, save, animate, and export pixel art. Unlock ADVANCED TOOLS for layers + animation." />
   <meta property="og:image" content="https://www.doodbrand.com/assets/doodel-preview.png" />
   <meta property="og:url" content="https://www.doodbrand.com/dood-el.html" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@doodxrpl" />
   <meta name="twitter:title" content="Dood-el | Pixel Creator" />
-  <meta name="twitter:description" content="Pixel draw. Save. Animate. Export. Unlock DOOD MODE." />
+  <meta name="twitter:description" content="Pixel draw. Save. Animate. Export. Unlock ADVANCED TOOLS." />
   <meta name="twitter:image" content="https://www.doodbrand.com/assets/doodel-preview.png">
 
   <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
@@ -151,7 +152,7 @@
   <script src="https://unpkg.com/xrpl@2.13.0/build/xrpl-latest.min.js" defer></script>
   <script src="https://xumm.app/assets/cdn/xumm-oauth2-pkce.min.js" defer></script>
 
-  <!-- GIF Export (DOOD MODE) -->
+  <!-- GIF Export (ADVANCED TOOLS) -->
   <script src="https://cdn.jsdelivr.net/npm/gif.js.optimized/dist/gif.js" defer></script>
 <style id="dood-brand-header-style">
   .dood-return-header{position:sticky;top:0;z-index:99999;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 18px;background:#050806;border-bottom:1px solid rgba(85,255,154,.35);box-shadow:0 12px 30px rgba(0,0,0,.35);font-family:Arial,Helvetica,sans-serif}
@@ -188,7 +189,7 @@
   .dood-logo,
   .site-logo,
   .app-logo {
-    background: transparent url('/assets/dood-portal-guide-v54.png?v=54') center/contain no-repeat !important;
+    background: transparent url('/assets/one-home-logo.png?v=107') center/contain no-repeat !important;
     color: transparent !important;
     overflow: hidden !important;
   }
@@ -207,7 +208,7 @@
   .dood-logo img,
   .site-logo img,
   .app-logo img {
-    content: url('/assets/dood-portal-guide-v54.png?v=54') !important;
+    content: url('/assets/one-home-logo.png?v=107') !important;
     width: 100% !important;
     height: 100% !important;
     object-fit: contain !important;
@@ -218,7 +219,7 @@
 
 <style id="dood-v54-portal-logo-component">
   :root {
-    --dood-portal-logo-url: url('/assets/dood-portal-guide-v54.png?v=54');
+    --dood-portal-logo-url: url('/assets/one-home-logo.png?v=107');
   }
 
   .dood-portal-logo,
@@ -264,7 +265,7 @@
   .logo-mark img,
   .site-logo img,
   .app-logo img {
-    content: url('/assets/dood-portal-guide-v54.png?v=54') !important;
+    content: url('/assets/one-home-logo.png?v=107') !important;
     width: 100% !important;
     height: 100% !important;
     display: block !important;
@@ -484,13 +485,18 @@
   }
 </style>
 
+<link rel="stylesheet" href="/shared/onehome-choice-header-v146780.css?v=146780">
+<script defer src="/shared/onehome-choice-header-v1467200.js?v=1467200"></script>
+
+<link rel="stylesheet" href="/shared/onehome-interior-shell-v1467141.css?v=1467141">
+  <link rel="stylesheet" href="/shared/onehome-global-appearance-v1467142.css?v=1467141">
 </head>
 
 <body class="creator-tool-page" data-lab-active="tools" data-lab-badge="Dood-el" data-lab-page="/lab/Dood-el.html">
 
 <div class="dood-return-header">
   <a class="dood-brand" href="../../index.html#districts" aria-label="Back to Dood Labs">
-    <img src="/assets/dood-portal-guide-v54.png?v=54" alt="Dood Labs logo">
+    <img src="/assets/one-home-logo.png?v=107" alt="One Home logo">
     <strong>Dood Labs</strong>
   </a>
   <div class="dood-return-actions">
@@ -522,11 +528,11 @@
     <p>💎 <a href="https://xrp.cafe/collection/dood-el" target="_blank" rel="noopener">Explore the Dood-el Collection on XRP.Cafe</a></p>
     <div class="wallet-strip">
       <span id="labWalletLine" class="pill-lab warn">Wallet: not connected</span>
-      <span id="labGatePill" class="pill-lab warn">Dood Mode: locked (1M $dOOd)</span></div>
+      <span id="labGatePill" class="pill-lab warn">Advanced Tools: locked (1M $dOOd)</span></div>
     <div class="cta-row">
       <button id="doodModeBtn" class="dood-btn" aria-haspopup="dialog" type="button">
         <span>✨</span>
-        <span>$dOOd Holders — DOOD MODE</span>
+        <span>$dOOd Holders — ADVANCED TOOLS</span>
         <span>→</span>
       </button>
       <button id="doodClear" class="dood-ghost" type="button" title="Clear wallet access">Disconnect</button>
@@ -607,13 +613,13 @@
   <div class="legend">
     <p><strong>Legend:</strong> 🖌️ Brush | 🧽 Eraser | 🪣 Fill | ↩️ Undo | ↪️ Redo | 🧼 Clear | 🔲 Grid | 🪞 Mirror | 🧱 Brick | ⬇️ Export | 🐦 Share | 🖼️ Upload</p></div>
 
-  <!-- DOOD MODE PANELS -->
+  <!-- ADVANCED TOOLS PANELS -->
   <div class="panelRow">
     <div class="card lockedWrap locked" id="doodPanel">
-      <div class="lockBadge" id="doodLockBadge">🔒 DOOD MODE</div>
-      <div class="lockedCover" id="doodLockedCover" title="Unlock DOOD MODE"></div>
+      <div class="lockBadge" id="doodLockBadge">🔒 ADVANCED TOOLS</div>
+      <div class="lockedCover" id="doodLockedCover" title="Unlock ADVANCED TOOLS"></div>
 
-      <h3>DOOD MODE Studio</h3>
+      <h3>ADVANCED TOOLS Studio</h3>
       <p class="muted" style="margin-top:-4px;">
         Layers… animation… pro tools… transparent exports… project files… GIF export.
       </p>
@@ -684,7 +690,7 @@
     <div class="card">
       <h3>Quick Tips</h3>
       <p class="muted" style="margin-top:-2px;">
-        Saves are local (browser). DOOD MODE unlocks layers + animation + pro export + GIF.
+        Saves are local (browser). ADVANCED TOOLS unlocks layers + animation + pro export + GIF.
       </p>
 
       <div class="row" style="margin-top:8px;">
@@ -698,7 +704,7 @@
 
       <div class="links">
         <a href="../noggins/Noggins.html" target="_blank" rel="noopener">✏️ Noggins</a>
-        <a href="dot-dood.html" target="_blank" rel="noopener">✏️ Dot-Dood</a></div></div></div>
+        <a href="/tools/dot-dood/dot-dood.html" target="_blank" rel="noopener">✏️ Dot-Dood</a></div></div></div>
 
   <section class="info" style="text-align:center;margin:18px auto 0;max-width:900px;">
     <p>🧠 <strong>Tip:</strong> Upload an image… it auto-pixelizes to your current grid (12/32/64). Use Alpha Cut to keep transparency.</p>
@@ -706,11 +712,11 @@
 
   <div class="social-footer">
     <h2 style="font-family:'Permanent Marker',cursive;color:#00ccff;margin:0 0 14px;">Join the Conversation</h2>
-    <a href="https://twitter.com/doodxrpl" target="_blank" rel="noopener" title="Follow on X"><img src="/assets/dood-portal-guide-v54.png?v=54" alt="Twitter"></a>
-    <a href="https://doodscord.com" target="_blank" rel="noopener" title="Join Discord"><img src="/assets/dood-portal-guide-v54.png?v=54" alt="Discord"></a>
-    <a href="https://t.me/doodxrpl" target="_blank" rel="noopener" title="Join Telegram"><img src="/assets/dood-portal-guide-v54.png?v=54" alt="Telegram"></a>
-    <a href="https://www.youtube.com/@doodxrpl" target="_blank" rel="noopener" title="YouTube"><img src="/assets/dood-portal-guide-v54.png?v=54" alt="YouTube"></a>
-    <a href="https://www.tiktok.com/@dooddoodles0?_t=ZP-8uox1mM4LaJ&_r=1" target="_blank" rel="noopener" title="TikTok"><img src="/assets/dood-portal-guide-v54.png?v=54" alt="TikTok"></a></div>
+    <a href="https://twitter.com/doodxrpl" target="_blank" rel="noopener" title="Follow on X"><img src="/assets/one-home-logo.png?v=107" alt="Twitter"></a>
+    <a href="https://doodscord.com" target="_blank" rel="noopener" title="Join Discord"><img src="/assets/one-home-logo.png?v=107" alt="Discord"></a>
+    <a href="https://t.me/doodxrpl" target="_blank" rel="noopener" title="Join Telegram"><img src="/assets/one-home-logo.png?v=107" alt="Telegram"></a>
+    <a href="https://www.youtube.com/@doodxrpl" target="_blank" rel="noopener" title="YouTube"><img src="/assets/one-home-logo.png?v=107" alt="YouTube"></a>
+    <a href="https://www.tiktok.com/@dooddoodles0?_t=ZP-8uox1mM4LaJ&_r=1" target="_blank" rel="noopener" title="TikTok"><img src="/assets/one-home-logo.png?v=107" alt="TikTok"></a></div>
 </main>
 
 <footer class="lab-footer">
@@ -721,10 +727,10 @@
     <p style="color:#777;font-size:0.9rem;">Memes with utility. NFTs with soul. Built by the people.</p></div>
 </footer>
 
-<!-- DOOD MODE Modal -->
+<!-- ADVANCED TOOLS Modal -->
 <div id="doodModeModal" class="dood-modal" role="dialog" aria-modal="true" aria-labelledby="doodModeTitle">
   <div class="dood-dialog">
-    <h3 id="doodModeTitle">DOOD MODE</h3>
+    <h3 id="doodModeTitle">ADVANCED TOOLS</h3>
     <p id="doodModeStatus">Connect your wallet to verify $dOOd holdings.</p>
     <div class="modal-actions">
       <button id="doodConnect" class="dood-primary" type="button">Connect &amp; Verify</button>
@@ -735,10 +741,10 @@
 
 <script>
 /* =========================================================
-   DOOD-EL CORE + DOOD MODE STUDIO (single-file)
+   DOOD-EL CORE + ADVANCED TOOLS STUDIO (single-file)
    Fixes:
    - canvas selector bug (was $("canvas"), now $("canvas"))
-   - DOOD MODE unlock actually unlocks panel (window.State + window.applyDoodLock)
+   - ADVANCED TOOLS unlock actually unlocks panel (window.State + window.applyDoodLock)
    - re-added Image Upload -> pixelize into grid (no CORS issues)
    ========================================================= */
 
@@ -1475,7 +1481,7 @@ function shareOnX(){
   window.open(url,"_blank","noopener");
 }
 
-/* ---------- GIF EXPORT (DOOD MODE) ---------- */
+/* ---------- GIF EXPORT (ADVANCED TOOLS) ---------- */
 async function exportGIF(){
   if(State.frames.length < 2){
     toast("Add at least 2 frames to export a GIF.");
@@ -1553,7 +1559,7 @@ async function exportGIF(){
   gif.render();
 }
 
-/* ---------- DOOD MODE: layers ---------- */
+/* ---------- ADVANCED TOOLS: layers ---------- */
 function refreshPanels(){
   const L = layers();
   const list = $("layersList");
@@ -1673,7 +1679,7 @@ function flattenToSingleGrid(){
   return out;
 }
 
-/* ---------- DOOD MODE: frames + animation ---------- */
+/* ---------- ADVANCED TOOLS: frames + animation ---------- */
 let animTimer = null;
 function addFrame(){
   pushHistory();
@@ -1722,7 +1728,7 @@ function stopAnim(){
   if(animTimer){ clearInterval(animTimer); animTimer=null; }
 }
 
-/* ---------- DOOD MODE: project file ---------- */
+/* ---------- ADVANCED TOOLS: project file ---------- */
 function exportProject(){
   const payload = {
     v: 1,
@@ -1798,7 +1804,7 @@ function escapeHtml(s){
   }[c]));
 }
 
-/* ---------- DOOD MODE lock helpers ---------- */
+/* ---------- ADVANCED TOOLS lock helpers ---------- */
 function applyDoodLock(){
   const panel = $("doodPanel");
   const badge = $("doodLockBadge");
@@ -1806,11 +1812,11 @@ function applyDoodLock(){
 
   if(State.doodUnlocked){
     panel.classList.remove("locked");
-    badge.textContent = "🔓 DOOD MODE";
+    badge.textContent = "🔓 ADVANCED TOOLS";
     pill.textContent = "Unlocked. Tools live.";
   }else{
     panel.classList.add("locked");
-    badge.textContent = "🔒 DOOD MODE";
+    badge.textContent = "🔒 ADVANCED TOOLS";
     pill.textContent = "Locked. Connect to verify.";
   }
   refreshPanels();
@@ -1836,7 +1842,7 @@ window.closeDoodModal = closeDoodModal;
 
 <script>
 /* =========================================================
-   DOOD MODE GATE — shared Lab wallet (DoodLabGate)
+   ADVANCED TOOLS GATE — shared Lab wallet (DoodLabGate)
    ========================================================= */
 (function(){
   const doodBtn = document.getElementById('doodModeBtn');
@@ -1868,7 +1874,7 @@ window.closeDoodModal = closeDoodModal;
     try{
       if (window.State) window.State.doodUnlocked = false;
       window.applyDoodLock?.();
-      if (titleEl) titleEl.textContent = 'DOOD MODE';
+      if (titleEl) titleEl.textContent = 'ADVANCED TOOLS';
       if (statusEl) statusEl.textContent = 'Connect your wallet to verify $dOOd holdings (≥ 1M).';
     }catch{}
   }
@@ -1876,8 +1882,8 @@ window.closeDoodModal = closeDoodModal;
     try{
       if (window.State) window.State.doodUnlocked = true;
       window.applyDoodLock?.();
-      window.toast?.('DOOD MODE unlocked.');
-      if (titleEl) titleEl.textContent = 'DOOD MODE — Unlocked';
+      window.toast?.('ADVANCED TOOLS unlocked.');
+      if (titleEl) titleEl.textContent = 'ADVANCED TOOLS — Unlocked';
       if (statusEl) statusEl.textContent = 'Access granted. Welcome in.';
       closeDoodModal();
     }catch{}
@@ -1950,7 +1956,7 @@ window.closeDoodModal = closeDoodModal;
 
 <script id="dood-v54-portal-logo-component-js">
 (function () {
-  const logoUrl = "/assets/dood-portal-guide-v54.png?v=54";
+  const logoUrl = "/assets/one-home-logo.png?v=107";
 
   function goHome(event) {
     event.preventDefault();
@@ -1961,10 +1967,10 @@ window.closeDoodModal = closeDoodModal;
     if (!el) return;
     el.classList.add("dood-portal-logo", "is-alive");
     el.setAttribute("role", "link");
-    el.setAttribute("aria-label", "Dood Labs Home");
-    el.setAttribute("title", "Dood Labs Home");
+    el.setAttribute("aria-label", "One Home");
+    el.setAttribute("title", "One Home");
     el.onclick = goHome;
-    el.innerHTML = '<img src="' + logoUrl + '" alt="Dood Labs Portal Guide">';
+    el.innerHTML = '<img src="' + logoUrl + '" alt="One Home">';
   }
 
   function initDoodPortalLogo() {
@@ -1990,13 +1996,11 @@ window.closeDoodModal = closeDoodModal;
 <script id="dood-v56-theme-modes-js">
 (function(){
   const modes = [
-    { id: "dood", label: "Dood Mode" },
-    { id: "doodette", label: "Doodette Mode" },
     { id: "dark", label: "Dark Mode" }
   ];
 
   function applyTheme(mode){
-    const clean = modes.some(m => m.id === mode) ? mode : "dood";
+    const clean = modes.some(m => m.id === mode) ? mode : "dark";
     document.body.classList.remove("theme-dood", "theme-doodette", "theme-dark");
     document.body.classList.add("theme-" + clean);
     localStorage.setItem("doodLabsThemeMode", clean);
@@ -2006,6 +2010,7 @@ window.closeDoodModal = closeDoodModal;
   }
 
   function addThemeSwitcher(){
+    return;
     if(document.getElementById("doodThemeSwitcher")) return;
     const wrap = document.createElement("div");
     wrap.id = "doodThemeSwitcher";
@@ -2022,8 +2027,7 @@ window.closeDoodModal = closeDoodModal;
   }
 
   function initThemeModes(){
-    addThemeSwitcher();
-    applyTheme(localStorage.getItem("doodLabsThemeMode") || "dood");
+    applyTheme((function(saved){return (saved === "dood" || saved === "doodette" || saved === "dark") ? "dark" : (saved || "dark");})(localStorage.getItem("doodLabsThemeMode")));
   }
 
   if(document.readyState === "loading"){
@@ -2050,7 +2054,7 @@ window.closeDoodModal = closeDoodModal;
     setTimeout(function(){
       const notice = document.getElementById("profileAuthNotice") || document.getElementById("profileNotice");
       if(notice){
-        notice.textContent = "Email confirmed. You can now log in and save your profile.";
+        notice.textContent = "Email confirmed. You can now log in and save your Passport.";
         notice.classList.add("show");
         notice.style.display = "block";
       }
@@ -2068,5 +2072,7 @@ window.closeDoodModal = closeDoodModal;
 })();
 </script>
 
+
+<script defer src="/shared/onehome-interior-shell-v1467141.js?v=1467200"></script>
 </body>
 </html>

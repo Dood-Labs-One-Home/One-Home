@@ -1,0 +1,164 @@
+<!doctype html>
+<!-- One Home v14.67.218 — canonical live-first Open Mints directory; equal-size cards and authoritative live availability; stale directory snapshots are never displayed in live mint details. -->
+<html lang="en">
+<head>
+  <script src="/shared/onehome-global-appearance-v1467200.js?v=1467200"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Open Mints · One Home</title>
+<link rel="icon" href="/favicon.png">
+<style>
+:root{color-scheme:dark;--panel:rgba(8,10,12,.95);--card:#0c1012;--line:#38453c;--pink:#ed22cc;--gold:#f7d84a;--muted:#d2d7d4;--green:#7dff99}
+*{box-sizing:border-box}
+html{scrollbar-gutter:stable}
+body{margin:0;min-height:100vh;font-family:Arial,sans-serif;color:#fff;background-color:#090909;background-image:linear-gradient(rgba(0,0,0,.56),rgba(0,0,0,.56)),url('/assets/one-home-room-pc-background.webp');background-position:center top;background-size:cover;background-repeat:no-repeat;background-attachment:scroll}
+body.detail-open{overflow:hidden}
+button,input{font:inherit}
+[hidden]{display:none!important}
+.wrap{width:min(1180px,calc(100% - 36px));margin:0 auto;padding:26px 0 72px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:24px}
+.brand{display:flex;align-items:center;gap:13px;color:#fff;text-decoration:none;font-weight:900;letter-spacing:.04em}
+.brand img{width:68px;height:68px;object-fit:contain}
+.back{display:inline-flex;align-items:center;border:1px solid #67525f;border-radius:999px;padding:12px 18px;color:#fff;text-decoration:none;font-weight:850;background:#171117}
+.hero,.mint-shell{background:var(--panel);border:1px solid var(--line);border-radius:26px;padding:28px;box-shadow:0 22px 70px rgba(0,0,0,.3)}
+.hero{margin-bottom:22px}
+.kicker{display:inline-flex;border:1px solid rgba(247,216,74,.55);border-radius:999px;padding:7px 11px;color:var(--gold);font-size:12px;font-weight:900;letter-spacing:.09em;text-transform:uppercase}
+.hero h1{font-size:clamp(42px,7vw,72px);line-height:1;margin:18px 0 10px;color:var(--pink)}
+.hero p{margin:0;color:var(--muted);font-size:18px;line-height:1.55;max-width:760px}
+.search-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;margin-bottom:20px}
+.search-row label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.search-row input{width:100%;min-height:48px;border:1px solid #526158;border-radius:14px;background:#fff;color:#111;padding:12px 15px;font-size:16px}
+.btn{display:inline-flex;justify-content:center;align-items:center;min-height:46px;border:0;border-radius:999px;padding:12px 19px;background:#941684;color:#fff;font-weight:900;text-decoration:none;cursor:pointer}
+.btn:hover,.btn:focus-visible{background:#b41a9f;outline:none;box-shadow:0 0 0 3px rgba(237,34,204,.2)}
+.btn.alt{background:#222c35}
+.btn.alt:hover,.btn.alt:focus-visible{background:#303d49}
+.result-line{display:flex;justify-content:space-between;gap:14px;align-items:center;margin:0 0 16px;color:var(--muted)}
+.result-line strong{color:#fff}
+.mint-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:16px;align-items:stretch}
+.mint-card{appearance:none;width:100%;height:100%;padding:0;overflow:hidden;border:1px solid #3b4941;border-radius:17px;background:var(--card);color:#fff;text-align:left;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,.22);transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;display:flex;flex-direction:column}
+.mint-card:hover,.mint-card:focus-visible{transform:translateY(-2px);border-color:var(--pink);box-shadow:0 14px 34px rgba(0,0,0,.34),0 0 0 3px rgba(237,34,204,.13);outline:none}
+.mint-card-art{display:block;width:100%;aspect-ratio:1/1;background:#161b1d;overflow:hidden;flex:0 0 auto}
+.mint-card-art img{display:block;width:100%;height:100%;object-fit:cover}
+.mint-card-name{display:block;padding:12px 13px 10px;font-size:16px;font-weight:900;line-height:1.25;overflow-wrap:anywhere;min-height:60px}
+.state{min-height:160px;border:1px solid #3b4941;border-radius:18px;padding:32px;text-align:center;color:var(--muted);line-height:1.55;background:#0c1012;display:grid;place-items:center}
+.state.error{border-color:#753939;color:#ffd6d6}
+.retry{margin-top:13px}
+.detail-overlay{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:22px;background:rgba(0,0,0,.78);backdrop-filter:blur(5px)}
+.detail-panel{position:relative;width:min(900px,100%);max-height:min(820px,calc(100vh - 44px));overflow:auto;overscroll-behavior:contain;background:#0a0e10;border:1px solid #526158;border-radius:25px;padding:24px;box-shadow:0 28px 90px rgba(0,0,0,.62)}
+.detail-close{position:sticky;top:0;z-index:2;float:right;width:44px;height:44px;border:1px solid #5a6760;border-radius:999px;background:#182027;color:#fff;font-size:25px;font-weight:900;cursor:pointer}
+.detail-layout{display:grid;grid-template-columns:minmax(260px,.85fr) minmax(300px,1.15fr);gap:26px;clear:both}
+.detail-art{width:100%;aspect-ratio:1/1;border:1px solid #405049;border-radius:19px;overflow:hidden;background:#161b1d}
+.detail-art img{display:block;width:100%;height:100%;object-fit:cover}
+.detail-kicker{color:var(--green);font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.detail-info h2{font-size:clamp(30px,5vw,50px);line-height:1;margin:10px 0 7px;overflow-wrap:anywhere}
+.creator{color:var(--gold);font-weight:850;margin-bottom:16px}
+.description{color:var(--muted);line-height:1.58;white-space:pre-wrap;margin:0 0 18px}
+.badges{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:17px}
+.badge{border:1px solid #4c5a53;border-radius:999px;padding:6px 9px;color:#dfe7e3;font-size:12px;font-weight:850}
+.details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.detail-stat{background:#111718;border:1px solid #303e38;border-radius:13px;padding:11px 12px}
+.detail-stat small{display:block;color:#aeb7b2;margin-bottom:4px}
+.detail-stat strong{display:block;overflow-wrap:anywhere}
+.detail-actions{display:flex;gap:10px;flex-wrap:wrap}
+@media(min-width:1050px){.mint-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media(max-width:720px){body{background-image:linear-gradient(rgba(0,0,0,.56),rgba(0,0,0,.56)),url('/assets/one-home-room-mobile-background.webp')}.wrap{width:min(100% - 20px,1180px);padding-top:14px}.top{align-items:flex-start}.brand span{display:none}.brand img{width:58px;height:58px}.back{padding:10px 14px}.hero,.mint-shell{padding:20px 16px;border-radius:21px}.search-row{grid-template-columns:1fr 1fr}.search-row input{grid-column:1/-1}.detail-layout{grid-template-columns:1fr}.detail-panel{padding:17px}.detail-overlay{padding:10px}.details{grid-template-columns:1fr}}
+@media(max-width:420px){.mint-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.mint-card-name{padding:10px;font-size:14px;min-height:55px}}
+
+.directory-section{margin-top:22px}
+.directory-section:first-of-type{margin-top:0}
+.directory-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin:0 0 14px;padding-bottom:12px;border-bottom:1px solid #344039}
+.directory-head h2{margin:0;font-size:24px}
+.directory-head p{margin:5px 0 0;color:var(--muted);line-height:1.45}
+.test-directory{border:1px solid rgba(247,216,74,.5);border-radius:20px;padding:18px;background:rgba(72,53,4,.12)}
+.test-pill{display:inline-flex;align-items:center;border:1px solid rgba(247,216,74,.65);border-radius:999px;padding:6px 10px;color:var(--gold);font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+.mint-card-test{border-color:rgba(247,216,74,.55)}
+.mint-card-test:hover,.mint-card-test:focus-visible{border-color:var(--gold);box-shadow:0 14px 34px rgba(0,0,0,.34),0 0 0 3px rgba(247,216,74,.13)}
+.mint-card-meta{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px 11px;margin-top:auto;min-height:39px;align-content:flex-start}
+.mint-card-chip{border:1px solid #46534c;border-radius:999px;padding:4px 7px;font-size:10px;font-weight:900;color:#dfe7e3}
+.mint-card-chip.test{border-color:rgba(247,216,74,.55);color:var(--gold)}
+.test-load-note{margin:12px 0 0;color:#e9d98e;font-size:13px;line-height:1.45}
+
+@media(prefers-reduced-motion:reduce){.mint-card{transition:none}.mint-card:hover,.mint-card:focus-visible{transform:none}}
+</style>
+
+<link rel="stylesheet" href="/shared/onehome-interior-shell-v1467141.css?v=1467141">
+<script src="/shared/onehome-chain-identity-v1467114.js?v=1467276"></script>
+  <link rel="stylesheet" href="/shared/onehome-global-appearance-v1467142.css?v=1467141">
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <a class="brand" href="/one-home/" aria-label="One Home"><img src="/assets/one-home-logo.png" alt="One Home"><span>ONE HOME · RARE INK STUDIO</span></a>
+    <a class="back" href="/mint-studio.html">← Back to Mint</a>
+  </header>
+
+  <section class="hero">
+    <span class="kicker">Rare Ink Studio</span>
+    <h1>Open Mints</h1>
+    <p>Explore live collections plus One Home test mints across supported test networks. Test mints use test-network currency only.</p>
+  </section>
+
+  <section class="mint-shell">
+    <form class="search-row" id="searchForm" role="search">
+      <label for="mintSearch">Search open mints</label>
+      <input id="mintSearch" type="search" placeholder="Search by mint name or creator" autocomplete="off">
+      <button class="btn" type="submit">Search</button>
+      <button class="btn alt" id="clearSearch" type="button" hidden>Clear</button>
+    </form>
+    <div class="result-line" id="resultLine" hidden><span><strong id="resultCount">0</strong> matching mints</span><span>Live + Test Directory</span></div>
+    <div id="loadingState" class="state">Loading open and test mints…</div>
+    <div id="errorState" class="state error" hidden><div><strong>Mint directory could not be loaded.</strong><br>Please try again.<div><button class="btn retry" id="retryBtn" type="button">Try Again</button></div></div></div>
+    <div id="noResultsState" class="state" hidden>No mints match your search.</div>
+
+    <!-- Canonical directory order: production/live first, testing second. -->
+    <section class="directory-section" id="live-mints">
+      <div class="directory-head">
+        <div><h2>Live Mints</h2><p>Public collections currently open for real-network minting.</p></div>
+      </div>
+      <div id="liveEmptyState" class="state" hidden>No live mints are open right now.</div>
+      <div class="mint-grid" id="liveMintGrid" hidden></div>
+    </section>
+
+    <section class="directory-section test-directory" id="test-mints">
+      <div class="directory-head">
+        <div><h2>Test Mints</h2><p>All available One Home test campaigns across supported test networks. Test-network currency only — no real funds.</p></div>
+        <span class="test-pill">TESTING ONLY</span>
+      </div>
+      <div id="testEmptyState" class="state" hidden>No One Home test mints are available right now.</div>
+      <div class="mint-grid" id="testMintGrid" hidden></div>
+      <div class="test-load-note" id="testLoadNote" hidden>The complete test directory could not be loaded. Any public test mints that One Home could recover are still shown.</div>
+    </section>
+  </section>
+</main>
+
+<div class="detail-overlay" id="detailOverlay" hidden>
+  <section class="detail-panel" role="dialog" aria-modal="true" aria-labelledby="detailName">
+    <button class="detail-close" id="detailClose" type="button" aria-label="Close mint details">×</button>
+    <div class="detail-layout">
+      <div class="detail-art"><img id="detailImage" src="/assets/one-home-image-placeholder.png" alt="Collection artwork"></div>
+      <div class="detail-info">
+        <div class="detail-kicker" id="detailKicker">Open Mint</div>
+        <h2 id="detailName">Mint Details</h2>
+        <div class="creator" id="detailCreator"></div>
+        <p class="description" id="detailDescription"></p>
+        <div class="badges" id="detailBadges"></div>
+        <div class="details" id="detailStats">
+          <div class="detail-stat"><small>Price</small><strong id="detailPrice"></strong></div>
+          <div class="detail-stat"><small>Available</small><strong id="detailAvailable"></strong></div>
+        </div>
+        <div class="detail-actions">
+          <a class="btn" id="detailOpenMint" href="#">Open Mint</a>
+          <button class="btn alt" id="detailShareX" type="button">Share Mint on X</button>
+          <button class="btn alt" id="detailCloseBottom" type="button">Back to Open Mints</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="/shared/onehome-mint-source-v146766.js?v=146766"></script>
+<script src="/open-mints-v1467266.js?v=1467266"></script>
+
+<script defer src="/shared/onehome-interior-shell-v1467141.js?v=1467200"></script>
+</body>
+</html>

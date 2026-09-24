@@ -1,0 +1,19 @@
+/* One Home v14.67.241 — SHRUNK room using existing One Home layout variables. */
+#onehomeShrunkCollabPage{min-height:100dvh;background:transparent!important;color:#fff}
+#onehomeShrunkCollabPage *{box-sizing:border-box}
+#onehomeShrunkCollabPage .oh-shrunk-room{width:min(1080px,calc(100% - 28px));margin:0 auto;padding:94px 0 64px}
+#onehomeShrunkCollabPage .oh-shrunk-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+#onehomeShrunkCollabPage .oh-shrunk-btn{appearance:none;border:1px solid rgba(var(--onehome-neon-rgb,255,43,214),.67)!important;border-radius:999px!important;background:rgba(4,5,9,.90)!important;color:#fff!important;padding:12px 20px!important;font:900 14px/1.2 Arial,sans-serif!important;cursor:pointer;min-height:46px;box-shadow:0 0 10px rgba(var(--onehome-neon-rgb,255,43,214),.12)}
+#onehomeShrunkCollabPage .oh-shrunk-btn:hover{border-color:var(--onehome-neon,#ff2bd6)!important;box-shadow:0 0 16px rgba(var(--onehome-neon-rgb,255,43,214),.30)!important}
+#onehomeShrunkCollabPage .oh-shrunk-btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
+#onehomeShrunkCollabPage .onehome-journey-hero,#onehomeShrunkCollabPage .oh-shrunk-panel{background:rgba(5,6,11,.84);border:1px solid rgba(var(--onehome-neon-rgb,255,43,214),.36);border-radius:23px;padding:28px;margin-bottom:18px}
+#onehomeShrunkCollabPage .onehome-journey-hero h1{font:900 clamp(32px,6vw,64px)/.98 Arial,sans-serif;color:white;margin:4px 0 9px}
+#onehomeShrunkCollabPage .onehome-journey-hero p,#onehomeShrunkCollabPage .oh-shrunk-panel p{color:#f5e4d9;line-height:1.52;max-width:780px}
+#onehomeShrunkCollabPage .oh-shrunk-panel h2{font:900 clamp(20px,3vw,27px) Arial,sans-serif;color:#fff;margin:0 0 7px}
+#onehomeShrunkCollabPage .oh-shrunk-grid{display:grid;grid-template-columns:1.12fr .88fr;gap:16px}
+#onehomeShrunkCollabPage .oh-shrunk-info{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.055);border-radius:17px;padding:17px}
+#onehomeShrunkCollabPage .oh-shrunk-info h3{font:900 19px Arial,sans-serif;color:#fff;margin:0 0 9px}
+#onehomeShrunkCollabPage .oh-shrunk-price{font:900 43px Arial,sans-serif;color:#fff;margin:4px 0 9px}
+#onehomeShrunkCollabPage .oh-shrunk-info ul{padding-left:19px;line-height:1.6}
+#onehomeShrunkCollabPage .oh-shrunk-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+@media(max-width:740px){#onehomeShrunkCollabPage .oh-shrunk-room{width:calc(100% - 20px);padding-top:88px}#onehomeShrunkCollabPage .oh-shrunk-grid{grid-template-columns:1fr}#onehomeShrunkCollabPage .onehome-journey-hero,#onehomeShrunkCollabPage .oh-shrunk-panel{padding:20px}}

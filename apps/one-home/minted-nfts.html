@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#05050a">
+  <title>Recently Minted · One Home</title>
+  <style>
+    :root{color-scheme:dark;--bg:#05050a;--panel:rgba(12,12,20,.76);--text:#fff;--muted:#b9b9c7;--line:rgba(255,255,255,.16);--pink:#ff4fa3;--cyan:#45e5ff}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 15% 0,rgba(255,79,163,.12),transparent 36rem),radial-gradient(circle at 100% 30%,rgba(69,229,255,.10),transparent 34rem),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    body{padding:env(safe-area-inset-top) max(18px,env(safe-area-inset-right)) max(28px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left))}
+    a{color:inherit}.shell{width:min(1240px,100%);margin:0 auto;padding:26px 0 56px}.top{display:flex;align-items:center;gap:14px;justify-content:space-between;flex-wrap:wrap;margin-bottom:34px}.brand{display:flex;align-items:center;gap:12px;text-decoration:none}.brand img{width:54px;height:54px;object-fit:contain}.brand strong{font-size:1.05rem;letter-spacing:.08em;text-transform:uppercase}.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.055);color:#fff;border-radius:999px;padding:11px 16px;font:inherit;font-weight:750;text-decoration:none;cursor:pointer}.btn:hover,.btn:focus-visible{border-color:rgba(69,229,255,.72);outline:none}.hero{margin-bottom:28px}.eyebrow{font-size:.78rem;text-transform:uppercase;letter-spacing:.16em;color:var(--cyan);font-weight:800}.hero h1{font-size:clamp(2.2rem,7vw,5.3rem);line-height:.94;margin:.28em 0 .18em;letter-spacing:-.045em}.hero p{max-width:760px;color:var(--muted);font-size:clamp(1rem,2vw,1.18rem);line-height:1.6;margin:0}.count{margin-top:14px;font-weight:800;color:#fff}.progress{height:3px;overflow:hidden;border-radius:9px;background:rgba(255,255,255,.08);margin:20px 0}.progress span{display:block;width:34%;height:100%;background:linear-gradient(90deg,var(--pink),var(--cyan));animation:slide 1.1s ease-in-out infinite alternate}@keyframes slide{from{transform:translateX(-95%)}to{transform:translateX(290%)}}.status{padding:18px 0;color:var(--muted)}.status.error{color:#ff9fbc}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}.card{min-width:0;border:1px solid var(--line);border-radius:22px;background:var(--panel);overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.24)}.media{aspect-ratio:1/1;background:rgba(255,255,255,.035);display:grid;place-items:center;overflow:hidden}.media img{width:100%;height:100%;object-fit:cover;display:block}.copy{padding:15px}.copy h2{font-size:1rem;margin:0 0 7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meta{display:grid;gap:6px;color:var(--muted);font-size:.82rem}.proof{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.proof a,.proof span{border:1px solid var(--line);border-radius:999px;padding:7px 9px;text-decoration:none;font-size:.75rem}.proof a:hover{border-color:var(--pink)}.more{display:flex;justify-content:center;padding-top:28px}.empty{grid-column:1/-1;border:1px dashed var(--line);border-radius:20px;padding:34px;text-align:center;color:var(--muted)}
+    @media(max-width:560px){.shell{padding-top:18px}.top{margin-bottom:28px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card{border-radius:15px}.copy{padding:10px}.copy h2{font-size:.86rem}.meta{font-size:.72rem}.proof{gap:5px}.proof a,.proof span{font-size:.66rem;padding:6px 7px}.brand strong{display:none}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <div class="top">
+    <a class="brand" href="/one-home/"><img src="/assets/one-home-logo.png?v=107" alt="One Home"><strong>One Home</strong></a>
+    <div class="actions"><a class="btn" id="backMint" href="/open-mints.html">← Back to Mint</a><a class="btn" href="/?oh_return=mintedItemsPage">My NFTs</a><a class="btn" href="/open-mints.html">Open Mints</a></div>
+  </div>
+  <section class="hero">
+    <div class="eyebrow">Ledger-confirmed collection</div>
+    <h1 id="title">Recently Minted</h1>
+    <p id="description">These are the ledger-confirmed NFTs already minted from this collection. Pending or reserved items are never shown here.</p>
+    <div class="count" id="count"></div>
+  </section>
+  <div class="progress" id="progress"><span></span></div>
+  <div class="status" id="status" hidden></div>
+  <section class="grid" id="grid" aria-live="polite"></section>
+  <div class="more"><button class="btn" id="more" type="button" hidden>Load More</button></div>
+</main>
+<script>
+(function(){
+  'use strict';
+  const SUPABASE_URL='https://fshvettlltcujmwvikfq.supabase.co';
+  const SUPABASE_KEY='sb_publishable_ARrX-vYhy8l-yhs6384S_g_n6214taB';
+  const API=SUPABASE_URL+'/functions/v1/platform-mint-reader';
+  const FALLBACK='/assets/one-home-logo.png?v=107';
+  const PAGE_SIZE=48;
+  let offset=0,total=0,hasMore=false,campaign=null,busy=false,seen=new Set();
+  const q=id=>document.getElementById(id);
+  const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const short=v=>{v=String(v||'');return v.length>18?v.slice(0,8)+'…'+v.slice(-7):v};
+  const campaignId=String(new URLSearchParams(location.search).get('campaign')||'').trim();
+  function setBusy(value){busy=value;q('progress').hidden=!value;q('more').disabled=value;q('more').textContent=value?'Loading…':'Load More'}
+  function status(message,error){const el=q('status');el.textContent=message||'';el.hidden=!message;el.classList.toggle('error',!!error)}
+  function imageMarkup(item){const candidates=[];if(item.image_url)candidates.push(String(item.image_url));(Array.isArray(item.image_fallback_urls)?item.image_fallback_urls:[]).forEach(u=>{u=String(u||'');if(u&&!candidates.includes(u))candidates.push(u)});const first=candidates.shift()||FALLBACK;return '<img src="'+esc(first)+'" alt="'+esc(item.name||'NFT')+'" loading="lazy" decoding="async" referrerpolicy="no-referrer" data-fallbacks="'+esc(JSON.stringify(candidates))+'" data-index="0">'}
+  function card(item){const id=String(item.token_id||item.nftoken_id||'');const tx=String(item.transaction_hash||'');const chain=String(item.chain_key||'blockchain');const xrpl=/^xrpl-/i.test(chain);const mainnet=xrpl&&String(item.network||'').toLowerCase()!=='testnet';const txLink=mainnet&&/^[A-F0-9]{64}$/i.test(tx)?'<a href="https://bithomp.com/explorer/'+encodeURIComponent(tx)+'" target="_blank" rel="noopener noreferrer">Ledger transaction</a>':'<span>Ledger confirmed</span>';return '<article class="card"><div class="media">'+imageMarkup(item)+'</div><div class="copy"><h2 title="'+esc(item.name||'NFT')+'">'+esc(item.name||'NFT')+'</h2><div class="meta">'+(item.inventory_number?'<span>#'+esc(item.inventory_number)+'</span>':'')+'<span>'+esc(xrpl?'NFTokenID':'Token')+' '+esc(short(id))+'</span><span>'+esc(chain.replace(/-/g,' '))+'</span><span>Minted '+esc(item.completed_at?new Date(item.completed_at).toLocaleString():'on chain')+'</span></div><div class="proof">'+txLink+'<span title="'+esc(tx)+'">TX '+esc(short(tx))+'</span></div></div></article>'}
+  function render(items,reset){if(reset)q('grid').innerHTML='';const html=[];(items||[]).forEach(item=>{const key=String(item.chain_key||'')+':'+String(item.token_id||item.nftoken_id||'')+':'+String(item.transaction_hash||'');if(!item.ledger_confirmed||seen.has(key))return;seen.add(key);html.push(card(item))});if(html.length)q('grid').insertAdjacentHTML('beforeend',html.join(''));if(!seen.size)q('grid').innerHTML='<div class="empty">No completed NFTs are recorded for this mint yet.</div>'}
+  function refreshHeader(){if(!campaign)return;q('title').textContent=(campaign.name||'Mint')+' · Recently Minted';q('description').textContent='Ledger-confirmed NFTs already minted from this collection. Pending or reserved items are not included.';q('count').textContent=total+' ledger-confirmed NFT'+(total===1?'':'s');document.title=(campaign.name||'Mint')+' · Recently Minted · One Home';const target=campaign.slug?'/m/'+encodeURIComponent(campaign.slug):'/mint/'+encodeURIComponent(campaign.id);q('backMint').href=target}
+  async function load(reset){if(busy)return;if(!/^[0-9a-f-]{36}$/i.test(campaignId)){status('This Recently Minted link is missing a valid campaign.',true);q('progress').hidden=true;return}if(reset){offset=0;total=0;hasMore=false;seen=new Set();q('grid').innerHTML=''}setBusy(true);status('');try{const response=await fetch(API,{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY},body:JSON.stringify({action:'public_minted_nfts',campaign_id:campaignId,offset,limit:PAGE_SIZE})});const data=await response.json().catch(()=>({}));if(!response.ok||data.success===false)throw new Error(data.error||'Recently Minted NFTs could not be loaded.');campaign=data.campaign||campaign;total=Math.max(0,Number(data.total_count)||0);hasMore=data.has_more===true;offset=Number.isFinite(Number(data.next_offset))?Number(data.next_offset):(offset+(Array.isArray(data.items)?data.items.length:0));render(Array.isArray(data.items)?data.items:[],reset);refreshHeader();q('more').hidden=!hasMore}catch(error){status(error&&error.message?error.message:String(error),true)}finally{setBusy(false);q('more').hidden=!hasMore}}
+  q('grid').addEventListener('error',function(event){const img=event.target;if(!(img instanceof HTMLImageElement))return;let list=[];try{list=JSON.parse(img.dataset.fallbacks||'[]')}catch(_error){}const index=Number(img.dataset.index||0);if(index<list.length){img.dataset.index=String(index+1);img.src=list[index];return}if(img.src.endsWith(FALLBACK))return;img.src=FALLBACK},true);
+  q('more').addEventListener('click',()=>load(false));load(true);
+}());
+</script>
+</body>
+</html>

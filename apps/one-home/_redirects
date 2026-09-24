@@ -1,3 +1,4 @@
+# Existing repository routes and OH-276 application routes; catch-all stays last.
 /app /index.html 200
 /app/* /index.html 200
 /admin /admin.html 200
@@ -5,5 +6,14 @@
 /profile/* /index.html 200
 /socials /index.html 200
 /external /index.html 200
-/* /index.html 200
 /admin/ /admin.html 200
+/joey-connect-test.html /?passport=wallets 301!
+/onehome-auth/* https://fshvettlltcujmwvikfq.supabase.co/auth/v1/:splat 200!
+/onehome-public-mint https://fshvettlltcujmwvikfq.supabase.co/functions/v1/get-public-mint 200!
+/mint-share/* /.netlify/functions/mint-share/:splat 200!
+/m/* /campaign-mint.html 200
+/mint/* /campaign-mint.html 200
+/lab/Dood-el.html /tools/dood-el/dood-el.html 301
+/lab/Dot-dood.html /tools/dot-dood/dot-dood.html 301
+/lab/Noggins.html /tools/noggins/noggins.html 301
+/* /index.html 200

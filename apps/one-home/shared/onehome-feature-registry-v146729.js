@@ -1,0 +1,12 @@
+(function(){'use strict';window.ONEHOME_FEATURE_REGISTRY=Object.freeze([
+{id:'homePage',name:'Front Porch',status:'active',public:true},{id:'onehomePassportEntrancePage',name:'Passport Entrance',status:'active',public:true},{id:'onehomeEntryChoicePage',name:'Main Entry',status:'active',public:true},
+{id:'onehomePassportJourneyPage',name:'Passport',status:'active',public:false},{id:'profilesPage',name:'Community Passports',status:'active',public:true},{id:'publicProfilePage',name:'Public Passport',status:'active',public:true},
+{id:'onehomeStartHerePage',name:'One Home',status:'active',public:true},{id:'onehomeEmberPage',name:'Ask Ember',status:'placeholder',public:true},{id:'onehomeExplorePage',name:'Explore Rooms',status:'active',public:true},{id:'shopPage',name:'Mimi & Pops Shop',status:'active',public:true},
+{id:'onehomeRareInkPage',name:'Rare Ink Studio',status:'active',public:true},{id:'onehomeCreatePage',name:'Creative Studio',status:'active',public:true},{id:'onehomeCollectiblesPage',name:'Collectibles & Stickers',status:'placeholder',public:true},
+{id:'arcadePage',name:'Rollies Arcade',status:'active',public:true},{id:'nightShotsPage',name:'Night Shots',status:'placeholder',public:true},{id:'socialCommandPage',name:'Community Command',status:'active',public:true},
+{id:'onehomeRareRoutesPage',name:'Rare Routes',status:'active',public:true},{id:'rareRoutesSystemPage',name:'Route System',status:'active',public:true},{id:'rareRoutesRewardsPage',name:'Route Rewards',status:'active',public:true},{id:'rareRoutesFuturePage',name:'Future Routes',status:'active',public:true},
+{id:'onehomeFounderPage',name:'Founder Page',status:'active',public:true},{id:'onehomeFounderMintPage',name:'Founder Supply Drop',status:'active',public:true},
+{id:'projectsPage',name:'Creator Projects',status:'active',public:true},{id:'onehomeMessagesPage',name:'One Home Messages',status:'active',public:false},{id:'socialInboxPage',name:'Social Inbox',status:'active',public:false},{id:'notificationsPage',name:'Notifications',status:'active',public:false},
+{id:'doodUPage',name:'Dood U',status:'active',public:true},{id:'labPage',name:'Lab',status:'active',public:true},{id:'collectorPage',name:'Collector Area',status:'placeholder',public:false},
+{id:'comingSoonPage',name:'Coming Soon',status:'support',public:false},{id:'liveFramePage',name:'Live Frame',status:'support',public:false}
+]);})();

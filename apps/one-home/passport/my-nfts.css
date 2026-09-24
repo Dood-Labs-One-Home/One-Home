@@ -1,0 +1,152 @@
+/* One Home v14.67.157 — My NFTs multichain wallet selector, search, sorting, details, and media playback. */
+#mintedItemsPage{min-height:100dvh;background:transparent!important}
+#mintedItemsPage .onehome-my-nfts-shell{
+  width:min(1180px,calc(100% - 32px));margin:24px auto 48px;padding:20px;
+  border:1px solid rgba(255,48,214,.58);border-radius:26px;
+  background:rgba(5,10,16,.9);box-shadow:0 0 34px rgba(255,48,214,.1)
+}
+.onehome-my-nfts-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.onehome-my-nfts-title{margin:16px 0 4px;color:#ff32d2;font-size:clamp(34px,6vw,58px);line-height:1}
+.onehome-my-nfts-btn{
+  appearance:none;border:1px solid rgba(255,48,214,.62);border-radius:999px;
+  background:rgba(0,0,0,.36);color:#fff;padding:10px 14px;font:inherit;font-weight:900;cursor:pointer
+}
+.onehome-my-nfts-btn:hover{background:rgba(255,48,214,.1)}
+.onehome-my-nfts-btn.primary{background:#ff32d2;color:#090609;border-color:#ff32d2}
+.onehome-my-nfts-wallets{margin:14px 0 8px}
+.onehome-my-nfts-wallet-select-wrap{display:grid;gap:7px;max-width:620px;color:#fff;font-weight:900}
+.onehome-my-nfts-wallet-select-wrap>span{font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#bfffd7}
+.onehome-my-nfts-wallet-select{
+  width:100%;min-height:46px;border:1px solid rgba(85,255,154,.42);border-radius:14px;
+  background:#111820;color:#fff;padding:10px 42px 10px 12px;font:inherit;font-weight:800;cursor:pointer
+}
+.onehome-my-nfts-wallet-select:focus{outline:2px solid rgba(255,48,214,.75);outline-offset:2px}
+.onehome-my-nfts-wallet-select:disabled{opacity:.55;cursor:not-allowed}
+.onehome-my-nfts-progress{margin:14px 0 8px}
+.onehome-my-nfts-progress-track{height:10px;overflow:hidden;border-radius:999px;border:1px solid rgba(85,255,154,.38);background:rgba(85,255,154,.08)}
+.onehome-my-nfts-progress-track span{display:block;width:42%;height:100%;border-radius:inherit;background:linear-gradient(90deg,rgba(85,255,154,.22),rgba(255,48,214,.9),rgba(85,255,154,.55));animation:oneHomeNftScan 1.05s ease-in-out infinite}
+@keyframes oneHomeNftScan{0%{transform:translateX(-110%)}100%{transform:translateX(245%)}}
+.onehome-my-nfts-status{
+  margin:12px 0 4px;padding:10px 12px;border:1px solid rgba(85,255,154,.3);
+  border-radius:14px;background:rgba(85,255,154,.05);color:#eafff1;font-weight:900;line-height:1.35
+}
+.onehome-my-nfts-status.is-error{border-color:rgba(255,95,95,.5);background:rgba(255,95,95,.07);color:#ffdede}
+.onehome-my-nfts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:18px}
+.onehome-my-nft-card{
+  border:1px solid rgba(255,48,214,.42);border-radius:20px;padding:14px;
+  background:rgba(0,0,0,.3);min-width:0;display:flex;flex-direction:column;gap:10px
+}
+.onehome-my-nft-media{
+  aspect-ratio:1/1;width:100%;border-radius:15px;overflow:hidden;display:grid;place-items:center;
+  background:linear-gradient(135deg,rgba(36,65,77,.72),rgba(50,18,54,.72));border:1px solid rgba(255,255,255,.1)
+}
+.onehome-my-nft-media img{display:block;width:100%;height:100%;object-fit:contain;background:rgba(0,0,0,.18)}
+.onehome-my-nft-name{margin:0;color:#ff32d2;font-size:19px;line-height:1.15;overflow-wrap:anywhere}
+.onehome-my-nft-collection{margin:0;color:#f5f1ee;font-size:14px;opacity:.88;overflow-wrap:anywhere}
+.onehome-my-nft-meta{margin-top:auto;display:grid;gap:5px;color:#c9c3c0;font-size:12px;line-height:1.35}
+.onehome-my-nft-meta strong{color:#fff}
+.onehome-my-nfts-more{display:flex;justify-content:center;margin-top:20px}
+.onehome-my-nfts-empty{padding:28px 18px;text-align:center;border:1px dashed rgba(255,255,255,.2);border-radius:18px;color:#d9d2cf}
+@media(max-width:700px){
+  #mintedItemsPage .onehome-my-nfts-shell{width:calc(100% - 20px);margin:10px auto 30px;padding:14px;border-radius:20px}
+  .onehome-my-nfts-toolbar{align-items:stretch}
+  .onehome-my-nfts-toolbar .onehome-my-nfts-btn{flex:1;text-align:center}
+  .onehome-my-nfts-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .onehome-my-nft-card{padding:10px;border-radius:16px}
+  .onehome-my-nft-name{font-size:15px}
+  .onehome-my-nft-collection,.onehome-my-nft-meta{font-size:11px}
+}
+@media(max-width:390px){.onehome-my-nfts-grid{grid-template-columns:1fr}}
+
+/* v14.67.95 — explicit multichain NFT search action */
+.onehome-my-nfts-search-wrap{display:grid;gap:7px;max-width:720px;margin:10px 0 8px;color:#fff;font-weight:900}
+.onehome-my-nfts-search-wrap label>span{font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#bfffd7}
+.onehome-my-nfts-search-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+.onehome-my-nfts-search{width:100%;min-height:46px;border:1px solid rgba(255,255,255,.24);border-radius:14px;background:rgba(7,10,12,.94);color:#fff;padding:11px 14px;font:inherit}
+.onehome-my-nfts-search-btn{min-height:46px;min-width:104px}
+.onehome-my-nfts-search::placeholder{color:rgba(255,255,255,.58)}
+.onehome-my-nfts-search:focus{outline:2px solid rgba(255,48,214,.75);outline-offset:2px}
+
+@media(max-width:560px){.onehome-my-nfts-search-row{grid-template-columns:1fr}.onehome-my-nfts-search-btn{width:100%}}
+
+.onehome-my-nfts-sort{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:10px 0 8px}.onehome-my-nfts-sort>span{margin-right:2px;color:#bfffd7;font-size:13px;font-weight:900;letter-spacing:.04em;text-transform:uppercase}.onehome-my-nfts-sort button{min-height:34px;padding:7px 11px;border:1px solid rgba(255,255,255,.18);border-radius:999px;background:rgba(255,255,255,.035);color:#d9e8de;font:900 11px/1 inherit;cursor:pointer}.onehome-my-nfts-sort button[aria-pressed="true"]{border-color:rgba(85,255,154,.65);background:rgba(85,255,154,.12);color:#fff}
+
+/* One Home v14.67.153 — sortable, tappable NFT details. */
+.onehome-my-nft-card{cursor:pointer;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease}
+.onehome-my-nft-card:hover,.onehome-my-nft-card:focus-visible{transform:translateY(-2px);border-color:rgba(85,255,154,.68);box-shadow:0 0 24px rgba(85,255,154,.08);outline:none}
+.onehome-my-nft-open-hint{color:#bfffd7!important;font-weight:900;letter-spacing:.04em;text-transform:uppercase}
+body.onehome-my-nft-detail-open{overflow:hidden}
+.onehome-my-nft-detail{position:fixed;inset:0;z-index:2147482000;display:grid;place-items:center;padding:18px}
+.onehome-my-nft-detail[hidden]{display:none!important}
+.onehome-my-nft-detail-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.onehome-my-nft-detail-card{position:relative;z-index:1;width:min(980px,100%);max-height:min(88dvh,900px);overflow:auto;border:1px solid rgba(255,48,214,.62);border-radius:24px;background:#070b10;color:#fff;padding:22px;box-shadow:0 20px 80px rgba(0,0,0,.65)}
+.onehome-my-nft-detail-close{position:sticky;top:0;float:right;z-index:3;width:42px;height:42px;border:1px solid rgba(255,255,255,.25);border-radius:50%;background:#111820;color:#fff;font:900 26px/1 sans-serif;cursor:pointer}
+.onehome-my-nft-detail-close:hover,.onehome-my-nft-detail-close:focus-visible{border-color:#bfffd7;outline:2px solid rgba(85,255,154,.28);outline-offset:2px}
+.onehome-my-nft-detail-layout{display:grid;grid-template-columns:minmax(260px,.9fr) minmax(0,1.25fr);gap:22px;align-items:start;clear:both}
+.onehome-my-nft-detail-media{aspect-ratio:1/1;overflow:hidden;border:1px solid rgba(255,255,255,.13);border-radius:18px;background:linear-gradient(135deg,rgba(36,65,77,.72),rgba(50,18,54,.72));display:grid;place-items:center}
+.onehome-my-nft-detail-media img{width:100%;height:100%;object-fit:contain;background:rgba(0,0,0,.18)}
+.onehome-my-nft-detail-copy{min-width:0}
+.onehome-my-nft-detail-kicker{margin:0 0 6px;color:#bfffd7;font-size:11px;font-weight:1000;letter-spacing:.14em}
+.onehome-my-nft-detail-copy h2{margin:0;color:#ff32d2;font-size:clamp(26px,4vw,42px);line-height:1.05;overflow-wrap:anywhere}
+.onehome-my-nft-detail-collection,.onehome-my-nft-detail-creator{margin:8px 0 0;color:#efe9e5;overflow-wrap:anywhere}
+.onehome-my-nft-detail-description{margin:14px 0 0;color:#d2cbc7;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.onehome-my-nft-detail-facts{display:grid;gap:0;margin:18px 0 0;border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden}
+.onehome-my-nft-detail-fact{display:grid;grid-template-columns:minmax(120px,.4fr) minmax(0,1fr);gap:12px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
+.onehome-my-nft-detail-fact:last-child{border-bottom:0}
+.onehome-my-nft-detail-fact dt{color:#bfffd7;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+.onehome-my-nft-detail-fact dd{margin:0;color:#fff;font-size:12px;line-height:1.4;overflow-wrap:anywhere;word-break:break-word}
+.onehome-my-nft-detail-fact a{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.onehome-my-nft-detail-section{margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,.12)}
+.onehome-my-nft-detail-section h3{margin:0 0 12px;color:#bfffd7;font-size:16px}
+.onehome-my-nft-attributes{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:0}
+.onehome-my-nft-attributes>div{border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.035);padding:10px;min-width:0}
+.onehome-my-nft-attributes dt{color:#c9c3c0;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;overflow-wrap:anywhere}
+.onehome-my-nft-attributes dd{margin:5px 0 0;color:#fff;font-size:13px;font-weight:800;overflow-wrap:anywhere}
+@media(max-width:720px){
+  .onehome-my-nft-detail{padding:8px}
+  .onehome-my-nft-detail-card{max-height:94dvh;border-radius:18px;padding:14px}
+  .onehome-my-nft-detail-layout{grid-template-columns:1fr;gap:14px}
+  .onehome-my-nft-detail-media{width:min(100%,420px);margin:0 auto}
+  .onehome-my-nft-detail-fact{grid-template-columns:1fr;gap:4px}
+  .onehome-my-nft-attributes{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:400px){.onehome-my-nft-attributes{grid-template-columns:1fr}}
+
+/* One Home v14.67.157 — resilient NFT media playback and truthful fallbacks. */
+.onehome-my-nft-media{position:relative}
+.onehome-my-nft-media-fallback{width:100%;height:100%;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px;text-align:center;background:linear-gradient(135deg,rgba(16,26,34,.95),rgba(42,18,47,.92));color:#fff}
+.onehome-my-nft-media-fallback strong{font-size:clamp(17px,2vw,22px);letter-spacing:.06em}
+.onehome-my-nft-media-fallback span{font-size:12px;color:#bfffd7;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+.onehome-my-nft-media-type strong{color:#ff32d2}
+.onehome-my-nft-card-media-badge{position:absolute;right:8px;bottom:8px;border:1px solid rgba(85,255,154,.62);border-radius:999px;background:rgba(4,8,12,.88);color:#bfffd7;padding:5px 8px;font-size:10px;font-weight:1000;letter-spacing:.07em;z-index:2}
+.onehome-my-nft-detail-media{aspect-ratio:auto;min-height:320px;overflow:visible;padding:10px}
+.onehome-my-nft-detail-media>.onehome-my-nft-image{width:100%;height:auto;max-height:70dvh;object-fit:contain;border-radius:12px}
+.onehome-my-nft-player-wrap{width:100%;display:grid;gap:10px;align-items:center}
+.onehome-my-nft-video{display:block;width:100%;max-height:70dvh;border-radius:12px;background:#000}
+.onehome-my-nft-audio{width:100%}
+.onehome-my-nft-audio-cover{width:100%!important;height:auto!important;max-height:50dvh!important;object-fit:contain!important;border-radius:12px}
+.onehome-my-nft-html,.onehome-my-nft-document{display:block;width:100%;min-height:58dvh;border:0;border-radius:12px;background:#fff}
+.onehome-my-nft-open-media{display:inline-flex;justify-content:center;align-items:center;min-height:42px;border:1px solid rgba(85,255,154,.45);border-radius:999px;color:#fff;text-decoration:none;font-weight:900;padding:9px 14px;background:rgba(85,255,154,.08)}
+.onehome-my-nft-open-media:hover,.onehome-my-nft-open-media:focus-visible{border-color:#bfffd7;outline:2px solid rgba(85,255,154,.25);outline-offset:2px}
+.onehome-my-nft-media-kind{justify-self:start;border:1px solid rgba(255,48,214,.45);border-radius:999px;padding:5px 8px;color:#ff9bea;background:rgba(255,48,214,.08);font-size:10px;font-weight:1000;letter-spacing:.07em}
+.onehome-my-nft-text-wrap{align-content:start}
+.onehome-my-nft-text{width:100%;max-height:58dvh;overflow:auto;margin:0;padding:16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:#05080b;color:#f7f2ef;white-space:pre-wrap;overflow-wrap:anywhere;font:500 14px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+@media(max-width:720px){.onehome-my-nft-detail-media{min-height:240px;padding:8px}.onehome-my-nft-html,.onehome-my-nft-document{min-height:60dvh}.onehome-my-nft-text{max-height:60dvh}}
+
+/* One Home v14.67.211 — surface collector benefits before technical NFT facts. */
+.onehome-redeemables-priority{margin-top:16px!important;padding-top:14px!important;margin-bottom:16px}
+.onehome-redeemables-priority+.onehome-my-nft-detail-facts{margin-top:0}
+/* One Home v14.67.209 — collector redemption inside My NFTs. */
+.onehome-redeemables{border-top-color:rgba(85,255,154,.24)}
+.onehome-redeemables>h3{display:flex;align-items:center;gap:8px}
+.onehome-redeem-loading,.onehome-redeem-empty{border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:14px;background:rgba(255,255,255,.035);color:#d8d1cd;display:grid;gap:5px;line-height:1.45}
+.onehome-redeem-empty strong{color:#fff}.onehome-redeem-empty.is-error{border-color:rgba(255,95,95,.45);color:#ffdede}
+.onehome-redeem-benefit{border:1px solid rgba(85,255,154,.28);border-radius:16px;padding:14px;background:rgba(9,15,14,.78);margin-top:10px}
+.onehome-redeem-benefit-head{display:flex;gap:12px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap}.onehome-redeem-benefit h4{margin:4px 0 0;color:#fff;font-size:18px}.onehome-redeem-benefit p{color:#d7d0cc;line-height:1.5;margin:10px 0}.onehome-redeem-type{color:#bfffd7;font-size:10px;font-weight:1000;letter-spacing:.12em}.onehome-redeem-state{border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:5px 8px;color:#d8d1cd;font-size:10px;font-weight:1000;text-transform:uppercase;letter-spacing:.05em}.onehome-redeem-state.open{border-color:rgba(85,255,154,.52);color:#bfffd7}.onehome-redeem-state.done{border-color:rgba(255,48,214,.52);color:#ff9bea}
+.onehome-redeem-meta{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 12px}.onehome-redeem-meta span{border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:6px 8px;color:#c9c3c0;font-size:10px}
+.onehome-redeem-button{margin-top:4px}.onehome-redeem-result{display:grid;gap:4px;border-left:3px solid rgba(255,48,214,.55);padding:9px 10px;background:rgba(255,48,214,.055);font-size:12px}.onehome-redeem-result strong{color:#fff}.onehome-redeem-result span{color:#d6cfcb}
+.onehome-redeem-form{display:grid;gap:11px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.12)}.onehome-redeem-form h5{margin:0;font-size:16px}.onehome-redeem-form label{display:grid;gap:6px;color:#e8e2de;font-size:12px;font-weight:900}.onehome-redeem-form input,.onehome-redeem-form textarea{width:100%;border:1px solid rgba(255,255,255,.22);border-radius:10px;background:#07100e;color:#fff;padding:10px 11px;font:inherit}.onehome-redeem-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.onehome-redeem-shipping{display:grid;gap:9px}.onehome-redeem-help{color:#bfffd7;font-size:11px;font-weight:700;line-height:1.45}.onehome-redeem-confirm{border:1px dashed rgba(85,255,154,.35);border-radius:10px;padding:10px;color:#d6cfcb;font-size:11px;line-height:1.45}.onehome-redeem-actions{display:flex;gap:8px;flex-wrap:wrap}.onehome-redeem-form-status{min-height:18px;color:#bfffd7;font-size:12px;font-weight:800}.onehome-redeem-form-status.is-error{color:#ffb1b1}
+@media(max-width:560px){.onehome-redeem-form-grid{grid-template-columns:1fr}.onehome-redeem-actions .onehome-my-nfts-btn{width:100%}.onehome-redeem-benefit{padding:12px}}
+
+/* One Home v14.67.224 — private physical-NFT fulfillment + QR/camera proof */
+.onehome-physical-link{margin-top:12px}.onehome-physical-card{border:1px solid rgba(91,236,137,.35);background:rgba(10,35,21,.35);border-radius:12px;padding:12px}.onehome-physical-tracking{margin-top:8px;overflow-wrap:anywhere}.onehome-physical-verified{display:grid;gap:8px;margin-top:10px}.onehome-physical-verified img{max-width:260px;width:100%;border-radius:12px;border:1px solid rgba(255,255,255,.2)}.onehome-physical-verified code{font-size:10px;overflow-wrap:anywhere}.onehome-physical-camera{margin-top:10px}.onehome-physical-camera p{line-height:1.45}.onehome-physical-status{margin-top:8px;font-size:12px;color:#caffd8}.onehome-physical-status.is-error{color:#ffb2b2}

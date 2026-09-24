@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="/shared/onehome-global-appearance-v1467200.js?v=1467200"></script>
   <meta charset="UTF-8" />
   <!-- lock zoom so pinch-to-zoom is handled by our tool, not the browser -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Create Noggins | Dood Creator</title>
-  <meta name="description" content="Draw, design, and export your own Noggins. Dood Mode unlocks advanced tools for $dOOd holders." />
+  <meta name="description" content="Draw, design, and export your own Noggins. Advanced Tools unlocks advanced tools for $dOOd holders." />
 
   <link rel="icon" href="https://www.doodbrand.com/DOOD_HUGE.png" type="image/png" />
   <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Roboto:wght@300;400;700;900&family=Monoton&display=swap" rel="stylesheet" />
@@ -298,7 +299,7 @@
   .dood-logo,
   .site-logo,
   .app-logo {
-    background: transparent url('/assets/dood-portal-guide-v54.png?v=54') center/contain no-repeat !important;
+    background: transparent url('/assets/one-home-logo.png?v=107') center/contain no-repeat !important;
     color: transparent !important;
     overflow: hidden !important;
   }
@@ -317,7 +318,7 @@
   .dood-logo img,
   .site-logo img,
   .app-logo img {
-    content: url('/assets/dood-portal-guide-v54.png?v=54') !important;
+    content: url('/assets/one-home-logo.png?v=107') !important;
     width: 100% !important;
     height: 100% !important;
     object-fit: contain !important;
@@ -328,7 +329,7 @@
 
 <style id="dood-v54-portal-logo-component">
   :root {
-    --dood-portal-logo-url: url('/assets/dood-portal-guide-v54.png?v=54');
+    --dood-portal-logo-url: url('/assets/one-home-logo.png?v=107');
   }
 
   .dood-portal-logo,
@@ -374,7 +375,7 @@
   .logo-mark img,
   .site-logo img,
   .app-logo img {
-    content: url('/assets/dood-portal-guide-v54.png?v=54') !important;
+    content: url('/assets/one-home-logo.png?v=107') !important;
     width: 100% !important;
     height: 100% !important;
     display: block !important;
@@ -594,13 +595,18 @@
   }
 </style>
 
+<link rel="stylesheet" href="/shared/onehome-choice-header-v146780.css?v=146780">
+<script defer src="/shared/onehome-choice-header-v1467200.js?v=1467200"></script>
+
+<link rel="stylesheet" href="/shared/onehome-interior-shell-v1467141.css?v=1467141">
+  <link rel="stylesheet" href="/shared/onehome-global-appearance-v1467142.css?v=1467141">
 </head>
 
 <body class="creator-tool-page" data-lab-active="tools" data-lab-badge="Noggins Creator" data-lab-page="/lab/Noggins.html">
 
 <div class="dood-return-header">
   <a class="dood-brand" href="../../index.html#districts" aria-label="Back to Dood Labs">
-    <img src="/assets/dood-portal-guide-v54.png?v=54" alt="Dood Labs logo">
+    <img src="/assets/one-home-logo.png?v=107" alt="One Home logo">
     <strong>Dood Labs</strong>
   </a>
   <div class="dood-return-actions">
@@ -631,11 +637,11 @@
     <p>Draw on templates… export clean <b>2048×2048</b>… and if you hold <b>1,000,000 $dOOd</b>, unlock the advanced kit (layers, projects, blend modes, export pack).</p>
     <div class="wallet-strip">
       <span id="labWalletLine" class="pill-lab warn">Wallet: not connected</span>
-      <span id="labGatePill" class="pill-lab warn">Dood Mode: locked (1M $dOOd)</span></div>
+      <span id="labGatePill" class="pill-lab warn">Advanced Tools: locked (1M $dOOd)</span></div>
     <div class="cta-row">
       <button id="doodModeBtn" class="dood-btn" aria-haspopup="dialog">
         <span>✨</span>
-        <span>Dood Mode (1M $dOOd)</span>
+        <span>Advanced Tools (1M $dOOd)</span>
         <span>→</span>
       </button>
       <button id="doodClear" class="dood-ghost" type="button" title="Disconnect">Disconnect</button>
@@ -758,7 +764,7 @@
 
       <!-- ADVANCED (token-gated) -->
       <div id="advancedPanel" style="display:none; margin-top:12px;">
-        <h3>Dood Mode — Advanced</h3>
+        <h3>Advanced Tools — Advanced</h3>
 
         <div class="row">
           <button id="newProjectBtn" class="small" type="button" style="flex:1;">🗂️ New Project</button>
@@ -791,10 +797,10 @@
         Pinch zoom… one finger draw… two fingers pan/zoom.</div>
     </section></div>
 
-  <!-- Dood Mode Modal -->
+  <!-- Advanced Tools Modal -->
   <div id="doodModeModal" class="dood-modal" role="dialog" aria-modal="true" aria-labelledby="doodModeTitle">
     <div class="dood-dialog">
-      <h3 id="doodModeTitle">Dood Mode</h3>
+      <h3 id="doodModeTitle">Advanced Tools</h3>
       <p id="doodModeStatus">Connect your wallet to verify you hold <b>≥ 1,000,000 $dOOd</b>.</p>
       <div class="modal-actions">
         <button id="doodConnect" class="dood-btn" type="button">Connect & Verify</button>
@@ -2139,7 +2145,7 @@
         if (wants){
           // if autosave has more layers than free allows, only restore fully if pro is unlocked
           if (!canUsePro() && (saved.layers?.length || 1) > 1){
-            alert('That autosave includes Pro layers. Unlock Dood Mode to restore the full session. Restoring Layer 1 only for now.');
+            alert('That autosave includes Pro layers. Unlock Advanced Tools to restore the full session. Restoring Layer 1 only for now.');
             // force payload to a single flattened layer
             saved.layers = [ saved.layers[0] ];
             saved.activeLayerIndex = 0;
@@ -2258,7 +2264,7 @@
 
 <script id="dood-v54-portal-logo-component-js">
 (function () {
-  const logoUrl = "/assets/dood-portal-guide-v54.png?v=54";
+  const logoUrl = "/assets/one-home-logo.png?v=107";
 
   function goHome(event) {
     event.preventDefault();
@@ -2269,10 +2275,10 @@
     if (!el) return;
     el.classList.add("dood-portal-logo", "is-alive");
     el.setAttribute("role", "link");
-    el.setAttribute("aria-label", "Dood Labs Home");
-    el.setAttribute("title", "Dood Labs Home");
+    el.setAttribute("aria-label", "One Home");
+    el.setAttribute("title", "One Home");
     el.onclick = goHome;
-    el.innerHTML = '<img src="' + logoUrl + '" alt="Dood Labs Portal Guide">';
+    el.innerHTML = '<img src="' + logoUrl + '" alt="One Home">';
   }
 
   function initDoodPortalLogo() {
@@ -2298,13 +2304,11 @@
 <script id="dood-v56-theme-modes-js">
 (function(){
   const modes = [
-    { id: "dood", label: "Dood Mode" },
-    { id: "doodette", label: "Doodette Mode" },
     { id: "dark", label: "Dark Mode" }
   ];
 
   function applyTheme(mode){
-    const clean = modes.some(m => m.id === mode) ? mode : "dood";
+    const clean = modes.some(m => m.id === mode) ? mode : "dark";
     document.body.classList.remove("theme-dood", "theme-doodette", "theme-dark");
     document.body.classList.add("theme-" + clean);
     localStorage.setItem("doodLabsThemeMode", clean);
@@ -2314,6 +2318,7 @@
   }
 
   function addThemeSwitcher(){
+    return;
     if(document.getElementById("doodThemeSwitcher")) return;
     const wrap = document.createElement("div");
     wrap.id = "doodThemeSwitcher";
@@ -2330,8 +2335,7 @@
   }
 
   function initThemeModes(){
-    addThemeSwitcher();
-    applyTheme(localStorage.getItem("doodLabsThemeMode") || "dood");
+    applyTheme((function(saved){return (saved === "dood" || saved === "doodette" || saved === "dark") ? "dark" : (saved || "dark");})(localStorage.getItem("doodLabsThemeMode")));
   }
 
   if(document.readyState === "loading"){
@@ -2358,7 +2362,7 @@
     setTimeout(function(){
       const notice = document.getElementById("profileAuthNotice") || document.getElementById("profileNotice");
       if(notice){
-        notice.textContent = "Email confirmed. You can now log in and save your profile.";
+        notice.textContent = "Email confirmed. You can now log in and save your Passport.";
         notice.classList.add("show");
         notice.style.display = "block";
       }
@@ -2376,5 +2380,7 @@
 })();
 </script>
 
+
+<script defer src="/shared/onehome-interior-shell-v1467141.js?v=1467200"></script>
 </body>
 </html>
