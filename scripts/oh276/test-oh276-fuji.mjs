@@ -21,7 +21,7 @@ test('Passport wallet tree includes explicitly selected MetaMask Fuji in alphabe
  assert.deepEqual([...rows.map(r=>r.label)],[...rows.map(r=>r.label)].sort((a,b)=>a.localeCompare(b)));
  assert.match(html,/selectedChainKey=''/);
 });
-test('canonical identity distinguishes Fuji from mainnet',()=>{
+test('Avalanche Mainnet is present but locked',()=>{\n const window={};vm.runInNewContext(read('shared/onehome-chain-identity-v1467114.js'),{window});\n const d=window.OneHomeChainIdentity.describe({chain_key:'avalanche-mainnet'});\n assert.equal(d.ecosystem,'evm');assert.equal(d.symbol,'AVAX');assert.equal(d.testOnly,false);assert.equal(d.known,true);\n const mainnet=fallbacks['avalanche-mainnet'];assert.equal(mainnet.chain_id,43114);assert.equal(mainnet.locked,true);assert.equal(mainnet.wallet_enabled,false);assert.equal(mainnet.mint_enabled,false);\n});\ntest('canonical identity distinguishes Fuji from mainnet',()=>{
  const window={};vm.runInNewContext(read('shared/onehome-chain-identity-v1467114.js'),{window});
  const d=window.OneHomeChainIdentity.describe({chain_key:'avalanche-fuji'});
  assert.equal(d.ecosystem,'evm');assert.equal(d.symbol,'AVAX');assert.equal(d.testOnly,true);assert.equal(d.known,true);
