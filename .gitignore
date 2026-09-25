@@ -141,3 +141,9 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Exact upstream un7z-opfs 1.0.2 runtime (not generated application dist).
+!apps/one-home/assets/vendor/un7z-opfs-1.0.2/dist/
+apps/one-home/assets/vendor/un7z-opfs-1.0.2/dist/*
+!apps/one-home/assets/vendor/un7z-opfs-1.0.2/dist/7zz.js
+!apps/one-home/assets/vendor/un7z-opfs-1.0.2/dist/7zz.wasm

@@ -1,0 +1,21 @@
+/* One Home v14.67.142 — authoritative site-wide No Neon surface. */
+html.onehome-neon-off,body.onehome-neon-off{
+  --onehome-neon:#fff!important;--onehome-neon-rgb:255,255,255!important;--onehome-shell-neon:#fff!important;--onehome-shell-neon-rgb:255,255,255!important;
+  --wallet-accent:#fff!important;--wallet-accent-rgb:255,255,255!important;--wallet-glow:none!important;
+  --profile-page-neon:#fff!important;--profile-page-neon-rgb:255,255,255!important;--wallet-page-neon:#fff!important;
+  --dood-accent:#fff!important;--dood-accent-2:#d4d4d4!important;--dood-main-accent:#fff!important;--dood-main-accent-soft:rgba(255,255,255,.52)!important;--dood-main-accent-bg:rgba(255,255,255,.07)!important;
+  --dood-theme-accent:#fff!important;--dood-theme-accent-2:#d4d4d4!important;--theme-accent:#fff!important;--theme-accent-rgb:255,255,255!important;
+  --accent:#fff!important;--accent2:#d4d4d4!important;--pink:#fff!important;--cyan:#dfe7e7!important;--green:#e1e7e2!important;--purple:#e2e0e4!important;
+  --dood-accent-glow:transparent!important;--dood-main-accent-glow:transparent!important;--dood-theme-glow:transparent!important;--theme-glow:transparent!important;--accent-glow:transparent!important;
+}
+html.onehome-neon-off body *:not(img):not(picture):not(video):not(canvas):not(source){box-shadow:none!important;text-shadow:none!important;}
+html.onehome-neon-off body :where(button,.btn,[role="button"],input,select,textarea,fieldset,article,section,nav,header,footer,main,[role="dialog"],[class*="card"],[class*="panel"],[class*="box"],[class*="tile"],[class*="section"],[class*="shell"],[class*="modal"],[class*="dialog"],[class*="neon"],.onehome-user-neon,[data-onehome-user-neon="1"]){box-shadow:none!important;text-shadow:none!important;filter:none!important;outline-color:rgba(255,255,255,.5)!important;}
+html.onehome-neon-off body :where([class*="card"],[class*="panel"],[class*="box"],[class*="tile"],[class*="section"],article,fieldset,#onehomeGlobalMenu .oh-menu-panel,#onehomeGlobalMenu .oh-contact-card){border-color:rgba(255,255,255,.22)!important;}
+html.onehome-neon-off body :where(button,.btn,[role="button"],input,select,textarea,.onehome-user-neon,.rare-routes-neon-button,[class*="neon-button"],[data-onehome-user-neon="1"],#onehomeGlobalMenu .oh-menu-toggle,#onehomeGlobalMenu .oh-menu-link,#onehomeGlobalMenu .oh-menu-action,#onehomeGlobalMenu .oh-prev-page,#onehomeGlobalMenu .oh-neon-switch){border-color:rgba(255,255,255,.56)!important;box-shadow:none!important;text-shadow:none!important;filter:none!important;}
+html.onehome-neon-off body :where(.onehome-user-neon,.rare-routes-neon-button,[class*="neon-button"],[data-onehome-user-neon="1"],#onehomeGlobalMenu .oh-menu-toggle,#onehomeGlobalMenu .oh-menu-link,#onehomeGlobalMenu .oh-menu-action,#onehomeGlobalMenu .oh-prev-page,#onehomeGlobalMenu .oh-neon-switch){color:#fff!important;background-color:rgba(0,0,0,.62)!important;}
+html.onehome-neon-off body :where(button,.btn,[role="button"],[class*="card"],[class*="panel"],[class*="box"],[class*="tile"],[class*="section"],[class*="shell"],[class*="modal"],[class*="dialog"],[class*="neon"])::before,
+html.onehome-neon-off body :where(button,.btn,[role="button"],[class*="card"],[class*="panel"],[class*="box"],[class*="tile"],[class*="section"],[class*="shell"],[class*="modal"],[class*="dialog"],[class*="neon"])::after{box-shadow:none!important;text-shadow:none!important;filter:none!important;}
+html.onehome-neon-off body :where(button,.btn,[role="button"]) :where(svg,i,[class*="icon"]){filter:none!important;text-shadow:none!important;box-shadow:none!important;}
+html.onehome-neon-off body #oneHomeV1455WalletManager{--wallet-accent:#fff!important;--wallet-accent-rgb:255,255,255!important;--wallet-glow:none!important;}
+html.onehome-neon-off body #onehomeGlobalMenu .oh-neon-swatch{box-shadow:none!important;filter:none!important;text-shadow:none!important;}
+html.onehome-neon-off body :where(img,svg,picture)[class*="neon" i],html.onehome-neon-off body :where(img,svg,picture)[class*="glow" i],html.onehome-neon-off body :where(img,svg,picture)[style*="drop-shadow" i]{filter:none!important;}

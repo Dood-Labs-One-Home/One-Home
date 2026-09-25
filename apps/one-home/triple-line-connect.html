@@ -1,0 +1,53 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><title>Connect Triple Line · One Home</title>
+<style>body{background:#0e1020;color:#f4f2ff;font:16px system-ui,sans-serif;min-height:100vh;display:grid;place-items:center;margin:0;padding:20px}main{max-width:520px}button,a{color:#d6c2ff}button{padding:12px;border-radius:8px;background:#302247;color:#fff;cursor:pointer}p{line-height:1.6}</style>
+</head><body><main><h1>Connecting your One Home Passport</h1><p id="status" role="status">Checking your existing One Home sign-in…</p><p><a href="/">Return to One Home</a></p><button id="retry" hidden type="button">Try again</button></main>
+<script>
+(function(){
+'use strict';
+var home='https://doodlabs.app';
+var target='https://triple-line.doodlabs.app';
+var endpoint='https://fshvettlltcujmwvikfq.supabase.co/functions/v1/triple-line-passport-sso';
+var api='https://fshvettlltcujmwvikfq.supabase.co';
+var key='sb_publishable_ARrX-vYhy8l-yhs6384S_g_n6214taB';
+var state=new URL(location.href).searchParams.get('state')||'';
+// Remove the one-time state from browser history and referrers before loading other scripts.
+history.replaceState(null,'','/triple-line-connect.html');
+var status=document.getElementById('status'),retry=document.getElementById('retry');
+function fail(text){status.textContent=text;retry.hidden=false;}
+function validRedirect(raw){
+ var u=new URL(String(raw||''));
+ if(u.origin!==target||u.pathname!=='/api/triple-line-passport/callback'||u.hash||u.username||u.password||
+   u.searchParams.getAll('code').length!==1||!/^[0-9a-f]{64}$/.test(u.searchParams.get('code'))||
+   Array.from(u.searchParams.keys()).some(function(k){return k!=='code';}))throw Error('INVALID_REDIRECT');
+ return u.toString();
+}
+async function connect(){
+ retry.hidden=true;
+ if(!/^[A-Za-z0-9_-]{43}$/.test(state)){fail('This connection request expired. Return to Triple Line and try again.');return;}
+ try{
+  status.textContent='Checking your existing One Home session…';
+  if(!window.supabase||typeof window.supabase.createClient!=='function')throw Error('AUTH_NOT_LOADED');
+  var existing=window.oneHomePassportSupabase||window.doodProfileSupabase||window.doodSupabase||window.supabaseClient;
+  var client=existing&&existing.auth?existing:window.supabase.createClient(api,key);
+  var found=await client.auth.getSession();
+  var session=found&&found.data&&found.data.session;
+  if(found.error||!session||!session.access_token){fail('Your One Home sign-in was not found in this browser. Open One Home, sign in there, then return to Triple Line.');return;}
+  status.textContent='Creating your private Passport connection…';
+  var response=await fetch(endpoint,{method:'POST',cache:'no-store',credentials:'omit',redirect:'error',
+    headers:{'Content-Type':'application/json','apikey':key,'Authorization':'Bearer '+session.access_token},
+    body:JSON.stringify({action:'create',state:state})});
+  var result=await response.json().catch(function(){return {};});
+  if(!response.ok||result.ok!==true)throw Error('CREATE_'+String(result.error||response.status));
+  var next=validRedirect(result.redirect_url);
+  status.textContent='Passport confirmed. Returning to Triple Line…';
+  window.location.assign(next);
+ }catch(error){console.error('Triple Line handoff could not finish (no tokens logged)',error&&error.name);fail('The secure connection could not finish. You can try again, or return to One Home.');}
+}
+retry.addEventListener('click',connect);
+var script=document.createElement('script');
+script.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3';
+script.crossOrigin='anonymous';script.onload=connect;
+script.onerror=function(){fail('Could not load One Home sign-in. Please try again.');};
+document.head.appendChild(script);
+})();
+</script></body></html>

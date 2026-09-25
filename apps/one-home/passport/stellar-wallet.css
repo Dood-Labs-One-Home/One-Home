@@ -1,0 +1,9 @@
+/* One Home v14.67.83 — Freighter Stellar Testnet multi-wallet linking and names. */
+#oneHomeStellarLinkedWallets{margin-top:14px!important}
+#oneHomeStellarWalletList .onehome-v1455-wallet-row{grid-template-columns:auto minmax(0,1fr) auto!important}
+.onehome-stellar-wallet-mark{display:grid!important;width:24px!important;height:24px!important;place-items:center!important;border:1px solid var(--wallet-page-neon,var(--onehome-neon,#55ff9a))!important;border-radius:50%!important;color:var(--wallet-page-neon,var(--onehome-neon,#55ff9a))!important;font-size:15px!important;line-height:1!important}
+.onehome-stellar-wallet-meta{display:flex!important;flex-wrap:wrap!important;gap:7px!important;margin-top:5px!important}
+.onehome-stellar-wallet-chip{display:inline-flex!important;align-items:center!important;min-height:22px!important;padding:3px 7px!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:999px!important;color:#ddd8d2!important;font-size:10px!important;font-weight:900!important;letter-spacing:.045em!important;text-transform:uppercase!important}
+.onehome-stellar-connect-btn::before{content:'✦';margin-right:8px;font-size:13px}
+.onehome-stellar-connect-btn:disabled{opacity:.55!important;cursor:wait!important}
+@media(max-width:760px){#oneHomeStellarWalletList .onehome-v1455-wallet-row{grid-template-columns:auto minmax(0,1fr)!important}#oneHomeStellarWalletList .onehome-v1455-row-actions{grid-column:2!important;width:100%!important}}

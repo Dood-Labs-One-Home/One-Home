@@ -1,0 +1,35 @@
+{
+  "version": "14.67.241",
+  "header_checks": {
+    "open-mints.html": {
+      "cache-control": [
+        "no-store",
+        "must-revalidate"
+      ],
+      "x-onehome-release": [
+        "14.67.241"
+      ]
+    },
+    "campaign-mint.html": {
+      "cache-control": [
+        "no-store",
+        "must-revalidate"
+      ]
+    },
+    "passport/campaign-mint-page.js": {
+      "cache-control": [
+        "no-store",
+        "must-revalidate"
+      ]
+    },
+    "open-mints-v1467218.js": {
+      "cache-control": [
+        "no-store",
+        "must-revalidate"
+      ],
+      "x-onehome-release": [
+        "14.67.241"
+      ]
+    }
+  }
+}

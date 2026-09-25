@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script src="/shared/onehome-global-appearance-v1467200.js?v=1467200"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>One Home Test Mint</title>
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+<link rel="icon" href="/favicon.png">
+<link rel="stylesheet" href="/passport/entrance.css?v=146795">
+<style>html,body{margin:0;min-height:100%;background:#000}body{overflow-x:hidden}.page-view{display:none}.page-view.active{display:block}</style>
+<script src="/shared/onehome-auth-storage-v146746.js?v=146746"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/shared/onehome-mint-source-v146766.js?v=146766"></script>
+<script src="/shared/onehome-x-mobile-handoff-v146747.js?v=146747"></script>
+
+<link rel="stylesheet" href="/shared/onehome-interior-shell-v1467141.css?v=1467141">
+  <link rel="stylesheet" href="/shared/onehome-global-appearance-v1467142.css?v=1467141">
+</head>
+<body>
+<div class="page-view active" id="onehomeFounderMintPage" aria-label="Published mint page">
+  <section class="founder-mint-stage">
+    <header class="passport-site-strip" aria-label="One Home mint page">
+      <div class="passport-site-brand">
+        <button class="passport-onehome-nav-button" type="button" id="founderMintOptionsBtn" aria-label="Return to One Home" title="Return to One Home">
+          <img src="/assets/one-home-logo.png?v=1369" alt="One Home — EST. 1978">
+        </button>
+        <span class="passport-site-path">ONE HOME <i>→</i> <span id="founderMintPathSection">TEST MINT</span> <i>→</i> <span id="founderMintHeaderPath">MINT</span></span>
+      </div>
+    </header>
+
+    <main class="founder-mint-content">
+      <section class="founder-mint-shell" aria-labelledby="founderMintHeading">
+        <div class="founder-mint-art" aria-label="Published collection artwork">
+          <div class="founder-mint-art-topline">
+            <span id="founderMintDropLabel">TEST MINT</span>
+            <span id="founderMintSealStatus">LOADING</span>
+          </div>
+
+          <div class="founder-crate-scene" id="founderMintArtworkStage">
+            <img id="founderMintArtwork" class="founder-mint-live-art" src="/assets/one-home-image-placeholder.png?v=1369" data-default-src="/assets/one-home-image-placeholder.png?v=1369" alt="Published mint artwork is loading">
+            <div id="founderMintCrateFallback" class="founder-mint-fallback-art" aria-hidden="true" hidden>
+              <div class="founder-crate-shadow"></div>
+              <div class="founder-crate">
+                <div class="founder-crate-plank founder-crate-plank-one"></div>
+                <div class="founder-crate-plank founder-crate-plank-two"></div>
+                <div class="founder-crate-plank founder-crate-plank-three"></div>
+                <div class="founder-crate-brace founder-crate-brace-left"></div>
+                <div class="founder-crate-brace founder-crate-brace-right"></div>
+                <div class="founder-crate-stamp">
+                  <small>ONE HOME</small><strong>MINT</strong><b>COLLECTION</b><span id="founderMintCrateSupply">— / —</span>
+                </div>
+                <div class="founder-crate-seal">88</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="founder-art-caption">
+            <p class="passport-eyebrow" id="founderMintArtEyebrow">Published through Rare Ink Studio</p>
+            <h2 id="founderMintRevealTitle">LOADING COLLECTION</h2>
+            <p id="founderMintRevealCopy">The artwork and mint information will appear here.</p>
+          </div>
+        </div>
+
+        <div class="founder-mint-details">
+          <div class="founder-mint-brandline">
+            <img src="/assets/one-home-logo.png?v=1369" alt="One Home">
+            <div><p class="passport-eyebrow" id="founderMintAccessLabel">One Home Mint</p><h1 id="founderMintHeading"><span id="founderMintName">LOADING MINT</span></h1></div>
+          </div>
+
+          <p class="founder-mint-intro" id="founderMintDescription">Loading mint details.</p>
+
+          <div class="founder-ready-banner" id="founderMintReadyBanner">
+            <span class="founder-ready-check" id="founderMintReadyIcon">…</span>
+            <div><strong id="founderMintReadyTitle">Checking your entry</strong><small id="founderMintWallet">Sign in and verify the receiving wallet to continue.</small></div>
+          </div>
+
+          <div class="founder-mint-stats" aria-label="Published mint details">
+            <div><small>PRICE</small><strong id="founderMintPrice">—</strong></div>
+            <div><small>REMAINING</small><strong id="founderMintSupply">—</strong></div>
+            <div><small>STATUS</small><strong id="founderMintStatusLabel">LOADING</strong></div>
+            <div><small>LIMIT</small><strong id="founderMintQuantity">—</strong></div>
+          </div>
+
+          <div class="founder-includes" id="founderMintIncludes"><div><span>•</span><strong>Loading collection features</strong></div></div>
+          <p class="founder-payment-note" id="founderMintPaymentNote">The saved mint price and collection requirements will appear here.</p>
+
+          <div class="founder-mint-actions">
+            <button class="founder-mint-button" id="founderMintXamanBtn" type="button" disabled>
+              <img src="/assets/wallets/xaman.svg" alt="" aria-hidden="true"><span><small>MINT WITH</small><strong>XAMAN</strong></span>
+            </button>
+            <button class="founder-mint-button" id="founderMintCrossmarkBtn" type="button" disabled>
+              <img src="/assets/wallets/crossmark.png" alt="" aria-hidden="true"><span><small>MINT WITH</small><strong>CROSSMARK</strong></span>
+            </button>
+            <button class="founder-mint-button" id="founderMintMetaMaskBtn" type="button" disabled hidden style="grid-column:1/-1">
+              <span><small>MINT WITH</small><strong>METAMASK · EVM TEST NETWORK</strong></span>
+            </button>
+          </div>
+
+          <div class="founder-mint-status is-preparing" id="founderMintStatus" role="status" aria-live="polite">
+            <strong>LOADING MINT</strong><span>Getting the mint ready.</span>
+          </div>
+          <button class="founder-mint-entry-button" id="founderMintVerifyBtn" type="button" hidden>Sign In and Verify Access</button>
+          <p class="founder-mint-fineprint">Your wallet will show the full transaction before anything is approved.</p>
+          <button class="founder-mint-entry-button" id="founderMintShareXBtn" type="button">Share Mint on X</button>
+        </div>
+      </section>
+    </main>
+  </section>
+</div>
+<script>
+(function(){
+  'use strict';
+  window.ONEHOME_TEST_MINT_PAGE=true;
+  const params=new URLSearchParams(location.search);
+  const campaign=String(params.get('campaign')||'').trim();
+  const network=String(params.get('network')||'testnet').toLowerCase();
+  function valid(){return /^[0-9a-f-]{36}$/i.test(campaign)&&network==='testnet';}
+  if(!valid()){
+    const status=document.getElementById('founderMintStatus');
+    if(status)status.innerHTML='<strong>TEST MINT NOT AVAILABLE</strong><span>Open this page from Mint → My Mints.</span>';
+    document.getElementById('founderMintXamanBtn')?.setAttribute('disabled','disabled');
+    document.getElementById('founderMintCrossmarkBtn')?.setAttribute('disabled','disabled');
+    return;
+  }
+  const script=document.createElement('script');
+  script.src='/passport/campaign-mint-page.js?v=1467276';
+  document.body.appendChild(script);
+})();
+</script>
+
+<script defer src="/shared/onehome-interior-shell-v1467141.js?v=1467200"></script>
+</body>
+</html>

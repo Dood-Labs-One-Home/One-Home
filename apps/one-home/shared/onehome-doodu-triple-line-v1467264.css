@@ -1,0 +1,12 @@
+/* OH-264: center the fifth Dood U button at exactly the same width as its peers. */
+#doodUPage .doodu-house-directory .oh-room-grid > .doodu-triple-door {
+  grid-column:1 / -1!important;
+  justify-self:center;
+  width:calc((100% - clamp(22px, 3vw, 42px)) / 2)!important;
+  white-space:normal;
+}
+@media(max-width:800px){
+  #doodUPage .doodu-house-directory .oh-room-grid > .doodu-triple-door {
+    width:100%!important;
+  }
+}

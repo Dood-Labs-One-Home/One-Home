@@ -1,0 +1,284 @@
+/* One Home v14.67.81 — centered mobile hubs within one shared safe viewport. */
+:root{--oh-room-max:980px;}
+
+/* Every interior surface uses the selected seasonal canvas. */
+body.onehome-interior-shell-active,
+body:has(.page-view.active:not(#homePage)){
+  background-color:#080503!important;
+  background-image:linear-gradient(180deg,rgba(9,5,3,.38),rgba(3,3,3,.58)),var(--onehome-interior-bg-desktop,url('/assets/spooky-time-main-entry-pc-v1467200.webp'))!important;
+  background-position:center top!important;
+  background-size:cover!important;
+  background-repeat:no-repeat!important;
+  background-attachment:fixed!important;
+}
+body.onehome-interior-shell-active main,
+body.onehome-interior-shell-active main#top,
+body.onehome-interior-shell-active #top,
+body.onehome-interior-shell-active > .page,
+body.onehome-interior-shell-active .page-view.active,
+body:has(.page-view.active:not(#homePage)) main,
+body:has(.page-view.active:not(#homePage)) #top,
+body:has(.page-view.active:not(#homePage)) .page-view.active{
+  background-color:transparent!important;
+  background-image:none!important;
+}
+#onehomePassportJourneyPage,#profilePage,#onehomeRareRoutesPage,#rareRoutesSystemPage,#rareRoutesRewardsPage,#rareRoutesFuturePage,
+#onehomeStartHerePage,#onehomeExplorePage,#shopPage,#onehomeRareInkPage,#onehomeCreatePage,#onehomeCollectiblesPage,
+#onehomeOtherCreativeToolsPage,#nightShotsPage,#socialCommandPage,#onehomeEmberPage,#onehomeFounderPage,#onehomeMessagesPage,#onehomePassportCreatorPage,
+#projectsPage,#socialInboxPage,#notificationsPage,#activityFeedPage,#creatorQuestsPage,#mintedItemsPage,#profilesPage,#publicProfilePage,#creatorPage,#arcadePage,#comingSoonPage,#liveFramePage{
+  min-height:100dvh!important;
+  background:transparent!important;
+  background-image:none!important;
+}
+#onehomePassportJourneyPage .onehome-journey-shell,
+.rare-routes-interior,.rare-routes-interior-shell,.rare-routes-stage{background-color:transparent!important;background-image:none!important;}
+#profilePage #oneHomeProfileWizardShell{background:linear-gradient(180deg,rgba(8,10,13,.88),rgba(8,10,13,.74))!important;border:1px solid rgba(255,255,255,.15)!important;box-shadow:0 18px 50px rgba(0,0,0,.34)!important;}
+#profilePage .onehome-profile-wizard-step-card{background:rgba(0,0,0,.24)!important;}
+#projectsPage .creator-city-panel,#socialInboxPage .creator-city-panel,#notificationsPage .creator-city-panel,#activityFeedPage .creator-city-panel,#creatorQuestsPage .creator-city-panel,#creatorPage .section,#mintedItemsPage .section,#profilesPage .section,#publicProfilePage .section{background:rgba(5,7,10,.72)!important;border-color:rgba(255,255,255,.14)!important;}
+.oh-functional-room{min-height:100dvh;width:min(1000px,calc(100% - 36px));margin:0 auto;padding:100px 0 54px;}
+#onehomeMessagesPage .dood-v92-message-panel{background:rgba(5,7,10,.78)!important;border:1px solid rgba(var(--onehome-neon-rgb,255,43,214),.4)!important;border-radius:22px!important;padding:20px!important;color:#fff!important;}
+
+/* Desktop Main Entry retains its three-door layout. */
+#onehomeEntryChoicePage .onehome-choice-page-logo,
+#onehomeEntryChoicePage #oneHomeJourneyChoiceButton,
+#onehomeEntryChoicePage .passport-site-strip{display:none!important;}
+#onehomeEntryChoicePage,
+#onehomeEntryChoicePage .passport-choice-stage,
+#onehomeEntryChoicePage .passport-choice-content,
+#onehomeEntryChoicePage .passport-choice-panel{background:transparent!important;background-image:none!important;box-shadow:none!important;border:0!important;}
+#onehomeEntryChoicePage .passport-choice-stage{min-height:100dvh!important;}
+#onehomeEntryChoicePage .passport-choice-content{min-height:100dvh!important;display:grid!important;place-items:center!important;padding:88px 22px 48px!important;}
+#onehomeEntryChoicePage .passport-choice-panel{width:min(var(--oh-room-max),94vw)!important;padding:0!important;}
+#onehomeEntryChoicePage .onehome-main-entry-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:clamp(22px,3vw,42px)!important;width:100%!important;}
+#onehomeEntryChoicePage .onehome-main-entry-neon-button{display:block!important;width:100%!important;min-height:58px!important;padding:14px 24px!important;border-radius:999px!important;font-size:clamp(18px,1.5vw,21px)!important;font-weight:900!important;line-height:1.2!important;}
+#onehomeEntryChoicePage .onehome-main-entry-art,#onehomeEntryChoicePage .onehome-main-entry-image-button img{display:none!important;}
+
+/* Desktop room directories remain balanced around the canvas. */
+.oh-room-directory{min-height:100dvh;width:min(var(--oh-room-max),calc(100% - 36px));margin:0 auto;padding:96px 0 54px;display:flex;align-items:center;justify-content:center;background:transparent!important;}
+.oh-room-grid{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(22px,3vw,42px);align-items:center;}
+.oh-room-grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr));width:min(760px,100%);}
+.oh-room-button{width:100%!important;min-height:58px!important;padding:14px 22px!important;border-radius:999px!important;font-size:clamp(17px,1.4vw,20px)!important;font-weight:900!important;white-space:normal!important;}
+
+.oh-coming-room{min-height:100dvh;width:min(900px,calc(100% - 36px));margin:0 auto;padding:110px 0 58px;display:flex;flex-direction:column;justify-content:center;gap:28px;text-align:center;}
+.oh-coming-room h1{margin:0;color:#fff;font-size:clamp(42px,7vw,78px);line-height:.95;}
+.oh-coming-room .oh-coming-label{color:var(--onehome-neon,#fff);font-weight:950;letter-spacing:.14em;text-transform:uppercase;}
+.oh-coming-room .oh-room-grid{margin:0 auto;}
+
+/* Passport Creator stays separate from the Rare Ink Studio creator tools. */
+#onehomePassportJourneyPage .onehome-v1414-passport-actions{grid-template-columns:repeat(5,minmax(0,1fr))!important;}
+#onehomePassportJourneyPage .onehome-homeops-status{
+  grid-column:1/-1;
+  width:100%;
+  box-sizing:border-box;
+  padding:10px 14px;
+  border:1px solid rgba(var(--onehome-neon-rgb,255,43,214),.42);
+  border-radius:14px;
+  background:rgba(4,8,9,.84);
+  color:#fff;
+  text-align:center;
+  font-weight:850;
+  line-height:1.35;
+}
+#onehomePassportJourneyPage .onehome-homeops-status.is-error{border-color:#ff496f;color:#ffd7df;}
+#onehomePassportJourneyPage .onehome-homeops-status[hidden]{display:none!important;}
+#onehomePassportJourneyPage [data-oh-homeops]:disabled{cursor:wait;opacity:.72;}
+.oh-passport-creator-page{min-height:100dvh;width:min(1060px,calc(100% - 36px));margin:0 auto;padding:108px 0 56px;color:#fff;}
+.oh-passport-creator-hero,.oh-passport-creator-section{border:1px solid rgba(var(--onehome-neon-rgb,255,43,214),.34);border-radius:20px;background:rgba(6,8,14,.76);box-shadow:0 18px 44px rgba(0,0,0,.28);}
+.oh-passport-creator-hero{padding:22px;margin-bottom:18px;}
+.oh-passport-creator-hero h1{margin:0 0 18px;font-size:clamp(34px,5vw,58px);line-height:1;color:#fff;}
+.oh-passport-creator-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
+.oh-passport-creator-actions button{width:100%;}
+.oh-passport-creator-sections{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.oh-passport-creator-section{padding:14px;min-width:0;}
+.oh-creator-list-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 4px 14px!important;border:0!important;background:transparent!important;color:#fff!important;font-size:20px!important;font-weight:950!important;text-align:left!important;box-shadow:none!important;text-shadow:none!important;cursor:pointer;}
+.oh-creator-list-toggle.no-extra{cursor:default;}
+.oh-creator-chevron{color:var(--onehome-neon,#fff);font-size:22px;line-height:1;}
+.oh-passport-creator-list{display:grid;gap:9px;}
+.oh-passport-creator-row{padding:11px 12px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(0,0,0,.25);}
+.oh-passport-creator-row[hidden]{display:none!important;}
+.oh-passport-creator-row strong,.oh-passport-creator-row small{display:block;}
+.oh-passport-creator-row small{margin-top:4px;color:rgba(255,255,255,.68);}
+.oh-passport-creator-empty{color:rgba(255,255,255,.68);font-style:italic;padding:8px 2px;}
+
+#onehomeRareRoutesPage .rare-routes-stage,#rareRoutesSystemPage .rare-routes-interior,#rareRoutesRewardsPage .rare-routes-interior,#rareRoutesFuturePage .rare-routes-interior{background:transparent!important;background-image:none!important;}
+#rareRoutesSystemPage .rare-routes-panel,#rareRoutesRewardsPage .rare-routes-panel,#rareRoutesFuturePage .rare-routes-panel{background:rgba(5,7,10,.66)!important;border-color:rgba(255,255,255,.13)!important;}
+#rareRoutesFuturePage .rare-routes-future-card[data-season-one-link="1"]{cursor:pointer;}
+#rareRoutesFuturePage .rare-routes-future-card[data-season-one-link="1"]:hover{border-color:var(--onehome-neon,#fff)!important;box-shadow:0 0 16px rgba(var(--onehome-neon-rgb,255,43,214),.24)!important;}
+
+@media(max-width:760px){
+  body.onehome-interior-shell-active,
+  body:has(.page-view.active:not(#homePage)){
+    background-image:linear-gradient(180deg,rgba(8,4,2,.38),rgba(3,3,3,.58)),var(--onehome-interior-bg-mobile,url('/assets/spooky-time-main-entry-mobile-v1467200.webp'))!important;
+    background-position:center top!important;
+    background-size:cover!important;
+    background-attachment:scroll!important;
+  }
+  #onehomePassportJourneyPage,#profilePage,#onehomeRareRoutesPage,#rareRoutesSystemPage,#rareRoutesRewardsPage,#rareRoutesFuturePage,
+  #onehomeStartHerePage,#onehomeExplorePage,#shopPage,#onehomeRareInkPage,#onehomeCreatePage,#onehomeCollectiblesPage,
+  #onehomeOtherCreativeToolsPage,#nightShotsPage,#socialCommandPage,#onehomeEmberPage,#onehomeFounderPage,#onehomeMessagesPage,#onehomePassportCreatorPage,
+  #projectsPage,#socialInboxPage,#notificationsPage,#activityFeedPage,#creatorQuestsPage,#mintedItemsPage,#profilesPage,#publicProfilePage,#creatorPage,#arcadePage,#comingSoonPage,#liveFramePage{
+    min-height:100vh!important;
+    min-height:100svh!important;
+    min-height:100dvh!important;
+    box-sizing:border-box!important;
+  }
+
+  /* The page, rather than several independent widgets, owns the mobile top inset. */
+  body.onehome-choice-logo-visible main#top,
+  body:has(main#top > .page-view.active:not(#homePage):not(#onehomePassportEntrancePage):not(#onehomeEntryChoicePage)) main#top{padding-top:0!important;}
+  body.onehome-choice-logo-visible main#top > .page-view.active,
+  body main#top > .page-view.active:not(#homePage):not(#onehomePassportEntrancePage):not(#onehomeEntryChoicePage){
+    padding-top:var(--oh-mobile-content-top)!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Main Entry keeps the shared header and centers its action group below it. */
+  #onehomeEntryChoicePage .onehome-choice-page-logo{display:flex!important;}
+  #onehomeEntryChoicePage .passport-choice-stage{min-height:100vh!important;min-height:100svh!important;min-height:100dvh!important;}
+  #onehomeEntryChoicePage .passport-choice-content{
+    min-height:100vh!important;
+    min-height:100svh!important;
+    min-height:100dvh!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    box-sizing:border-box!important;
+    padding:var(--oh-mobile-content-top) 16px var(--oh-mobile-content-bottom)!important;
+  }
+  #onehomeEntryChoicePage .passport-choice-panel{width:min(var(--oh-mobile-content-max),100%)!important;margin:0 auto!important;}
+  #onehomeEntryChoicePage .onehome-main-entry-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:var(--oh-mobile-action-gap)!important;
+    width:100%!important;
+    margin:0!important;
+  }
+
+  /* Every directory centers its complete action group in the usable viewport. */
+  .oh-room-directory{
+    min-height:calc(100vh - 102px);
+    min-height:calc(100svh - 102px);
+    min-height:calc(100dvh - 102px);
+    width:min(var(--oh-mobile-content-max),calc(100% - 32px));
+    margin:0 auto;
+    padding:0 0 var(--oh-mobile-content-bottom);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-sizing:border-box;
+  }
+  .oh-room-grid,.oh-room-grid.cols-2{
+    grid-template-columns:1fr!important;
+    width:100%!important;
+    gap:var(--oh-mobile-action-gap)!important;
+    margin:0!important;
+  }
+
+  #onehomeEntryChoicePage .onehome-main-entry-neon-button,
+  .oh-room-button,
+  #onehomeRareRoutesPage .rare-routes-neon-button{
+    width:100%!important;
+    min-height:var(--oh-mobile-action-height)!important;
+    padding:12px 18px!important;
+    border-width:1.5px!important;
+    border-radius:999px!important;
+    background:rgba(2,12,8,.72)!important;
+    font-size:17px!important;
+    font-weight:850!important;
+    line-height:1.2!important;
+    letter-spacing:0!important;
+    text-shadow:0 0 7px rgba(var(--onehome-neon-rgb,57,255,136),.62)!important;
+    box-shadow:0 0 12px rgba(var(--onehome-neon-rgb,57,255,136),.34),inset 0 0 9px rgba(var(--onehome-neon-rgb,57,255,136),.10)!important;
+    transform:none!important;
+    white-space:normal!important;
+  }
+  #onehomeEntryChoicePage .onehome-main-entry-neon-button:active,
+  .oh-room-button:active,
+  #onehomeRareRoutesPage .rare-routes-neon-button:active{background:rgba(var(--onehome-neon-rgb,57,255,136),.17)!important;}
+
+  .oh-functional-room{
+    min-height:calc(100vh - 102px);
+    min-height:calc(100svh - 102px);
+    min-height:calc(100dvh - 102px);
+    width:min(var(--oh-mobile-content-max),calc(100% - 24px));
+    margin:0 auto;
+    padding:0 0 var(--oh-mobile-content-bottom);
+  }
+  .oh-coming-room{
+    min-height:calc(100vh - 102px);
+    min-height:calc(100svh - 102px);
+    min-height:calc(100dvh - 102px);
+    width:min(var(--oh-mobile-content-max),calc(100% - 32px));
+    padding:0 0 var(--oh-mobile-content-bottom);
+    justify-content:center;
+    box-sizing:border-box;
+    gap:20px;
+  }
+  .oh-coming-room h1{font-size:clamp(34px,11vw,48px);}
+  #onehomePassportJourneyPage .onehome-journey-shell{
+    width:min(var(--oh-mobile-content-max),calc(100% - 16px));
+    padding:0 0 var(--oh-mobile-content-bottom)!important;
+  }
+  #onehomePassportJourneyPage .onehome-v1414-passport-actions{grid-template-columns:1fr!important;gap:10px!important;}
+  .oh-passport-creator-actions,.oh-passport-creator-sections{grid-template-columns:1fr!important;}
+  .oh-passport-creator-page{
+    min-height:calc(100vh - 102px);
+    min-height:calc(100svh - 102px);
+    min-height:calc(100dvh - 102px);
+    width:min(var(--oh-mobile-content-max),calc(100% - 24px));
+    padding:0 0 var(--oh-mobile-content-bottom);
+  }
+
+  /* Rare Routes centers its choices and progress as one cohesive mobile group. */
+  #onehomeRareRoutesPage .rare-routes-stage{
+    min-height:calc(100vh - 102px)!important;
+    min-height:calc(100svh - 102px)!important;
+    min-height:calc(100dvh - 102px)!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    box-sizing:border-box!important;
+    padding:0 16px var(--oh-mobile-content-bottom)!important;
+    overflow:visible!important;
+  }
+  #onehomeRareRoutesPage .rare-routes-core{
+    width:min(var(--oh-mobile-content-max),100%)!important;
+    display:grid!important;
+    gap:24px!important;
+    margin:0 auto!important;
+    align-self:auto!important;
+  }
+  #onehomeRareRoutesPage .rare-routes-destinations{
+    width:100%!important;
+    grid-template-columns:1fr!important;
+    gap:var(--oh-mobile-action-gap)!important;
+  }
+  #onehomeRareRoutesPage .rare-routes-neon-button{text-transform:uppercase!important;letter-spacing:.035em!important;}
+  #onehomeRareRoutesPage .rare-routes-progress-wrap{width:100%!important;gap:10px!important;}
+  #onehomeRareRoutesPage .rare-routes-progress-label{font-size:13px!important;letter-spacing:.08em!important;}
+  #onehomeRareRoutesPage .rare-routes-progress-track{height:18px!important;}
+
+  /* Global Previous Page is the one mobile back control on Rare Routes interiors. */
+  .rare-routes-interior{
+    width:100%!important;
+    max-width:100%!important;
+    min-height:calc(100vh - 102px)!important;
+    min-height:calc(100svh - 102px)!important;
+    min-height:calc(100dvh - 102px)!important;
+    padding:0 14px var(--oh-mobile-content-bottom)!important;
+    box-sizing:border-box!important;
+  }
+  .rare-routes-interior-top{display:none!important;}
+  .rare-routes-interior-shell{width:100%!important;max-width:100%!important;margin:0!important;}
+  .rare-routes-panel{width:100%!important;max-width:100%!important;box-sizing:border-box!important;}
+}
+
+@media(max-width:350px){
+  #onehomeEntryChoicePage .passport-choice-content{padding-left:12px!important;padding-right:12px!important;}
+  .oh-room-directory{width:calc(100% - 24px);}
+  #onehomeEntryChoicePage .onehome-main-entry-neon-button,
+  .oh-room-button,
+  #onehomeRareRoutesPage .rare-routes-neon-button{min-height:54px!important;padding:11px 14px!important;font-size:16px!important;}
+}
+
+/* Old Creator City navigation surfaces are retired; feature pages remain active. */
+#doodV128DailyHomePanel,#doodV128ConnectPanel,header nav [data-v128-projects]{display:none!important;}

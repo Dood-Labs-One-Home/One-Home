@@ -1,0 +1,602 @@
+/* One Home v13.60 — mobile-first Creator + Mint layout */
+.mobile-mint-progress,.mobile-review-artwork{display:none}
+:root{
+  --oh-mobile-edge:14px;
+  --oh-mobile-header:66px;
+  --oh-mobile-action-safe:calc(118px + env(safe-area-inset-bottom,0px));
+}
+
+@media (max-width:820px){
+  html{overflow-x:hidden!important;scroll-padding-top:78px}
+  body.creator-mobile-app,
+  body.mint-mobile-app{
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    overflow-x:hidden!important;
+    -webkit-text-size-adjust:100%;
+  }
+  body.creator-mobile-app::after,
+  body.mint-mobile-app::after{
+    content:"";
+    position:fixed;
+    inset:0 0 auto 0;
+    height:var(--oh-mobile-header);
+    background:rgba(7,10,16,.97);
+    border-bottom:1px solid rgba(255,255,255,.12);
+    box-shadow:0 8px 26px rgba(0,0,0,.32);
+    z-index:2147482000;
+    pointer-events:none;
+  }
+  body.creator-mobile-app #oneHomeChoiceLogoControl,
+  body.creator-mobile-app .onehome-inline-choice-logo,
+  body.creator-mobile-app .onehome-existing-choice-logo,
+  body.mint-mobile-app #oneHomeChoiceLogoControl,
+  body.mint-mobile-app .onehome-inline-choice-logo,
+  body.mint-mobile-app .onehome-existing-choice-logo{
+    width:48px!important;
+    height:48px!important;
+    min-width:48px!important;
+    min-height:48px!important;
+    top:9px!important;
+    left:12px!important;
+    padding:3px!important;
+    border-radius:10px!important;
+    background:#050505!important;
+    z-index:2147483000!important;
+  }
+  body.creator-mobile-app button,
+  body.creator-mobile-app input,
+  body.creator-mobile-app select,
+  body.creator-mobile-app textarea,
+  body.mint-mobile-app button,
+  body.mint-mobile-app input,
+  body.mint-mobile-app select,
+  body.mint-mobile-app textarea{
+    font-size:16px!important;
+  }
+  body.creator-mobile-app button,
+  body.mint-mobile-app button,
+  body.mint-mobile-app .btn{
+    min-height:48px;
+    touch-action:manipulation;
+  }
+
+  /* Creator shell */
+  body.creator-mobile-app{
+    padding:calc(var(--oh-mobile-header) + 12px) var(--oh-mobile-edge) var(--oh-mobile-action-safe)!important;
+  }
+  body.creator-mobile-app>div{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+  }
+  body.creator-mobile-app>div>h1{
+    margin:0 0 8px!important;
+    font-size:clamp(30px,9vw,38px)!important;
+    line-height:1.05!important;
+    letter-spacing:-1px!important;
+  }
+  body.creator-mobile-app>div>h1+p{
+    margin:0 0 20px!important;
+    font-size:16px!important;
+    line-height:1.5!important;
+  }
+  body.creator-mobile-app #riCreatorDoorHome,
+  body.creator-mobile-app #riCreatorWorkspace{
+    width:100%!important;
+    max-width:none!important;
+  }
+  body.creator-mobile-app #riCreatorWorkspace{
+    padding:14px!important;
+    border-radius:18px!important;
+    margin:0!important;
+  }
+  body.creator-mobile-app .ri-creator-question{
+    font-size:clamp(25px,7.5vw,32px)!important;
+    line-height:1.12!important;
+    margin:4px 0 8px!important;
+  }
+  body.creator-mobile-app .ri-creator-intro{
+    font-size:15px!important;
+    line-height:1.5!important;
+    margin:0 0 16px!important;
+  }
+  body.creator-mobile-app .ri-project-actions,
+  body.creator-mobile-app .ri-project-row-actions,
+  body.creator-mobile-app .ri-workspace-buttons{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:10px!important;
+  }
+  body.creator-mobile-app .ri-project-actions button,
+  body.creator-mobile-app .ri-project-row-actions button,
+  body.creator-mobile-app .ri-workspace-buttons button,
+  body.creator-mobile-app .ri-creator-start,
+  body.creator-mobile-app .ri-project-back{
+    width:100%!important;
+    min-height:52px!important;
+    padding:13px 15px!important;
+  }
+  body.creator-mobile-app .ri-project-list-panel,
+  body.creator-mobile-app .ri-project-row,
+  body.creator-mobile-app .ri-creator-select-wrap{
+    padding:14px!important;
+    border-radius:16px!important;
+  }
+  body.creator-mobile-app .ri-project-list-head,
+  body.creator-mobile-app .ri-workspace-top{
+    align-items:stretch!important;
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:10px!important;
+  }
+  body.creator-mobile-app .ri-project-list-head button{width:100%!important}
+  body.creator-mobile-app .ri-room-name{font-size:14px!important;line-height:1.35!important}
+  body.creator-mobile-app .easy-fields,
+  body.creator-mobile-app .easy-choice-grid{
+    grid-template-columns:1fr!important;
+    gap:12px!important;
+  }
+  body.creator-mobile-app .easy-fields label{
+    padding:13px!important;
+    border-radius:14px!important;
+  }
+  body.creator-mobile-app .easy-step-title{
+    margin:20px 0 12px!important;
+    gap:11px!important;
+  }
+  body.creator-mobile-app .easy-step-title>span{
+    width:36px!important;
+    height:36px!important;
+    min-width:36px!important;
+    font-size:18px!important;
+  }
+  body.creator-mobile-app .easy-step-title strong{font-size:21px!important}
+  body.creator-mobile-app .easy-step-title small{font-size:14px!important}
+
+  /* One job per screen and larger progress */
+  body.creator-mobile-app .ri-single-progress,
+  body.creator-mobile-app .ri-multi-progress,
+  body.creator-mobile-app .ri-random-progress{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:9px!important;
+    margin:4px 0 16px!important;
+  }
+  body.creator-mobile-app .ri-single-progress strong,
+  body.creator-mobile-app .ri-multi-progress strong,
+  body.creator-mobile-app .ri-random-progress strong{
+    font-size:16px!important;
+  }
+  body.creator-mobile-app .ri-single-track,
+  body.creator-mobile-app .ri-multi-track,
+  body.creator-mobile-app .ri-random-track{
+    width:100%!important;
+    height:12px!important;
+  }
+  body.creator-mobile-app .ri-single-card,
+  body.creator-mobile-app .ri-multi-card,
+  body.creator-mobile-app .ri-random-card,
+  body.creator-mobile-app .ri-card,
+  body.creator-mobile-app .ri-wizard-panel{
+    padding:16px!important;
+    border-radius:17px!important;
+    margin-top:14px!important;
+  }
+  body.creator-mobile-app .ri-single-card h2,
+  body.creator-mobile-app .ri-multi-card h2,
+  body.creator-mobile-app .ri-random-card h2,
+  body.creator-mobile-app .ri-wizard-panel h2{
+    font-size:clamp(24px,7vw,30px)!important;
+    line-height:1.15!important;
+  }
+  body.creator-mobile-app .ri-single-card>p,
+  body.creator-mobile-app .ri-multi-card>p,
+  body.creator-mobile-app .ri-random-card>p{
+    font-size:15px!important;
+    margin-bottom:17px!important;
+  }
+  body.creator-mobile-app .ri-single-upload,
+  body.creator-mobile-app .ri-multi-upload,
+  body.creator-mobile-app .ri-random-upload,
+  body.creator-mobile-app .ri-upload{
+    padding:15px!important;
+    border-radius:15px!important;
+  }
+  body.creator-mobile-app .ri-multi-grid,
+  body.creator-mobile-app .ri-random-grid,
+  body.creator-mobile-app .ri-image-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+  body.creator-mobile-app .ri-multi-image-card,
+  body.creator-mobile-app .ri-random-image-card{
+    padding:9px!important;
+    min-width:0!important;
+  }
+  body.creator-mobile-app .ri-multi-image-card img,
+  body.creator-mobile-app .ri-random-image-card img{
+    width:100%!important;
+    height:auto!important;
+    aspect-ratio:1!important;
+    object-fit:cover!important;
+  }
+  body.creator-mobile-app .ri-multi-one-image,
+  body.creator-mobile-app .ri-random-one-image{
+    grid-template-columns:1fr!important;
+    gap:12px!important;
+    padding:12px!important;
+  }
+  body.creator-mobile-app .ri-multi-one-image img,
+  body.creator-mobile-app .ri-random-one-image img{
+    width:100%!important;
+    height:auto!important;
+    max-height:360px!important;
+    object-fit:contain!important;
+  }
+  body.creator-mobile-app .ri-multi-trait-row,
+  body.creator-mobile-app .ri-random-trait-row,
+  body.creator-mobile-app .ri-single-trait-row,
+  body.creator-mobile-app .ri-random-distribution-item{
+    grid-template-columns:1fr!important;
+  }
+  body.creator-mobile-app .ri-random-distribution-item img{
+    width:72px!important;
+    height:72px!important;
+  }
+
+  /* Review as one clean card with thumbnail rows */
+  body.creator-mobile-app .ri-multi-review,
+  body.creator-mobile-app .ri-random-review,
+  body.creator-mobile-app .ri-single-review{
+    display:block!important;
+    background:#151f31!important;
+    border:1px solid #3f4f6c!important;
+    border-radius:15px!important;
+    padding:0 14px!important;
+    overflow:hidden!important;
+  }
+  body.creator-mobile-app .ri-multi-review-item,
+  body.creator-mobile-app .ri-random-review-item,
+  body.creator-mobile-app .ri-single-review-item{
+    background:transparent!important;
+    border-radius:0!important;
+    border-bottom:1px solid #334155!important;
+    padding:14px 0!important;
+  }
+  body.creator-mobile-app .ri-multi-review-item:last-child,
+  body.creator-mobile-app .ri-random-review-item:last-child,
+  body.creator-mobile-app .ri-single-review-item:last-child{border-bottom:0!important}
+  body.creator-mobile-app .ri-multi-review-art,
+  body.creator-mobile-app .ri-random-review-art{
+    grid-template-columns:64px minmax(0,1fr)!important;
+    gap:11px!important;
+  }
+  body.creator-mobile-app .ri-multi-review-art img,
+  body.creator-mobile-app .ri-random-review-art img{
+    width:64px!important;
+    height:64px!important;
+    object-fit:cover!important;
+  }
+
+  /* Sticky mobile actions */
+  body.creator-mobile-app .ri-single-actions,
+  body.creator-mobile-app .ri-multi-actions,
+  body.creator-mobile-app .ri-random-actions,
+  body.creator-mobile-app .easy-finish,
+  body.creator-mobile-app .ri-wizard-panel>.ri-action-row:last-child{
+    position:sticky!important;
+    bottom:calc(8px + env(safe-area-inset-bottom,0px))!important;
+    z-index:1500!important;
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:8px!important;
+    padding:10px!important;
+    margin:20px -5px 0!important;
+    border:1px solid rgba(118,136,236,.75)!important;
+    border-radius:15px!important;
+    background:rgba(12,18,30,.97)!important;
+    box-shadow:0 14px 35px rgba(0,0,0,.45)!important;
+    backdrop-filter:blur(12px);
+  }
+  body.creator-mobile-app .ri-single-actions .right,
+  body.creator-mobile-app .ri-multi-actions .right,
+  body.creator-mobile-app .ri-random-actions .right{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:8px!important;
+  }
+  body.creator-mobile-app .ri-single-actions button,
+  body.creator-mobile-app .ri-multi-actions button,
+  body.creator-mobile-app .ri-random-actions button,
+  body.creator-mobile-app .easy-finish button,
+  body.creator-mobile-app .ri-wizard-panel>.ri-action-row:last-child button{
+    width:100%!important;
+    min-width:0!important;
+    min-height:48px!important;
+    padding:11px 10px!important;
+    margin:0!important;
+  }
+  body.creator-mobile-app .easy-finish>div{display:none!important}
+  body.creator-mobile-app .easy-finish{position:sticky!important}
+
+  /* Do not create nested scrolling on phones */
+  body.creator-mobile-app .ri-project-list-panel,
+  body.creator-mobile-app .ri-project-list,
+  body.creator-mobile-app .ri-card,
+  body.creator-mobile-app .ri-wizard-panel,
+  body.creator-mobile-app .ri-single-card,
+  body.creator-mobile-app .ri-multi-card,
+  body.creator-mobile-app .ri-random-card{
+    max-height:none!important;
+    overflow:visible!important;
+  }
+
+  /* Mint shell */
+  body.mint-mobile-app{
+    background-image:url('/assets/one-home-room-mobile-background.webp')!important;
+  }
+  body.mint-mobile-app .wrap{
+    width:100%!important;
+    max-width:none!important;
+    padding:calc(var(--oh-mobile-header) + 12px) var(--oh-mobile-edge) var(--oh-mobile-action-safe)!important;
+  }
+  body.mint-mobile-app .top{display:none!important}
+  body.mint-mobile-app .hero,
+  body.mint-mobile-app .panel{
+    width:100%!important;
+    padding:16px!important;
+    border-radius:18px!important;
+    margin-top:14px!important;
+  }
+  body.mint-mobile-app .hero{margin-top:0!important}
+  body.mint-mobile-app .hero h1{
+    font-size:clamp(32px,10vw,42px)!important;
+    line-height:1.04!important;
+    margin:4px 0 8px!important;
+    letter-spacing:-1px!important;
+  }
+  body.mint-mobile-app .hero p,
+  body.mint-mobile-app .mint-home-question>p,
+  body.mint-mobile-app .empty{
+    font-size:15px!important;
+    line-height:1.5!important;
+  }
+  body.mint-mobile-app .grid,
+  body.mint-mobile-app .field-grid,
+  body.mint-mobile-app .source-grid,
+  body.mint-mobile-app .review,
+  body.mint-mobile-app .burn-reward-details{
+    grid-template-columns:1fr!important;
+    gap:10px!important;
+  }
+  body.mint-mobile-app .choice,
+  body.mint-mobile-app .source-card,
+  body.mint-mobile-app .mint-card,
+  body.mint-mobile-app .mint-setting-question,
+  body.mint-mobile-app .traits-box,
+  body.mint-mobile-app .artwork-trait-card{
+    padding:14px!important;
+    border-radius:15px!important;
+  }
+  body.mint-mobile-app .choice p{min-height:0!important}
+  body.mint-mobile-app .field input,
+  body.mint-mobile-app .field textarea,
+  body.mint-mobile-app .field select{
+    min-height:50px!important;
+    padding:13px!important;
+  }
+  body.mint-mobile-app .mint-guided-progress{
+    margin:4px 0 18px!important;
+  }
+  body.mint-mobile-app .mint-guided-progress-head{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:3px!important;
+    font-size:15px!important;
+  }
+  body.mint-mobile-app .mint-guided-progress-track,
+  body.mint-mobile-app .mobile-mint-progress-track{
+    height:12px!important;
+  }
+  body.mint-mobile-app .mint-setting-question h3{
+    font-size:clamp(23px,7vw,30px)!important;
+    line-height:1.14!important;
+  }
+  body.mint-mobile-app .traits-head,
+  body.mint-mobile-app .artwork-trait-title,
+  body.mint-mobile-app .creator-inline-head{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    align-items:stretch!important;
+  }
+  body.mint-mobile-app .traits-head button,
+  body.mint-mobile-app .artwork-trait-title button,
+  body.mint-mobile-app .creator-inline-head button{width:100%!important}
+  body.mint-mobile-app .artwork-trait-header{
+    grid-template-columns:64px minmax(0,1fr)!important;
+  }
+  body.mint-mobile-app .artwork-trait-thumb{
+    width:64px!important;
+    height:64px!important;
+  }
+  body.mint-mobile-app .creator-inline-frame{
+    height:calc(100svh - 150px)!important;
+    min-height:650px!important;
+  }
+
+  /* Replace squeezed desktop step pills with a large mobile progress block */
+  body.mint-mobile-app .steps{display:none!important}
+  body.mint-mobile-app .mobile-mint-progress{
+    display:block!important;
+    margin:0 0 18px!important;
+    padding:13px 14px!important;
+    border:1px solid #4b5550!important;
+    border-radius:15px!important;
+    background:#0d1211!important;
+  }
+  body.mint-mobile-app .mobile-mint-progress-copy{
+    display:flex!important;
+    justify-content:space-between!important;
+    gap:10px!important;
+    margin-bottom:9px!important;
+    font-weight:900!important;
+  }
+  body.mint-mobile-app .mobile-mint-progress-name{color:#f5b2e9!important;text-align:right!important}
+  body.mint-mobile-app .mobile-mint-progress-track{
+    border-radius:999px!important;
+    overflow:hidden!important;
+    background:#242b27!important;
+    border:1px solid #465149!important;
+  }
+  body.mint-mobile-app .mobile-mint-progress-fill{
+    height:100%!important;
+    width:14.285%!important;
+    border-radius:999px!important;
+    background:linear-gradient(90deg,#8e167e,#ed22cc)!important;
+    transition:width .2s ease!important;
+  }
+
+  /* One review card and visual artwork gallery */
+  body.mint-mobile-app .wizard-step[data-step="4"]>.review{
+    display:block!important;
+    padding:0 14px!important;
+    background:#0b0e10!important;
+    border:1px solid #36423a!important;
+    border-radius:15px!important;
+    overflow:hidden!important;
+  }
+  body.mint-mobile-app .wizard-step[data-step="4"]>.review>div{
+    padding:13px 0!important;
+    border:0!important;
+    border-bottom:1px solid #2e3932!important;
+    border-radius:0!important;
+    background:transparent!important;
+  }
+  body.mint-mobile-app .wizard-step[data-step="4"]>.review>div:last-child{border-bottom:0!important}
+  body.mint-mobile-app .mobile-review-artwork{
+    display:block!important;
+    margin:0 0 14px!important;
+    padding:14px!important;
+    border:1px solid #465149!important;
+    border-radius:15px!important;
+    background:#0b0e10!important;
+  }
+  body.mint-mobile-app .mobile-review-artwork h3{margin:0 0 11px!important;font-size:20px!important}
+  body.mint-mobile-app .mobile-review-artwork-grid{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+  body.mint-mobile-app .mobile-review-artwork-item{
+    min-width:0!important;
+    border:1px solid #36423a!important;
+    border-radius:13px!important;
+    overflow:hidden!important;
+    background:#111617!important;
+  }
+  body.mint-mobile-app .mobile-review-artwork-item button{
+    width:100%!important;
+    min-height:0!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    color:#fff!important;
+    text-align:left!important;
+  }
+  body.mint-mobile-app .mobile-review-artwork-item img,
+  body.mint-mobile-app .mobile-review-artwork-placeholder{
+    display:block!important;
+    width:100%!important;
+    aspect-ratio:1!important;
+    object-fit:cover!important;
+    background:#181d1a!important;
+  }
+  body.mint-mobile-app .mobile-review-artwork-placeholder{
+    display:grid!important;
+    place-items:center!important;
+    color:#aeb5b1!important;
+    font-size:13px!important;
+    padding:8px!important;
+  }
+  body.mint-mobile-app .mobile-review-artwork-label{
+    display:block!important;
+    padding:9px 10px!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+    font-size:13px!important;
+    font-weight:800!important;
+  }
+
+  /* Sticky Mint actions */
+  body.mint-mobile-app .mint-settings-actions,
+  body.mint-mobile-app .wizard-step>.actions,
+  body.mint-mobile-app #bulkMintPanel>.actions{
+    position:sticky!important;
+    bottom:calc(8px + env(safe-area-inset-bottom,0px))!important;
+    z-index:1500!important;
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:8px!important;
+    margin:20px -5px 0!important;
+    padding:10px!important;
+    border:1px solid rgba(237,34,204,.55)!important;
+    border-radius:15px!important;
+    background:rgba(8,10,12,.97)!important;
+    box-shadow:0 14px 35px rgba(0,0,0,.48)!important;
+    backdrop-filter:blur(12px);
+  }
+  body.mint-mobile-app .mint-settings-actions .btn,
+  body.mint-mobile-app .wizard-step>.actions .btn,
+  body.mint-mobile-app #bulkMintPanel>.actions .btn{
+    width:100%!important;
+    min-width:0!important;
+    min-height:48px!important;
+    margin:0!important;
+  }
+  body.mint-mobile-app .mint-settings-actions #settingsNextBtn,
+  body.mint-mobile-app .wizard-step>.actions .btn:not(.alt){order:-1!important}
+
+  body.mint-mobile-app .mint-card .actions,
+  body.mint-mobile-app #myMintsPanel>.actions{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+  }
+  body.mint-mobile-app .mint-card .actions .btn,
+  body.mint-mobile-app #myMintsPanel>.actions .btn{width:100%!important}
+
+  /* No nested scrolling */
+  body.mint-mobile-app .panel,
+  body.mint-mobile-app .mint-setting-question,
+  body.mint-mobile-app .creator-inline,
+  body.mint-mobile-app .mint-list,
+  body.mint-mobile-app .review{
+    max-height:none!important;
+    overflow:visible!important;
+  }
+
+  /* Full-screen tap preview */
+  .oh-artwork-lightbox{
+    position:fixed!important;
+    inset:0!important;
+    z-index:2147483600!important;
+    display:grid!important;
+    place-items:center!important;
+    padding:18px!important;
+    background:rgba(0,0,0,.92)!important;
+  }
+  .oh-artwork-lightbox[hidden]{display:none!important}
+  .oh-artwork-lightbox-card{
+    width:min(100%,560px)!important;
+    max-height:calc(100svh - 36px)!important;
+    overflow:auto!important;
+    padding:12px!important;
+    border:1px solid rgba(255,255,255,.22)!important;
+    border-radius:16px!important;
+    background:#101312!important;
+  }
+  .oh-artwork-lightbox-card img{display:block!important;width:100%!important;max-height:72svh!important;object-fit:contain!important;border-radius:12px!important}
+  .oh-artwork-lightbox-card button{width:100%!important;margin-top:10px!important}
+}

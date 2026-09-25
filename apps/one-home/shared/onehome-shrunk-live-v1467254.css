@@ -1,0 +1,16 @@
+/* OH-254 production collaboration checkout; scoped to SHRUNK room only. */
+#oh254LiveFlow{display:grid;gap:16px;margin:24px auto;max-width:920px}
+#oh254LiveFlow .oh254-panel{background:rgba(5,6,9,.93);border:1px solid rgba(255,255,255,.24);border-radius:20px;padding:23px;scroll-margin-top:90px}
+#oh254LiveFlow h2{margin:0 0 14px}#oh254LiveFlow h3{font-size:30px;margin:4px 0}
+#oh254LiveFlow .oh254-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+#oh254LiveFlow label{display:grid;gap:7px;margin:12px 0;font-weight:700}
+#oh254LiveFlow input,#oh254LiveFlow select,#oh254LiveFlow textarea{width:100%;min-width:0;padding:12px;border:1px solid #777;border-radius:10px;background:#121212;color:#fff;font:inherit}
+#oh254LiveFlow .oh254-status{padding:12px;margin:10px 0;border:1px solid #666;border-radius:10px;overflow-wrap:anywhere}
+#oh254LiveFlow .oh254-status:empty{display:none}#oh254LiveFlow .oh254-status.good{border-color:#42b962}#oh254LiveFlow .oh254-status.warn{border-color:#ceaa58}#oh254LiveFlow .oh254-status.bad{border-color:#d45151}
+#oh254LiveFlow .oh254-note{font-size:13px;line-height:1.6;color:#eee}
+#oh254LiveFlow .oh254-list{display:grid;gap:10px}#oh254LiveFlow .oh254-item{display:flex;justify-content:space-between;gap:14px;align-items:center;border:1px solid #666;border-radius:12px;padding:14px}
+#oh254LiveFlow .oh254-item strong,#oh254LiveFlow .oh254-item small{display:block}#oh254LiveFlow .oh254-item small{margin-top:6px}
+#oh254LiveFlow #oh254Card{min-height:100px;background:#fff;padding:10px;border-radius:10px;margin:13px 0}
+#oh254LiveFlow button:disabled{opacity:.55;cursor:not-allowed}
+#oh254LiveFlow [hidden]{display:none!important}
+@media(max-width:720px){#oh254LiveFlow .oh254-fields{grid-template-columns:1fr}#oh254LiveFlow .oh254-item{flex-direction:column;align-items:stretch}}

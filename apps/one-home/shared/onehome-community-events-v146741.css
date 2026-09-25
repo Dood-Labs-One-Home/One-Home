@@ -1,0 +1,16 @@
+.onehome-community-feed{display:grid;gap:12px;margin-top:16px}
+.onehome-community-event{border:1px solid rgba(var(--onehome-neon-rgb,255,43,214),.34);border-radius:18px;padding:15px 16px;background:rgba(0,0,0,.38);backdrop-filter:blur(8px)}
+.onehome-community-event h3{margin:0 0 7px;color:var(--onehome-neon,#ff2bd6);font-size:1.05rem}
+.onehome-community-event p{margin:0;line-height:1.45;color:#fff}
+.onehome-community-event-meta{margin-top:9px;color:rgba(255,255,255,.7);font-size:.85rem}
+.onehome-community-event-type{display:inline-flex;border:1px solid rgba(var(--onehome-neon-rgb,255,43,214),.45);border-radius:999px;padding:4px 9px;margin-bottom:8px;font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:var(--onehome-neon,#ff2bd6)}
+.onehome-community-event-link{display:inline-flex;margin-top:11px;border:1px solid var(--onehome-neon,#ff2bd6);border-radius:999px;padding:8px 12px;color:var(--onehome-neon,#ff2bd6);background:rgba(0,0,0,.3);font-weight:900;text-decoration:none;cursor:pointer}
+.onehome-community-feed-actions{display:flex;justify-content:center;margin-top:14px}
+.onehome-community-empty,.onehome-community-status{border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:14px;background:rgba(0,0,0,.28);color:#fff}
+.onehome-community-status.is-error{border-color:#ff6b6b;color:#ffd0d0}.onehome-community-status.is-success{border-color:#58e68a;color:#bfffd1}
+.onehome-community-compose{max-width:920px;margin:0 auto;border:1px solid rgba(var(--onehome-neon-rgb,255,43,214),.38);border-radius:24px;padding:22px;background:rgba(0,0,0,.5);backdrop-filter:blur(10px)}
+.onehome-community-compose h1{margin:0 0 8px}.onehome-community-compose p{color:rgba(255,255,255,.82)}
+.onehome-community-form{display:grid;gap:14px;margin-top:18px}.onehome-community-form label{display:grid;gap:7px;font-weight:900;color:#fff}
+.onehome-community-form input,.onehome-community-form textarea,.onehome-community-form select{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.35);border-radius:14px;background:rgba(0,0,0,.62);color:#fff;padding:12px 13px;font:inherit}
+.onehome-community-form textarea{min-height:130px;resize:vertical}.onehome-community-form-actions{display:flex;gap:10px;flex-wrap:wrap}
+@media(max-width:700px){.onehome-community-compose{padding:17px}.onehome-community-event{padding:13px}}
