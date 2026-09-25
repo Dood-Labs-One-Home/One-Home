@@ -6,6 +6,7 @@
   'use strict';
   var CHAINS={
     'avalanche-fuji':{label:'Avalanche Fuji',ecosystem:'evm',environment:'testnet',symbol:'AVAX'},
+    'avalanche-mainnet':{label:'Avalanche Mainnet (Locked)',ecosystem:'evm',environment:'mainnet',symbol:'AVAX',locked:true},
     'xrpl-mainnet':{label:'XRP Ledger',ecosystem:'xrpl',environment:'mainnet',symbol:'XRP'},
     'xrpl-testnet':{label:'XRP Ledger Testnet',ecosystem:'xrpl',environment:'testnet',symbol:'XRP'},
     'stellar-testnet':{label:'Stellar Testnet',ecosystem:'stellar',environment:'testnet',symbol:'XLM'},
