@@ -14247,6 +14247,7 @@ body:has(#profilePage.onehome-wallet-only.page-view.active) main#top,body:has(#p
 if(window.__oneHomeV1467108WalletFlow)return;window.__oneHomeV1467108WalletFlow=true;
 var xrplRows=[],chainRows=[],selectedChainKey='',addPickerOpen=false;
 var CHAINS=[
+ {key:'avalanche-mainnet',label:'Avalanche',ecosystem:'evm',providers:[{key:'metamask',label:'MetaMask',link:function(chain){return window.OneHomeMetaMaskWallets?.link('evm',chain.key)}}]},
  {key:'avalanche-fuji',label:'Avalanche — Testnet',ecosystem:'evm',providers:[{key:'metamask',label:'MetaMask',link:function(chain){return window.OneHomeMetaMaskWallets?.link('evm',chain.key)}}]},
  {key:'arbitrum-sepolia',label:'Arbitrum — Testnet',ecosystem:'evm',providers:[{key:'metamask',label:'MetaMask',link:function(chain){return window.OneHomeMetaMaskWallets?.link('evm',chain.key)}}]},
  {key:'base-mainnet',label:'Base',ecosystem:'evm',providers:[{key:'metamask',label:'MetaMask',link:function(chain){return window.OneHomeMetaMaskWallets?.link('evm',chain.key)}}]},
