@@ -16,16 +16,17 @@ test('creator and collector use Fuji, AVAX and the same network config',()=>{
 });
 test('Passport wallet tree includes explicitly selected MetaMask Fuji in alphabetical order',()=>{
  const html=read('index.html'),block=html.match(/var CHAINS=(\[[\s\S]*?\]\.sort\(function\(a,b\)\{return a.label.localeCompare\(b.label\)\}\));/)[1];
- const rows=vm.runInNewContext(block,{window:{}});const a=rows.find(r=>r.key==='avalanche-fuji');
+ const rows=vm.runInNewContext(block,{window:{}});const a=rows.find(r=>r.key==='avalanche-fuji');const mainnet=rows.find(r=>r.key==='avalanche-mainnet');
+ assert.equal(mainnet.label,'Avalanche');assert.equal(mainnet.providers[0].key,'metamask');
  assert.equal(a.ecosystem,'evm');assert.equal(a.providers[0].key,'metamask');
  assert.deepEqual([...rows.map(r=>r.label)],[...rows.map(r=>r.label)].sort((a,b)=>a.localeCompare(b)));
  assert.match(html,/selectedChainKey=''/);
 });
-test('Avalanche Mainnet is present but locked',()=>{
+test('Avalanche Mainnet allows Passport wallet linking while minting stays locked',()=>{
  const window={};vm.runInNewContext(read('shared/onehome-chain-identity-v1467114.js'),{window});
  const d=window.OneHomeChainIdentity.describe({chain_key:'avalanche-mainnet'});
- assert.equal(d.ecosystem,'evm');assert.equal(d.symbol,'AVAX');assert.equal(d.testOnly,false);assert.equal(d.known,true);
- const mainnet=fallbacks['avalanche-mainnet'];assert.equal(mainnet.chain_id,43114);assert.equal(mainnet.locked,true);assert.equal(mainnet.wallet_enabled,false);assert.equal(mainnet.mint_enabled,false);
+ assert.equal(d.ecosystem,'evm');assert.equal(d.symbol,'AVAX');assert.equal(d.testOnly,false);assert.equal(d.known,true);assert.equal(d.label,'Avalanche Mainnet');
+ const mainnet=fallbacks['avalanche-mainnet'];assert.equal(mainnet.chain_id,43114);assert.equal(mainnet.locked,true);assert.equal(mainnet.wallet_enabled,true);assert.equal(mainnet.mint_enabled,false);
 });
 test('canonical identity distinguishes Fuji from mainnet',()=>{
  const window={};vm.runInNewContext(read('shared/onehome-chain-identity-v1467114.js'),{window});
