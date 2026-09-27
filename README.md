@@ -89,6 +89,11 @@ The current arcade library includes:
 
 Each game is kept as a complete project inside this repository so One Home can evolve toward reliable in-app game experiences while still allowing hosted game pages when appropriate.
 
+
+## Creator Mint Progress
+
+One Home is rolling out the ability to grow compatible active XRPL digital mints with additional editions while keeping the existing mint experience in place. Availability is being staged through the creator interface.
+
 ## Near-Term Roadmap
 
 1. Document the One Home architecture and privacy direction.
