@@ -92,7 +92,7 @@ Each game is kept as a complete project inside this repository so One Home can e
 
 ## Creator Mint Progress
 
-One Home is rolling out the ability to grow compatible active XRPL digital mints with additional editions while keeping the existing mint experience in place. Availability is being staged through the creator interface.
+One Home creators can add digital editions to compatible active XRPL mints through the creator interface while keeping the existing mint experience in place.
 
 ## Near-Term Roadmap
 
