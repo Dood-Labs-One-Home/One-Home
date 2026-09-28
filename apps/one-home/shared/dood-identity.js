@@ -14,9 +14,13 @@
   var PROFILE_ME_ERROR_KEY = 'dood_identity_profile_me_error';
   var syncing = null;
   var lastWalletSynced = '';
+  var syncGeneration = 0;
+  var profileMePromise = null;
+  var PROFILE_ME_TTL = 30000;
 
   function clean(v){ return String(v == null ? '' : v).trim(); }
   function lower(v){ return clean(v).toLowerCase(); }
+  function truthy(v){ return v === true || v === 1 || lower(v) === 'true' || lower(v) === '1'; }
   function safeJsonParse(v){ try { return JSON.parse(v); } catch(e) { return null; } }
   function writeJson(key, value){ try { localStorage.setItem(key, JSON.stringify(value)); } catch(e) {} }
   function removeKey(key){ try { localStorage.removeItem(key); } catch(e) {} }
@@ -115,7 +119,7 @@
         avatar_url: clean(profile.avatar_url || profile.avatarUrl || ''),
         bio: clean(profile.bio || ''),
         role_type: clean(profile.role_type || profile.roleType || ''),
-        profile_complete: !!profile.profile_complete,
+        profile_complete: truthy(profile.profile_complete) || truthy(profile.profileComplete) || truthy(data.profile_complete) || truthy(data.profileComplete),
         primary_wallet: clean(profile.primary_wallet || profile.primaryWallet || outWallet)
       },
       wallet: {
@@ -212,7 +216,7 @@
         avatar_url: clean(profile.avatar_url || profile.avatarUrl || fallbackProfile.avatar_url || ''),
         bio: clean(profile.bio || fallbackProfile.bio || ''),
         role_type: clean(profile.role_type || profile.roleType || fallbackProfile.role_type || ''),
-        profile_complete: !!(profile.profile_complete || fallbackProfile.profile_complete),
+        profile_complete: truthy(profile.profile_complete) || truthy(profile.profileComplete) || truthy(data.profile_complete) || truthy(data.profileComplete) || truthy(fallbackProfile.profile_complete) || truthy(fallbackProfile.profileComplete),
         primary_wallet: clean(profile.primary_wallet || profile.primaryWallet || fallbackProfile.primary_wallet || walletAddress)
       },
       wallet: {
@@ -228,11 +232,20 @@
     };
   }
 
-  async function getProfileMe(force){
+  async function fetchProfileMe(force){
+    var generation = syncGeneration;
+    var requestedWallet = getLocalWallet();
     var session = safeJsonParse(localStorage.getItem(SESSION_KEY) || 'null');
-    if (!session || !session.profile || !session.profile.dood_id || force) {
+    var sessionWallet = clean(session && session.wallet && session.wallet.wallet_address);
+    if (!session || !session.profile || !session.profile.dood_id || force || (requestedWallet && lower(sessionWallet) !== lower(requestedWallet))) {
       session = await syncFromLabWallet();
+      if (!session) return null;
+      sessionWallet = clean(session && session.wallet && session.wallet.wallet_address);
+      if (requestedWallet && lower(getLocalWallet()) === lower(requestedWallet) && lower(sessionWallet) === lower(requestedWallet)) {
+        generation = syncGeneration;
+      }
     }
+    if (generation !== syncGeneration) return null;
     session = session || safeJsonParse(localStorage.getItem(SESSION_KEY) || 'null') || {};
     var walletAddress = clean((session.wallet && session.wallet.wallet_address) || getLocalWallet());
     var headers = profileMeHeaders();
@@ -248,17 +261,20 @@
         credentials: 'omit',
         headers: headers
       });
+      if (generation !== syncGeneration) return null;
       var text = '';
       try { text = await res.text(); } catch(e) {}
       var data = text ? safeJsonParse(text) : {};
       if (!data) data = { raw:text };
-      if (!res.ok || data.ok === false) throw new Error(clean(data.error || data.message || data.raw || ('labApi profile/me HTTP ' + res.status)));
+      if (!res.ok || data.ok === false) throw new Error(clean(data.error || data.message || data.raw || ('labApi Passport HTTP ' + res.status)));
       var profileMe = normalizeProfileMe(data, session);
+      if (generation !== syncGeneration) return null;
       writeJson(PROFILE_ME_KEY, profileMe);
       removeKey(PROFILE_ME_ERROR_KEY);
       try { window.dispatchEvent(new CustomEvent('dood_identity_profile_me', { detail: profileMe })); } catch(e) {}
       return profileMe;
     } catch(err) {
+      if (generation !== syncGeneration) return null;
       var fallback = normalizeProfileMe({}, session);
       writeJson(PROFILE_ME_KEY, fallback);
       writeJson(PROFILE_ME_ERROR_KEY, {
@@ -273,7 +289,29 @@
     }
   }
 
+  async function getProfileMe(force){
+    var cached = safeJsonParse(localStorage.getItem(PROFILE_ME_KEY) || 'null');
+    var cachedAt = cached && cached.fetched_at ? Date.parse(cached.fetched_at) : 0;
+    var cachedWallet = clean(cached && cached.wallet && cached.wallet.wallet_address);
+    var currentWallet = getLocalWallet();
+    if (!force && cached && cachedAt && currentWallet && lower(cachedWallet) === lower(currentWallet) && Date.now() - cachedAt < PROFILE_ME_TTL) return cached;
+    if (profileMePromise) return profileMePromise;
+    var generation = syncGeneration;
+    var requestedWallet = currentWallet;
+    var currentRequest = fetchProfileMe(!!force).then(function(result){
+      if (!result) return null;
+      var resultWallet = clean(result && result.wallet && result.wallet.wallet_address);
+      if (requestedWallet) return lower(getLocalWallet()) === lower(requestedWallet) && lower(resultWallet) === lower(requestedWallet) ? result : null;
+      return generation === syncGeneration ? result : null;
+    }).finally(function(){
+      if (profileMePromise === currentRequest) profileMePromise = null;
+    });
+    profileMePromise = currentRequest;
+    return currentRequest;
+  }
+
   async function syncFromLabWallet(){
+    var generation = syncGeneration;
     var walletAddress = getLocalWallet();
     if (!walletAddress) {
       setError('No valid XRPL wallet address found in local app storage yet. Connect wallet first.');
@@ -281,31 +319,44 @@
     }
 
     var current = safeJsonParse(localStorage.getItem(SESSION_KEY) || 'null');
+    var previousWallet = clean((current && current.wallet && current.wallet.wallet_address) || lastWalletSynced);
+    if (previousWallet && lower(previousWallet) !== lower(walletAddress)) {
+      syncGeneration += 1;
+      generation = syncGeneration;
+      removeKey(PROFILE_ME_KEY);
+      removeKey(PROFILE_ME_ERROR_KEY);
+      profileMePromise = null;
+      syncing = null;
+    }
     var currentToken = clean(current && (current.token || current.access_token || current.accessToken || current.jwt || (current.session && (current.session.token || current.session.access_token || current.session.accessToken || current.session.jwt))) || '');
     if (current && currentToken && current.profile && current.profile.dood_id && current.wallet && lower(current.wallet.wallet_address) === lower(walletAddress)) {
       return current;
     }
     if (syncing) return syncing;
 
-    syncing = (async function(){
+    var currentSync = (async function(){
       try {
         lastWalletSynced = walletAddress;
         var data = await postWalletConnect(walletAddress);
+        if (generation !== syncGeneration) return null;
         var session = normalize(data, walletAddress);
+        if (generation !== syncGeneration) return null;
         writeJson(SESSION_KEY, session);
         if (session.profile && session.profile.dood_id) clearError();
         else setError('labApi responded but did not return profile.dood_id.', data);
         try { window.dispatchEvent(new CustomEvent('dood_identity_synced', { detail: session })); } catch(e) {}
-        try { setTimeout(function(){ getProfileMe(false).catch(function(){}); }, 150); } catch(e) {}
+        try { setTimeout(function(){ if(generation === syncGeneration) getProfileMe(false).catch(function(){}); }, 150); } catch(e) {}
         return session;
       } catch(err) {
+        if (generation !== syncGeneration) return null;
         setError(err && err.message ? err.message : String(err || 'Unknown labApi sync error'));
         return null;
       } finally {
-        syncing = null;
+        if (syncing === currentSync) syncing = null;
       }
     })();
-    return syncing;
+    syncing = currentSync;
+    return currentSync;
   }
 
   function scheduleSync(ms){
@@ -318,11 +369,17 @@
   }
 
   async function patchProfileMe(fields){
+    var generation = syncGeneration;
+    var requestedWallet = getLocalWallet();
     fields = fields || {};
     var session = safeJsonParse(localStorage.getItem(SESSION_KEY) || 'null') || {};
     var headers = profileMeHeaders();
-    if (!headers.Authorization) {
+    var sessionWallet = clean(session && session.wallet && session.wallet.wallet_address);
+    if (!headers.Authorization || (requestedWallet && lower(sessionWallet) !== lower(requestedWallet))) {
       session = await syncFromLabWallet();
+      if (!session) return null;
+      sessionWallet = clean(session && session.wallet && session.wallet.wallet_address);
+      if (requestedWallet && lower(getLocalWallet()) === lower(requestedWallet) && lower(sessionWallet) === lower(requestedWallet)) generation = syncGeneration;
       headers = profileMeHeaders();
     }
     if (!headers.Authorization) throw new Error('No dood_identity_session.token. Connect wallet first.');
@@ -345,15 +402,20 @@
       headers: headers,
       body: JSON.stringify(payload)
     });
+    if (generation !== syncGeneration) return null;
     var text = '';
     try { text = await res.text(); } catch(e) {}
     var data = text ? safeJsonParse(text) : {};
     if (!data) data = { raw:text };
     if (!res.ok || data.ok === false) {
-      throw new Error(clean(data.error || data.message || data.raw || ('labApi profile PATCH HTTP ' + res.status)));
+      throw new Error(clean(data.error || data.message || data.raw || ('labApi Passport update HTTP ' + res.status)));
     }
     // Always re-read server state after a successful save.
-    return await getProfileMe(false);
+    if (profileMePromise) {
+      try { await profileMePromise; } catch(e) {}
+      if (generation !== syncGeneration) return null;
+    }
+    return await getProfileMe(true);
   }
 
   window.DoodIdentity = {
@@ -365,6 +427,16 @@
     PROFILE_ME_ERROR_KEY: PROFILE_ME_ERROR_KEY,
     getLocalWallet: getLocalWallet,
     getSession: function(){ return safeJsonParse(localStorage.getItem(SESSION_KEY) || 'null'); },
+    clearSession: function(){
+      syncGeneration += 1;
+      [SESSION_KEY, LAST_ERROR_KEY, LAST_DEBUG_KEY, PROFILE_ME_KEY, PROFILE_ME_ERROR_KEY].forEach(function(key){
+        try { localStorage.removeItem(key); } catch(e) {}
+        try { sessionStorage.removeItem(key); } catch(e) {}
+      });
+      lastWalletSynced = '';
+      syncing = null;
+      profileMePromise = null;
+    },
     getProfileMe: getProfileMe,
     patchProfileMe: patchProfileMe,
     syncFromLabWallet: syncFromLabWallet
@@ -385,7 +457,7 @@
     if (checks > 25) clearInterval(timer);
   }, 1000);
 
-  window.addEventListener('focus', function(){ scheduleSync(500); try { setTimeout(function(){ getProfileMe(false).catch(function(){}); }, 1200); } catch(e) {} });
+  window.addEventListener('focus', function(){ scheduleSync(500); });
   window.addEventListener('storage', function(e){
     if (e && /wallet/i.test(e.key || '')) scheduleSync(250);
   });

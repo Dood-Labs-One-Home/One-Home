@@ -1,0 +1,12 @@
+{
+  "contract": "One Home Safari/Xaman Mobile Working Model",
+  "baseline_release": "14.67.219",
+  "source_file": "apps/one-home/passport/campaign-mint-page.js",
+  "policy": "FROZEN. Do not change these sections in future One Home releases unless Ink explicitly authorizes a Xaman mobile behavior change after the working v14.67.219 model. Unrelated mint code may change.",
+  "sections": {
+    "finishWalletConnection": "d1e0b2d28d3aee96195962a52fbb53a37a46f27eacdce58abc14d0baf72ffaaa",
+    "connectXamanMintWallet": "6b18cf8e632572f9acc4d950a4c30259f19d7f733bb8afdef1abadbe21fd505a",
+    "showMintXamanLaunch": "f4b0a38bb45643dec97662d1800407e7332297be6fae62e7f369576f73971cf0",
+    "publicMobileXamanLaunchBranch": "c73b9d904b4f78186185555e3d5137dfd45216e587f4e3d04da3cbec8557a4e6"
+  }
+}

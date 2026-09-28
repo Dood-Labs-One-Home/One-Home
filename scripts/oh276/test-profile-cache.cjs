@@ -1,0 +1,13 @@
+const fs=require('node:fs');const vm=require('node:vm');const assert=require('node:assert/strict');const path=require('node:path');
+const html=fs.readFileSync(path.resolve(__dirname,'../../apps/one-home/index.html'),'utf8');
+const start=html.indexOf('  const PROFILE_CACHE_TTL=');const end=html.indexOf('  async function renderDirectory()',start);
+assert(start>=0&&end>start,'public profile cache bounds');
+const old={user_id:'owner',username:'test',profile_pic_url:'old'};const fresh={...old,profile_pic_url:'new'};let listener;let release;let calls=0;
+const context=vm.createContext({window:{addEventListener(name,fn){listener=fn},dispatchEvent(){}},CustomEvent:class{},Date,sb:{rpc(){calls++;return new Promise(resolve=>{release=resolve})}},profileRows:[]});
+vm.runInContext(html.slice(start,end),context);
+(async()=>{const api=context.window.OneHomePublicProfileData;
+const pending=api.load();listener({detail:{profile:fresh}});release({data:[old]});const resolved=await pending;assert.equal(resolved[0].profile_pic_url,'new');
+const cached=await api.load();assert.equal(cached[0].profile_pic_url,'new');assert.equal(calls,1);
+const newer={...fresh,profile_pic_url:'newer'};listener({detail:{profile:newer}});assert.equal((await api.load())[0].profile_pic_url,'newer');assert.equal((await api.load()).length,1);
+console.log('PASS public profile cache: immediate saved photo, stale in-flight response, no duplicate profile');
+})().catch(e=>{console.error(e);process.exitCode=1});

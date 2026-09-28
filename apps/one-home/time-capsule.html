@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script src="/shared/onehome-global-appearance-v1467200.js?v=1467200"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#050607">
+  <title>Time Capsule · One Home</title>
+  <link rel="icon" href="/favicon.png">
+  <script src="/shared/onehome-supabase-lite.js?v=1225"></script>
+  <style>
+    :root{--panel:rgba(10,11,14,.94);--line:#34433a;--pink:#f326d1;--green:#a8ff35;--muted:#c8c8c8;--gold:#fff568}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background-color:#050607;background-image:linear-gradient(180deg,rgba(7,4,3,.55),rgba(2,3,3,.82)),url('/assets/one-home-room-pc-background.webp?v=1231');background-position:center top;background-size:cover;background-repeat:no-repeat;background-attachment:fixed;color:#fff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    .shell{width:min(1180px,calc(100% - 28px));margin:auto;padding:24px 0 72px}
+    .top{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+    .top img{width:62px;height:58px;object-fit:contain}
+    .top a{color:#fff;text-decoration:none;font-weight:850}
+    .hero,.empty,.error{background:var(--panel);border:1px solid var(--line);border-radius:26px;padding:26px;box-shadow:0 20px 60px rgba(0,0,0,.32);backdrop-filter:blur(10px)}
+    .label,.pill{display:inline-flex;align-items:center;border:1px solid #756d13;color:var(--gold);border-radius:999px;padding:6px 10px;font-size:11px;font-weight:950;letter-spacing:.08em;text-transform:uppercase}
+    h1{margin:14px 0 10px;color:var(--pink);font-size:clamp(44px,7vw,78px);line-height:.95}
+    .hero p{max-width:780px;margin:0;color:#eee;line-height:1.65;font-size:17px}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:20px}
+    .capsule{overflow:hidden;background:var(--panel);border:1px solid var(--line);border-radius:24px;box-shadow:0 18px 54px rgba(0,0,0,.36);backdrop-filter:blur(10px)}
+    .image-wrap{position:relative;aspect-ratio:1;background:linear-gradient(145deg,#0b0c0e,#151019);display:grid;place-items:center;overflow:hidden}
+    .image-wrap img{width:100%;height:100%;object-fit:contain}
+    .image-fallback{font-size:58px;color:var(--pink);font-weight:950}
+    .capsule-body{padding:19px}
+    .capsule h2{margin:12px 0 6px;font-size:22px}
+    .project{color:var(--green);font-weight:850}
+    .description,.history{color:#ddd;line-height:1.55}
+    .history{border-left:3px solid var(--pink);padding-left:12px;margin-top:14px}
+    .details{display:grid;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid #30353a}
+    .detail{display:grid;grid-template-columns:88px 1fr;gap:10px;font-size:12px}
+    .detail span:first-child{color:var(--muted)}
+    .hash{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;word-break:break-all}
+    .empty,.error{margin-top:20px;text-align:center}
+    .empty h2,.error h2{color:var(--green);font-size:28px}
+    .hidden{display:none!important}
+    @media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:620px){body{background-image:linear-gradient(180deg,rgba(7,4,3,.52),rgba(2,3,3,.82)),url('/assets/one-home-room-mobile-background.webp?v=1231');background-attachment:scroll}.grid{grid-template-columns:1fr}.hero{padding:21px}.detail{grid-template-columns:1fr}.detail span:first-child{font-weight:850}}
+  </style>
+  <link rel="stylesheet" href="/shared/onehome-choice-header-v146780.css?v=146780">
+  <script defer src="/shared/onehome-choice-header-v1467200.js?v=1467200"></script>
+
+<link rel="stylesheet" href="/shared/onehome-interior-shell-v1467141.css?v=1467141">
+  <link rel="stylesheet" href="/shared/onehome-global-appearance-v1467142.css?v=1467141">
+</head>
+<body>
+  <main class="shell">
+    <div class="top">
+      <a href="/one-home/"><img src="/assets/one-home-logo.png" alt="One Home"></a>
+      <a href="/one-home/">Back to One Home</a>
+    </div>
+    <section class="hero">
+      <span class="label">Preserved History</span>
+      <h1>Time Capsule</h1>
+      <p>Every piece here has completed its journey through Burn to Build. Its ownership was permanently released, while its story and verified record remain part of One Home.</p>
+    </section>
+    <section id="capsuleGrid" class="grid" aria-live="polite"></section>
+    <section id="emptyState" class="empty hidden">
+      <h2>The capsule is ready.</h2>
+      <p>Published stories from Burn to Build will appear here.</p>
+    </section>
+    <section id="errorState" class="error hidden">
+      <h2>The capsule is resting.</h2>
+      <p>Please return soon to explore preserved stories.</p>
+    </section>
+  </main>
+  <script>
+  (()=>{'use strict';
+    const SUPABASE_URL='https://fshvettlltcujmwvikfq.supabase.co';
+    const SUPABASE_KEY='sb_publishable_ARrX-vYhy8l-yhs6384S_g_n6214taB';
+    const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+    const $=id=>document.getElementById(id);
+    const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    const imageUrl=value=>{
+      const uri=String(value||'').trim();
+      if(uri.startsWith('ipfs://'))return 'https://ipfs.io/ipfs/'+uri.slice(7);
+      if(uri.startsWith('ar://'))return 'https://arweave.net/'+uri.slice(5);
+      return /^https:\/\//i.test(uri)?uri:'';
+    };
+    const dateText=value=>{
+      const date=new Date(value);
+      return Number.isNaN(date.getTime())?'Verified on the XRP Ledger':date.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+    };
+    const networkText=value=>String(value||'').toLowerCase()==='testnet'?'XRPL Testnet':'XRP Ledger';
+    const card=row=>{
+      const image=imageUrl(row.original_image_uri);
+      const imageMarkup=image?`<img src="${esc(image)}" alt="${esc(row.nft_name||'Preserved NFT')}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.classList.remove('hidden')"><div class="image-fallback hidden">◈</div>`:'<div class="image-fallback">◈</div>';
+      return `<article class="capsule">
+        <div class="image-wrap">${imageMarkup}</div>
+        <div class="capsule-body">
+          <span class="pill">Verified Burn</span>
+          <h2>${esc(row.nft_name||'Untitled NFT')}</h2>
+          <div class="project">${esc(row.creator_attribution||row.metadata_snapshot?.collection||'Preserved Collection')}</div>
+          ${row.nft_description?`<p class="description">${esc(row.nft_description)}</p>`:''}
+          ${row.historical_commentary?`<p class="history">${esc(row.historical_commentary)}</p>`:''}
+          <div class="details">
+            <div class="detail"><span>Burned</span><strong>${esc(dateText(row.burned_at))}</strong></div>
+            <div class="detail"><span>Network</span><strong>${esc(networkText(row.network))}</strong></div>
+            ${row.creator_attribution?`<div class="detail"><span>Attribution</span><strong>${esc(row.creator_attribution)}</strong></div>`:''}
+            <div class="detail"><span>Transaction</span><span class="hash">${esc(row.transaction_hash||'Verified')}</span></div>
+          </div>
+        </div>
+      </article>`;
+    };
+    async function load(){
+      $('emptyState').classList.add('hidden');
+      $('errorState').classList.add('hidden');
+      const response=await fetch(`${SUPABASE_URL}/functions/v1/public-time-capsule`,{
+        method:'GET',
+        headers:{'apikey':SUPABASE_KEY,'Accept':'application/json'}
+      });
+      const payload=await response.json().catch(()=>({}));
+      if(!response.ok||payload.success===false){
+        console.error('Time Capsule load failed:',payload.error||response.statusText);
+        $('errorState').classList.remove('hidden');
+        return;
+      }
+      const rows=Array.isArray(payload.entries)?payload.entries:[];
+      if(!rows.length){$('emptyState').classList.remove('hidden');return}
+      $('capsuleGrid').innerHTML=rows.map(card).join('');
+    }
+    load().catch(error=>{console.error('Time Capsule load failed:',error);$('errorState').classList.remove('hidden')});
+  })();
+  </script>
+
+<script defer src="/shared/onehome-interior-shell-v1467141.js?v=1467200"></script>
+</body>
+</html>

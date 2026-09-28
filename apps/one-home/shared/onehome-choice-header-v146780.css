@@ -1,0 +1,190 @@
+/* One Home v14.67.80 — logo-only return aligned to the shared mobile shell. */
+
+/* Remove the incorrect v12.72 outlined bar, even when later page CSS styles headers. */
+html body header.onehome-choice-header.onehome-choice-header,
+html body .onehome-choice-header.onehome-choice-header{
+  display:none!important;
+  width:0!important;
+  height:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  background:none!important;
+  box-shadow:none!important;
+}
+
+#oneHomeChoiceLogoControl,
+.onehome-inline-choice-logo,
+.onehome-existing-choice-logo,
+.onehome-choice-page-logo{
+  width:104px!important;
+  height:77px!important;
+  min-width:104px!important;
+  min-height:77px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  margin:0!important;
+  padding:4px!important;
+  box-sizing:border-box!important;
+  border:0!important;
+  border-radius:8px!important;
+  outline:0;
+  background:#030303!important;
+  box-shadow:0 3px 12px rgba(0,0,0,.72)!important;
+  color:#fff!important;
+  cursor:pointer!important;
+  appearance:none!important;
+  text-decoration:none!important;
+  position:fixed!important;
+  top:8px!important;
+  left:8px!important;
+  z-index:2147483000!important;
+}
+
+/*
+  Some older standalone and Founder pages supplied their own full-width header.
+  Once that header carries the return logo, collapse the container completely
+  while keeping the fixed logo control visible and clickable.
+*/
+html body .onehome-logo-only-banner.onehome-logo-only-banner{
+  display:block!important;
+  position:static!important;
+  inset:auto!important;
+  width:0!important;
+  max-width:0!important;
+  min-width:0!important;
+  height:0!important;
+  max-height:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  background-image:none!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  overflow:visible!important;
+  pointer-events:none!important;
+}
+
+html body .onehome-logo-only-banner .passport-site-brand{
+  display:contents!important;
+}
+
+html body .onehome-logo-only-banner .passport-site-path,
+html body .onehome-logo-only-banner .passport-header-signin,
+html body .top.onehome-logo-only-banner > :not(.onehome-inline-choice-logo){
+  display:none!important;
+}
+
+html body .onehome-logo-only-banner .onehome-inline-choice-logo,
+html body .onehome-logo-only-banner .onehome-existing-choice-logo{
+  pointer-events:auto!important;
+}
+
+/* The Choices page removes only its own banner and uses a static logo control. */
+#onehomeEntryChoicePage .passport-choice-stage > .passport-site-strip{
+  display:none!important;
+}
+
+#oneHomeChoiceLogoControl[hidden]{
+  display:none!important;
+}
+
+#oneHomeChoiceLogoControl img,
+.onehome-inline-choice-logo img,
+.onehome-existing-choice-logo img,
+.onehome-choice-page-logo img{
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  object-fit:contain!important;
+  display:block!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+
+#oneHomeChoiceLogoControl:hover,
+.onehome-inline-choice-logo:hover,
+.onehome-existing-choice-logo:hover,
+.onehome-choice-page-logo:hover{
+  transform:translateY(-1px);
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,.9));
+}
+
+#oneHomeChoiceLogoControl:focus-visible,
+.onehome-inline-choice-logo:focus-visible,
+.onehome-existing-choice-logo:focus-visible,
+.onehome-choice-page-logo:focus-visible{
+  outline:2px solid #fff!important;
+  outline-offset:3px!important;
+}
+
+/* Leave clear space for the logo without drawing a header or box. */
+body.onehome-choice-logo-visible main#top{
+  padding-top:82px!important;
+}
+
+.onehome-choice-sr-only{
+  position:absolute!important;
+  width:1px!important;
+  height:1px!important;
+  padding:0!important;
+  margin:-1px!important;
+  overflow:hidden!important;
+  clip:rect(0,0,0,0)!important;
+  white-space:nowrap!important;
+  border:0!important;
+}
+
+/* Old V15 Back Home buttons returned outside to the porch. */
+.onehome-v15-back{
+  display:none!important;
+}
+
+@media(max-width:620px){
+  #oneHomeChoiceLogoControl,
+  .onehome-inline-choice-logo,
+  .onehome-existing-choice-logo,
+  .onehome-choice-page-logo{
+    width:82px!important;
+    height:61px!important;
+    min-width:82px!important;
+    min-height:61px!important;
+  }
+  #oneHomeChoiceLogoControl{
+    top:calc(10px + env(safe-area-inset-top,0px))!important;
+    left:12px!important;
+  }
+  body.onehome-choice-logo-visible main#top{
+    padding-top:0!important;
+  }
+}
+
+
+/* Keep every logo on the same mobile top line. */
+@media(max-width:620px){
+  .onehome-choice-page-logo{
+    top:calc(10px + env(safe-area-inset-top,0px))!important;
+    left:12px!important;
+  }
+}
+
+@media(max-width:350px){
+  #oneHomeChoiceLogoControl,
+  .onehome-inline-choice-logo,
+  .onehome-existing-choice-logo,
+  .onehome-choice-page-logo{
+    width:76px!important;
+    height:57px!important;
+    min-width:76px!important;
+    min-height:57px!important;
+    left:8px!important;
+  }
+}

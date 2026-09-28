@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script src="/shared/onehome-global-appearance-v1467200.js?v=1467200"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mint Links | One Home</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{color-scheme:dark;--bg:#07080b;--card:#11141a;--soft:#171b23;--line:#2a3140;--text:#f4f7fb;--muted:#aeb8c8;--accent:#f4d35e;--ok:#79e0aa;--bad:#ff9b9b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#151923 0,#07080b 42%);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.wrap{max-width:980px;margin:0 auto;padding:28px 18px 70px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:28px}.button{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:#11151d;color:var(--text);text-decoration:none;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer}.button.primary{background:var(--accent);color:#111;border-color:var(--accent)}h1{font-size:clamp(30px,6vw,54px);margin:0 0 8px}.lead{max-width:780px;color:var(--muted);line-height:1.6;margin:0 0 24px}.notice{border:1px solid #42506a;background:#101722;border-radius:12px;padding:14px 16px;color:#dfe9f7;margin:0 0 22px}.status{min-height:22px;color:var(--muted);margin:10px 0}.status.bad{color:var(--bad)}.list{display:grid;gap:14px}.card{background:linear-gradient(180deg,#11151d,#0d1016);border:1px solid var(--line);border-radius:16px;padding:18px}.name{font-size:20px;font-weight:900}.meta{color:var(--muted);line-height:1.55;margin-top:6px}.urlbox{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}.url{flex:1;min-width:260px;border:1px solid var(--line);background:#080a0e;border-radius:10px;padding:11px 12px;font:700 14px/1.35 ui-monospace,SFMono-Regular,Menlo,monospace;color:#dff0ff;overflow-wrap:anywhere}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.empty{border:1px dashed var(--line);border-radius:14px;padding:22px;color:var(--muted)}.hint{font-size:12px;color:var(--muted);margin-top:8px}@media(max-width:650px){.wrap{padding:20px 14px 60px}.url{min-width:100%}.actions .button{width:100%}}
+</style>
+  <link rel="stylesheet" href="/shared/onehome-global-appearance-v1467142.css?v=1467141">
+</head>
+<body>
+<main class="wrap">
+  <div class="top"><a class="button" href="/one-home/">← One Home</a><a class="button" href="/mint-studio.html#my-mints">My Mints</a></div>
+  <h1>Mint Links</h1>
+  <p class="lead">Every One Home Mint has a short permanent public link. One Home creates it automatically from the mint name, and you can customize it before sharing.</p>
+  <div class="notice"><strong>Public format:</strong> doodlabs.app/m/your-mint-name. Existing UUID Mint links continue to work, and old short links redirect to the current short link if you rename one.</div>
+  <div id="status" class="status">Loading your Mint links…</div>
+  <section id="campaigns" class="list"></section>
+</main>
+<script>
+(function(){
+'use strict';
+const SUPABASE_URL='https://fshvettlltcujmwvikfq.supabase.co';
+const SUPABASE_KEY='sb_publishable_ARrX-vYhy8l-yhs6384S_g_n6214taB';
+const STORAGE_KEY='sb-fshvettlltcujmwvikfq-auth-token';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{storageKey:STORAGE_KEY,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const root=document.getElementById('campaigns');
+const status=document.getElementById('status');
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function slugHint(value){return String(value||'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,54).replace(/-+$/,'');}
+async function info(id){const {data,error}=await sb.rpc('onehome_get_mint_public_link',{p_campaign_id:id});if(error)throw error;return data||null;}
+async function copy(value,button){try{await navigator.clipboard.writeText(value);const old=button.textContent;button.textContent='Copied';setTimeout(()=>button.textContent=old,1200)}catch(_e){window.prompt('Copy this Mint link:',value)}}
+async function edit(id,current,name){let next=window.prompt('Choose the short Mint URL.\n\nOnly letters, numbers, and hyphens are used.\nExample: doodlabs.app/m/yakuzaxrp',current||slugHint(name)||'mint');if(next===null)return;next=String(next||'').trim();if(!next)return;const {data,error}=await sb.rpc('onehome_set_mint_public_slug',{p_campaign_id:id,p_slug:next});if(error)throw error;return data;}
+function card(c,link){const slug=String(link?.public_slug||'').trim();const href=slug?window.location.origin+'/m/'+slug:window.location.origin+'/mint/'+c.id;const state=String(c.status||c.authorized_minter_status||'Saved').replaceAll('_',' ');return '<article class="card" data-id="'+esc(c.id)+'"><div class="name">'+esc(c.name||'Untitled Mint')+'</div><div class="meta">'+esc(state)+' · '+esc(c.network||c.chain_key||'One Home Mint')+'</div><div class="urlbox"><div class="url">'+esc(href)+'</div></div><div class="actions"><button class="button primary" type="button" data-copy="'+esc(href)+'">Copy Link</button><button class="button" type="button" data-edit="'+esc(c.id)+'" data-slug="'+esc(slug)+'" data-name="'+esc(c.name||'Untitled Mint')+'">Edit Mint URL</button><a class="button" href="'+esc(href)+'" target="_blank" rel="noopener">Open Mint</a></div><div class="hint">Changing the short URL keeps the old short URL as a redirect, so previously shared links keep working.</div></article>';}
+async function load(){
+ try{
+  status.className='status';status.textContent='Loading your Mint links…';
+  const sr=await sb.auth.getSession();const token=sr?.data?.session?.access_token||'';if(!token)throw new Error('Sign in to your One Home Passport, then open Passport → Creator → Mint Links again.');
+  const response=await fetch(SUPABASE_URL+'/functions/v1/creator-mint-library',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+token},body:JSON.stringify({action:'list'})});
+  const data=await response.json().catch(()=>({}));if(!response.ok||data.success===false)throw new Error(data.error||'Your Mint campaigns could not be loaded.');
+  const rows=Array.isArray(data.campaigns)?data.campaigns:[];rows.sort((a,b)=>String(b.updated_at||b.created_at||'').localeCompare(String(a.updated_at||a.created_at||'')));
+  if(!rows.length){root.innerHTML='<div class="empty">No Mint campaigns yet. Your current package will appear here automatically after its Mint campaign is created.</div>';status.textContent='';return;}
+  const links=await Promise.all(rows.map(c=>info(String(c.id||'')).catch(()=>null)));
+  root.innerHTML=rows.map((c,i)=>card(c,links[i])).join('');
+  root.querySelectorAll('[data-copy]').forEach(btn=>btn.onclick=()=>copy(btn.dataset.copy,btn));
+  root.querySelectorAll('[data-edit]').forEach(btn=>btn.onclick=async()=>{btn.disabled=true;const old=btn.textContent;btn.textContent='Saving…';try{await edit(btn.dataset.edit,btn.dataset.slug,btn.dataset.name);await load()}catch(e){window.alert(e?.message||String(e));btn.disabled=false;btn.textContent=old}});
+  status.textContent=rows.length+' Mint '+(rows.length===1?'link':'links')+' available.';
+ }catch(e){status.textContent=e?.message||String(e);status.className='status bad';root.innerHTML='<div class="empty">Mint links will appear here after you sign in and have a Mint campaign.</div>';}
+}
+load();
+})();
+</script>
+</body>
+</html>

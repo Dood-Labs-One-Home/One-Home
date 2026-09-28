@@ -1,0 +1,117 @@
+(function(){
+'use strict';
+if(window.__ONEHOME_CREATOR_GAMES_V146741__)return;window.__ONEHOME_CREATOR_GAMES_V146741__=true;
+var SUPABASE_URL=window.DOOD_SUPABASE_URL||window.SUPABASE_URL||'https://fshvettlltcujmwvikfq.supabase.co';
+var SUPABASE_KEY=window.DOOD_SUPABASE_KEY||window.SUPABASE_KEY||'sb_publishable_ARrX-vYhy8l-yhs6384S_g_n6214taB';
+var creatorRows=[],arcadeRows=[];
+var TOOLS=[
+ {game_key:'tool_dood_atlas',title:'Dood Atlas',status:'Tool',description:'Dood Atlas creator and pixel system.',play_url:'./tools/dood-atlas/public/dood-atlas.html',full_page_url:'./tools/dood-atlas/public/dood-atlas.html',sort_order:900},
+ {game_key:'tool_dood_el',title:'Dood-el',status:'Tool',description:'Pixel art and creator drawing tool.',play_url:'./tools/dood-el/dood-el.html',full_page_url:'./tools/dood-el/dood-el.html',sort_order:901},
+ {game_key:'tool_dot_dood',title:'Dot-dood',status:'Tool',description:'Bubble and dot art studio.',play_url:'./tools/dot-dood/dot-dood.html',full_page_url:'./tools/dot-dood/dot-dood.html',sort_order:902},
+ {game_key:'tool_noggins',title:'Noggins',status:'Tool',description:'Noggins creator tool.',play_url:'./tools/noggins/noggins.html',full_page_url:'./tools/noggins/noggins.html',sort_order:903}
+];
+var FALLBACK=[
+ {game_key:'autumn_s_bakery',title:"Autumn's Bakery",banner_url:'assets/autumn-s-bakery-banner.webp',play_url:'https://rare-ink-studio.github.io/Autumns-Bakery/',full_page_url:'https://rare-ink-studio.github.io/Autumns-Bakery/',sort_order:10},
+ {game_key:'burger_money',title:'Burger Money',banner_url:'assets/burger-money-banner.webp',play_url:'https://rare-ink-studio.github.io/Burger-Money/',full_page_url:'https://rare-ink-studio.github.io/Burger-Money/',sort_order:20},
+ {game_key:'catch_and_fry',title:'Catch and Fry',banner_url:'assets/catch-and-fry-banner.webp',play_url:'https://rare-ink-studio.github.io/Catch-and-Fry/',full_page_url:'https://rare-ink-studio.github.io/Catch-and-Fry/',sort_order:30},
+ {game_key:'duckyverse',title:'DuckyVerse',play_url:'https://rare-ink-studio.github.io/duckyverse-arena/',full_page_url:'https://rare-ink-studio.github.io/duckyverse-arena/',sort_order:40},
+ {game_key:'horde',title:'Horde',play_url:'https://rare-ink-studio.github.io/horde-yard/',full_page_url:'https://rare-ink-studio.github.io/horde-yard/',sort_order:50},
+ {game_key:'hydro_pong',title:'Hydro-Pong',banner_url:'assets/hydro-pong-banner.webp',play_url:'https://rare-ink-studio.github.io/Hydro-Pong/',full_page_url:'https://rare-ink-studio.github.io/Hydro-Pong/',sort_order:60},
+ {game_key:'monster_truck_jump',title:'Monster Truck Jump',banner_url:'assets/monster-truck-jump-banner.webp',play_url:'https://rare-ink-studio.github.io/Monster-Truck-Jump/',full_page_url:'https://rare-ink-studio.github.io/Monster-Truck-Jump/',sort_order:70},
+ {game_key:'peanut_house',title:'Peanut House',banner_url:'assets/peanut-house-escape-banner.webp',play_url:'https://rare-ink-studio.github.io/Peanut-House/',full_page_url:'https://rare-ink-studio.github.io/Peanut-House/',sort_order:80},
+ {game_key:'rollies',title:'Rollies',banner_url:'assets/rollies-banner.webp',play_url:'https://rare-ink-studio.github.io/Rollies/',full_page_url:'https://rare-ink-studio.github.io/Rollies/',sort_order:90},
+ {game_key:'smash_house',title:'Smash House',banner_url:'assets/smash-house-banner.webp',play_url:'https://rare-ink-studio.github.io/Smash-House/',full_page_url:'https://rare-ink-studio.github.io/Smash-House/',sort_order:100},
+ {game_key:'skate_n_surf',title:'Skate N Surf',banner_url:'assets/skate-n-surf-banner.webp',play_url:'https://rare-ink-studio.github.io/Surf-and-Skate/',full_page_url:'https://rare-ink-studio.github.io/Surf-and-Skate/',sort_order:110},
+ {game_key:'taco_toss',title:'Taco Toss',banner_url:'assets/taco-toss-banner.webp',play_url:'https://rare-ink-studio.github.io/Taco-Toss/',full_page_url:'https://rare-ink-studio.github.io/Taco-Toss/',sort_order:120},
+ {game_key:'wiener_yeeter',title:'Wiener-Yeeter',banner_url:'assets/wiener-yeeter-banner.webp',play_url:'https://rare-ink-studio.github.io/Wiener-Yeeter/',full_page_url:'https://rare-ink-studio.github.io/Wiener-Yeeter/',sort_order:130},
+ {game_key:'possum_tails',title:'Possum Tails',play_url:'https://possumtails.ca/',full_page_url:'https://possumtails.ca/',sort_order:140},
+ {game_key:'xrp_chess',title:'XRP Chess',sort_order:150},
+ {game_key:'future_arcade_games',title:'Future Arcade Games',status:'Coming Soon',description:'Future Rollies Arcade games will appear here.',sort_order:999}
+];
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function norm(v){return String(v||'').toLowerCase().replace(/[’']/g,'').replace(/&/g,' and ').replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim()}
+function slug(v){return norm(v).replace(/\s+/g,'-')}
+function titleCompare(a,b){return String(a&&a.title||'').localeCompare(String(b&&b.title||''),undefined,{sensitivity:'base',numeric:true,ignorePunctuation:true})}
+function client(){try{return window.doodSupabase||window.doodProfileSupabase||window.oneHomePassportSupabase||(window.supabase&&window.supabase.createClient?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null)}catch(_e){return null}}
+function banner(row){var b=String(row&& (row.banner_url||row.card_image_url||row.logo_url)||'').trim();if(b)return b;var n=norm(row&& (row.game_key||row.title));var map={'autumn s bakery':'assets/autumn-s-bakery-banner.webp','burger money':'assets/burger-money-banner.webp','catch and fry':'assets/catch-and-fry-banner.webp','hydro pong':'assets/hydro-pong-banner.webp','monster truck jump':'assets/monster-truck-jump-banner.webp','peanut house':'assets/peanut-house-escape-banner.webp','peanut house escape':'assets/peanut-house-escape-banner.webp','rollies':'assets/rollies-banner.webp','smash house':'assets/smash-house-banner.webp','skate n surf':'assets/skate-n-surf-banner.webp','taco toss':'assets/taco-toss-banner.webp','wiener yeeter':'assets/wiener-yeeter-banner.webp'};return map[n]||''}
+function normalizeRow(row){row=Object.assign({},row||{});row.title=String(row.title||row.card_title||row.name||row.game_key||'Untitled');row.game_key=String(row.game_key||slug(row.title));row.description=String(row.short_description||row.description||row.card_body||'').trim();row.banner_url=banner(row);row.play_url=String(row.button_1_url||row.play_url||row.full_page_url||'').trim();row.full_page_url=String(row.full_page_url||row.button_2_url||row.play_url||row.play_url||'').trim();row.sort_order=Number(row.sort_order||999);return row}
+async function identity(){var c=client();if(!c||!c.auth||!c.auth.getSession)return null;var sr=await c.auth.getSession();var u=sr&&sr.data&&sr.data.session&&sr.data.session.user;if(!u)return null;var p=null;try{var r=await c.from('dood_profiles').select('*').eq('user_id',u.id).maybeSingle();p=r&&r.data||null}catch(_e){}return {user:u,passport:p||{},username:norm(p&&p.username),display:norm(p&&p.display_name)}}
+async function publicIdentity(username){var c=client(),cleanName=String(username||'').replace(/^@/,'').trim();if(!c||!cleanName)return null;try{var r=await c.from('dood_profiles').select('*').ilike('username',cleanName).maybeSingle();var p=r&&r.data||null;if(!p)return null;return {user:{id:p.user_id||p.owner_user_id||''},passport:p,username:norm(p.username),display:norm(p.display_name)}}catch(_e){return null}}
+function hasStrongOwner(row){var keys=['owner_user_id','creator_user_id','passport_user_id','created_by_user_id','user_id','owner_id'];return keys.some(function(k){return row&&row[k]})}
+function ownedBy(row,id){
+  if(!id||!id.user||!row)return false;
+  var uid=String(id.user.id||'').toLowerCase();
+  var idFields=['owner_user_id','creator_user_id','passport_user_id','created_by_user_id','user_id','owner_id'];
+  for(var i=0;i<idFields.length;i++){
+    var val=String(row[idFields[i]]||'').toLowerCase();
+    if(val&&val===uid)return true;
+  }
+  /* A strong UUID owner belongs to somebody else if it did not match above. */
+  if(hasStrongOwner(row))return false;
+  var uname=id.username,display=id.display;
+  /* Admin-managed project linking writes the stable Passport username into
+     created_by. Legacy username columns remain accepted for older records. */
+  var usernameFields=['created_by','owner_username','creator_username','passport_username','created_by_username','username'];
+  for(var j=0;j<usernameFields.length;j++){
+    var uv=norm(row[usernameFields[j]]);
+    if(uv&&uname&&uv===uname)return true;
+  }
+  /* owner_name is a display label only. Match it exactly; never guess from
+     partial names, studio labels, or tokenized text. */
+  var ownerLabel=norm(row.owner_name||row.creator_name||row.creator||row.owner||'');
+  return !!(ownerLabel&&display&&ownerLabel===display);
+}
+async function loadRows(){var c=client();if(!c)return FALLBACK.concat(TOOLS).map(normalizeRow).sort(titleCompare);try{var r=await c.from('arcade_games').select('*').order('title',{ascending:true});if(r.error)throw r.error;var rows=(r.data||[]).filter(function(x){return x&&x.is_visible!==false}).map(normalizeRow);var keys=new Set(rows.map(function(x){return norm(x.game_key||x.title)}));TOOLS.forEach(function(t){if(!keys.has(norm(t.game_key)))rows.push(normalizeRow(t))});return (rows.length?rows:FALLBACK.concat(TOOLS).map(normalizeRow)).sort(titleCompare)}catch(e){console.warn('One Home game browser fallback:',e);return FALLBACK.concat(TOOLS).map(normalizeRow).sort(titleCompare)}}
+function match(row,q){q=norm(q);if(!q)return true;return norm([row.title,row.description,row.category,row.project_type,row.owner_name,row.created_by].filter(Boolean).join(' ')).indexOf(q)>=0}
+function tile(row,kind){var b=banner(row);var img=b?'<img loading="lazy" decoding="async" src="'+esc(b)+'" alt="'+esc(row.title)+' banner" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'grid\'">':'';return '<button class="onehome-banner-tile" type="button" data-ohcg-kind="'+kind+'" data-ohcg-key="'+esc(row.game_key)+'" aria-label="View '+esc(row.title)+'">'+img+'<span class="onehome-banner-placeholder" style="'+(b?'display:none':'display:grid')+'">'+esc(row.title)+'</span></button>'}
+function bind(root,rows,kind){if(!root)return;root.querySelectorAll('[data-ohcg-key]').forEach(function(b){b.addEventListener('click',function(){var key=b.getAttribute('data-ohcg-key');var row=rows.find(function(x){return String(x.game_key)===key})||rows.find(function(x){return norm(x.game_key)===norm(key)});if(row)openInfo(row,kind)})})}
+function openGameFullScreen(row,url){
+  // Every embeddable arcade game uses the SAME full-viewport play surface.
+  // Do not wrap an iframe in the old scrollable information modal.
+  if(typeof window.OneHomeGameStageClose==='function')window.OneHomeGameStageClose();
+  if(window.OneHomeRolliesPilot&&typeof window.OneHomeRolliesPilot.close==='function')window.OneHomeRolliesPilot.close();
+  var oldBody=document.body.style.overflow,oldHtml=document.documentElement.style.overflow;
+  var overlay=document.createElement('div');
+  overlay.className='onehome-game-stage-screen';
+  overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');
+  overlay.setAttribute('aria-label',String(row.title||'Game'));
+  overlay.innerHTML='<header class="onehome-game-stage-bar"><button type="button" data-stage-close>← Back to Arcade</button><span class="onehome-game-stage-title">'+esc(row.title)+'</span></header><main class="onehome-game-stage-play" data-stage-mount></main>';
+  var frame=document.createElement('iframe');
+  frame.className='onehome-game-stage-frame';frame.title=String(row.title||'Game');
+  frame.referrerPolicy='no-referrer';frame.allow='fullscreen';
+  frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups');
+  frame.src=url;overlay.querySelector('[data-stage-mount]').appendChild(frame);
+  document.body.appendChild(overlay);
+  document.body.style.overflow='hidden';document.documentElement.style.overflow='hidden';
+  function close(){if(!overlay.isConnected)return;frame.src='about:blank';overlay.remove();document.body.style.overflow=oldBody;document.documentElement.style.overflow=oldHtml;window.removeEventListener('keydown',onKey);if(window.OneHomeGameStageClose===close)window.OneHomeGameStageClose=null;}
+  function onKey(e){if(e.key==='Escape'&&document.activeElement!==frame)close();}
+  overlay.querySelector('[data-stage-close]').addEventListener('click',close);
+  window.addEventListener('keydown',onKey);
+  window.OneHomeGameStageClose=close;
+  overlay.querySelector('[data-stage-close]').focus();
+}
+function openInfo(row,kind){
+  if(kind==='arcade'&&String(row.game_key||'').toLowerCase()==='rollies_speakeasy'&&window.OneHomeRolliesPilot){window.OneHomeRolliesPilot.open(row);return;}
+  document.querySelectorAll('.onehome-game-modal-backdrop').forEach(function(x){x.remove()});
+  var b=banner(row),raw=row.full_page_url||row.play_url||'',url='';
+  try{var parsed=new URL(raw,location.href);if(parsed.protocol==='https:'&&(!raw.startsWith('//')))url=parsed.href}catch(_e){}
+  var embed=kind==='arcade'&&row.iframe_allowed===true&&row.external_only!==true&&!!url;
+  if(embed){openGameFullScreen(row,url);return;}
+  var overlay=document.createElement('div');overlay.className='onehome-game-modal-backdrop';
+  overlay.innerHTML='<div class="onehome-game-modal'+(embed?' onehome-rollies-modal':'')+'"><button type="button" class="onehome-user-neon" data-close="1">← Close</button>'+(b?'<img src="'+esc(b)+'" alt="'+esc(row.title)+' banner">':'')+'<h2>'+esc(row.title)+'</h2>'+(row.status?'<p><strong>Status:</strong> '+esc(row.status)+'</p>':'')+(row.description?'<p>'+esc(row.description)+'</p>':'')+((row.created_by||row.owner_name)?'<p><strong>Creator:</strong> '+esc(row.created_by||row.owner_name)+'</p>':'')+'<div class="onehome-game-modal-actions">'+(embed?'<button type="button" data-play-here="1">Play inside One Home</button>':'')+(url?'<a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">'+(kind==='creator'?'Open Project / Game':'Open Game Page')+'</a>':'<span>Link coming soon.</span>')+'</div>'+(embed?'<div class="onehome-embedded-game" data-embedded-game hidden></div>':'')+'</div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click',function(e){if(e.target===overlay||e.target.closest('[data-close]')){var f=overlay.querySelector('iframe');if(f)f.src='about:blank';overlay.remove()}});
+  if(embed){overlay.querySelector('[data-play-here]').addEventListener('click',function(){var mount=overlay.querySelector('[data-embedded-game]');if(!mount||mount.querySelector('iframe'))return;var frame=document.createElement('iframe');frame.src=url;frame.title=String(row.title||'Game');frame.referrerPolicy='no-referrer';frame.allow='fullscreen';frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups');mount.appendChild(frame);mount.hidden=false;this.disabled=true;});}
+}
+function renderArcade(q){var root=document.getElementById('oneHomeArcadeBrowser');if(!root)return;var rows=arcadeRows.filter(function(x){return x.show_arcade!==false&&match(x,q)}).sort(titleCompare);root.innerHTML=rows.length?rows.map(function(x){return tile(x,'arcade')}).join(''):'<div class="onehome-browser-empty">No games match that search.</div>';bind(root,rows,'arcade')}
+async function refreshArcade(){arcadeRows=await loadRows();renderArcade(document.getElementById('oneHomeArcadeSearchInput')&&document.getElementById('oneHomeArcadeSearchInput').value)}
+async function refreshCreatorProjects(){var root=document.getElementById('projectCityGrid');if(!root)return;root.innerHTML='<div class="onehome-browser-empty">Loading your creator projects…</div>';var id=await identity();if(!id){root.innerHTML='<div class="onehome-browser-empty">Sign in with your One Home Passport to view your creator projects.</div>';return}var all=await loadRows();creatorRows=all.filter(function(row){return row.show_projects!==false&&ownedBy(row,id)}).sort(function(a,b){return a.sort_order-b.sort_order});if(creatorRows.length&&typeof window.OneHomeQuestSystemComplete==='function')window.OneHomeQuestSystemComplete('q-project');renderCreator(document.getElementById('oneHomeCreatorProjectSearchInput')&&document.getElementById('oneHomeCreatorProjectSearchInput').value)}
+function renderCreator(q){var root=document.getElementById('projectCityGrid');if(!root)return;var rows=creatorRows.filter(function(x){return match(x,q)});root.innerHTML=rows.length?rows.map(function(x){return tile(x,'creator')}).join(''):'<div class="onehome-browser-empty">'+(creatorRows.length?'No creator projects match that search.':'No verified creator-owned projects are linked to this Passport yet.')+'</div>';bind(root,rows,'creator')}
+async function renderPublicPassportProjects(username,root){if(!root)return;root.innerHTML='<div class="onehome-browser-empty">Loading creator work…</div>';var id=await publicIdentity(username);if(!id){root.innerHTML='<div class="onehome-browser-empty">No verified creator projects are linked to this Passport yet.</div>';return}var all=await loadRows();var rows=all.filter(function(row){return row.show_projects!==false&&ownedBy(row,id)}).sort(function(a,b){return a.sort_order-b.sort_order});root.innerHTML=rows.length?'<div class="onehome-banner-grid">'+rows.map(function(x){return tile(x,'creator')}).join('')+'</div>':'<div class="onehome-browser-empty">No verified creator projects are linked to this Passport yet.</div>';var grid=root.querySelector('.onehome-banner-grid');if(grid)bind(grid,rows,'creator')}
+function bindSearch(inputId,buttonId,fn){var input=document.getElementById(inputId),btn=document.getElementById(buttonId);if(btn&&!btn.dataset.bound){btn.dataset.bound='1';btn.addEventListener('click',function(){fn(input&&input.value||'')})}if(input&&!input.dataset.bound){input.dataset.bound='1';input.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();fn(input.value)}})}}
+async function verifyQuests(){var id=await identity();if(!id)return;var c=client();if(!c)return;try{var p=id.passport||{};if(p.username&&p.display_name&&(p.bio||p.profile_pic_url||p.is_public))window.OneHomeQuestSystemComplete&&window.OneHomeQuestSystemComplete('q-profile')}catch(_e){}try{var w=await c.from('passport_wallets').select('id,verified_at').eq('owner_user_id',id.user.id).limit(1);if(!w.error&&w.data&&w.data.length)window.OneHomeQuestSystemComplete&&window.OneHomeQuestSystemComplete('q-wallet')}catch(_e2){}try{var all=await loadRows();if(all.some(function(row){return row.show_projects!==false&&ownedBy(row,id)}))window.OneHomeQuestSystemComplete&&window.OneHomeQuestSystemComplete('q-project')}catch(_e3){}try{var u=await c.from('onehome_community_events').select('id').eq('actor_user_id',id.user.id).eq('event_type','build_update').eq('is_system',false).limit(1);if(!u.error&&u.data&&u.data.length)window.OneHomeQuestSystemComplete&&window.OneHomeQuestSystemComplete('q-update')}catch(_e4){}}
+function wake(e){var pid=e&&e.detail&&e.detail.pageId||((document.querySelector('.page-view.active[id]')||{}).id||'');if(pid==='arcadePage'){refreshArcade();setTimeout(function(){bindSearch('oneHomeArcadeSearchInput','oneHomeArcadeSearchBtn',renderArcade)},0)}if(pid==='projectsPage'){refreshCreatorProjects();setTimeout(function(){bindSearch('oneHomeCreatorProjectSearchInput','oneHomeCreatorProjectSearchBtn',renderCreator)},0)}if(pid==='creatorQuestsPage')verifyQuests()}
+window.OneHomeCreatorGames={refreshArcade:refreshArcade,refreshCreatorProjects:refreshCreatorProjects,renderPublicPassportProjects:renderPublicPassportProjects,openCreatorProjects:function(){if(window.OneHomeNavigation)window.OneHomeNavigation.goPage('projectsPage');else if(window.showPage)window.showPage('projectsPage');refreshCreatorProjects()},verifyQuests:verifyQuests};
+window.addEventListener('onehome:page-activated',wake);
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){bindSearch('oneHomeArcadeSearchInput','oneHomeArcadeSearchBtn',renderArcade);bindSearch('oneHomeCreatorProjectSearchInput','oneHomeCreatorProjectSearchBtn',renderCreator);wake({detail:{pageId:(document.querySelector('.page-view.active[id]')||{}).id||''}});verifyQuests()});else{bindSearch('oneHomeArcadeSearchInput','oneHomeArcadeSearchBtn',renderArcade);bindSearch('oneHomeCreatorProjectSearchInput','oneHomeCreatorProjectSearchBtn',renderCreator);wake({detail:{pageId:(document.querySelector('.page-view.active[id]')||{}).id||''}});verifyQuests()}
+})();

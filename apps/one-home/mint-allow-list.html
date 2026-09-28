@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script src="/shared/onehome-global-appearance-v1467200.js?v=1467200"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Manage Allow List | One Home</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3"></script>
+<style>
+:root{color-scheme:dark;--bg:#08090b;--panel:#111318;--soft:#191c22;--line:#2b3039;--text:#f4f6f8;--muted:#aeb5c0;--ok:#8ee6ad;--warn:#ffd479;--bad:#ff9b9b;--focus:#d9dce2}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}.wrap{max-width:1050px;margin:auto;padding:20px}.top{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}.back,.button{border:1px solid var(--line);background:transparent;color:var(--text);border-radius:10px;padding:10px 14px;text-decoration:none;cursor:pointer;font:inherit}.button.primary{background:var(--text);color:#0b0c0e;border-color:var(--text);font-weight:700}.button.danger{border-color:#6c3030;color:#ffc1c1}.button:disabled{opacity:.45;cursor:not-allowed}h1{font-size:clamp(27px,5vw,42px);line-height:1.05;margin:28px 0 8px}.lead{color:var(--muted);max-width:760px;margin:0 0 24px}.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0}.summary>div,.card{border:1px solid var(--line);border-radius:14px;background:var(--panel)}.summary>div{padding:14px}.summary small{display:block;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:11px}.summary strong{display:block;margin-top:4px}.card{padding:18px;margin:14px 0}.card h2{margin:0 0 14px;font-size:18px}.formgrid{display:grid;grid-template-columns:2fr .7fr .9fr 1fr;gap:10px}.field{display:flex;flex-direction:column;gap:6px}.field.wide{grid-column:1/-1}label{font-size:12px;color:var(--muted);font-weight:700}input{width:100%;border:1px solid var(--line);background:#0c0e12;color:var(--text);padding:11px 12px;border-radius:9px;font:inherit}input:focus{outline:2px solid var(--focus);outline-offset:1px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.status{min-height:22px;color:var(--muted);margin-top:10px}.status.ok{color:var(--ok)}.status.bad{color:var(--bad)}.entry{border-top:1px solid var(--line);padding:15px 0}.entry:first-child{border-top:0;padding-top:0}.row{display:flex;gap:10px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap}.wallet{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 8px;font-size:11px;color:var(--muted)}.pill.on{color:var(--ok)}.alloc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0}.alloc>div{background:var(--soft);border-radius:10px;padding:10px}.alloc small{display:block;color:var(--muted);font-size:11px}.note{color:var(--muted);margin:8px 0}.empty{padding:12px 0;color:var(--muted)}.hide{display:none!important}@media(max-width:720px){.summary,.formgrid,.alloc{grid-template-columns:1fr}.field.wide{grid-column:auto}.wrap{padding:16px}}
+</style>
+  <link rel="stylesheet" href="/shared/onehome-global-appearance-v1467142.css?v=1467141">
+</head>
+<body>
+<main class="wrap">
+  <div class="top"><a id="back" class="back" href="/mint-studio.html">← Back to Mint Studio</a><span class="pill">XRP Ledger</span></div>
+  <h1>Manage Allow List</h1>
+  <p class="lead">Give specific XRP wallets free mints, discounted mints, or both. Used mints stay used when an entry is edited or disabled.</p>
+  <div class="summary">
+    <div><small>Mint</small><strong id="campaignName">Loading…</strong></div>
+    <div><small>Network</small><strong id="network">—</strong></div>
+    <div><small>Public price</small><strong id="publicPrice">—</strong></div>
+  </div>
+  <section class="card">
+    <h2 id="formTitle">Add wallet</h2>
+    <div class="formgrid">
+      <div class="field"><label for="wallet">XRP wallet address</label><input id="wallet" autocomplete="off" spellcheck="false" placeholder="r…"></div>
+      <div class="field"><label for="free">Free mints</label><input id="free" type="number" min="0" step="1" value="0"></div>
+      <div class="field"><label for="discountQty">Discounted mints</label><input id="discountQty" type="number" min="0" step="1" value="0"></div>
+      <div class="field"><label for="discountPrice">Discount price (XRP)</label><input id="discountPrice" inputmode="decimal" placeholder="0.005"></div>
+      <div class="field wide"><label for="note">Private creator note (optional)</label><input id="note" maxlength="500" placeholder="Giveaway winner, community group, collaborator…"></div>
+    </div>
+    <div class="actions"><button id="save" class="button primary" type="button">Save Allow List entry</button><button id="cancelEdit" class="button hide" type="button">Cancel edit</button></div>
+    <div id="formStatus" class="status"></div>
+  </section>
+  <section class="card"><div class="row"><h2>Allow List wallets</h2><button id="refresh" class="button" type="button">Refresh</button></div><div id="entries"><div class="empty">Loading Allow List…</div></div></section>
+</main>
+<script>
+(function(){
+'use strict';
+const PROJECT='fshvettlltcujmwvikfq';
+const SUPABASE_URL='https://fshvettlltcujmwvikfq.supabase.co';
+const SUPABASE_KEY='sb_publishable_ARrX-vYhy8l-yhs6384S_g_n6214taB';
+const STORAGE_KEY='sb-fshvettlltcujmwvikfq-auth-token';
+const qs=new URLSearchParams(location.search);
+const returnTo=(qs.get('from')||'').trim().toLowerCase();
+const FUNCTION_URL=SUPABASE_URL+'/functions/v1/'+(returnTo==='admin'?'platform-mint-allow-list-manager':'mint-allow-list-manager');
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{storageKey:STORAGE_KEY,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const campaign=(qs.get('campaign')||'').trim();
+const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const xrpl=/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/;
+const $=id=>document.getElementById(id);
+let editing=null; let currentEntries=[];
+$('back').href=returnTo==='admin'?'/admin.html':returnTo==='creator'?'/mint-allow-lists.html':(campaign?'/mint-studio.html?campaign='+encodeURIComponent(campaign)+'&step=7':'/mint-studio.html');
+$('back').textContent=returnTo==='admin'?'← Back to Admin Mint Manager':returnTo==='creator'?'← Back to Creator Allow Lists':'← Back to Mint Studio';
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function accessToken(){
+  const result=await sb.auth.getSession();
+  return result?.data?.session?.access_token||'';
+}
+async function call(action,extra){
+  const token=await accessToken(); if(!token)throw new Error('Sign in to your One Home Passport, then reopen this Allow List.');
+  const res=await fetch(FUNCTION_URL,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({action,campaign_id:campaign,...(extra||{})})});
+  const data=await res.json().catch(()=>({})); if(!res.ok||data.success===false)throw new Error(data.error||data.detail||'Allow List request failed.'); return data;
+}
+function setStatus(msg,bad){const el=$('formStatus');el.textContent=msg||'';el.className='status '+(bad?'bad':msg?'ok':'');}
+function intValue(id){const n=Number($(id).value||0); if(!Number.isInteger(n)||n<0)throw new Error('Mint allocations must be whole numbers of 0 or more.'); return n;}
+function reset(){editing=null;$('formTitle').textContent='Add wallet';$('wallet').disabled=false;$('wallet').value='';$('free').value='0';$('discountQty').value='0';$('discountPrice').value='';$('note').value='';$('cancelEdit').classList.add('hide');$('save').textContent='Save Allow List entry';setStatus('');}
+function editEntry(id){const e=currentEntries.find(x=>x.id===id);if(!e)return;editing=id;$('formTitle').textContent='Edit wallet';$('wallet').value=e.wallet_address||'';$('wallet').disabled=true;$('free').value=Number(e.free_mint_quantity||0);$('discountQty').value=Number(e.discounted_mint_quantity||0);$('discountPrice').value=e.discounted_price==null?'':String(Number(e.discounted_price));$('note').value=e.note||'';$('cancelEdit').classList.remove('hide');$('save').textContent='Save changes';scrollTo({top:0,behavior:'smooth'});}
+async function toggle(id,active){setStatus(active?'Reactivating wallet…':'Disabling wallet…');try{const d=await call(active?'reactivate':'deactivate',{entry_id:id});render(d.entries||[]);setStatus(active?'Wallet reactivated.':'Wallet disabled. Usage history was kept.');}catch(e){setStatus(e.message,true);}}
+function render(entries){
+ currentEntries=entries||[]; const root=$('entries');
+ if(!currentEntries.length){root.innerHTML='<div class="empty">No wallets are on this Allow List yet.</div>';return;}
+ root.innerHTML=currentEntries.map(e=>{const u=e.usage||{};const discount=e.discounted_mint_quantity>0?Number(e.discounted_price||0)+' XRP':'—';return '<div class="entry"><div class="row"><div><div class="wallet">'+esc(e.wallet_address)+'</div><span class="pill '+(e.active?'on':'')+'">'+(e.active?'ACTIVE':'DISABLED')+'</span></div><div class="actions"><button class="button" data-edit="'+esc(e.id)+'">Edit</button><button class="button '+(e.active?'danger':'')+'" data-toggle="'+esc(e.id)+'" data-active="'+(e.active?'0':'1')+'">'+(e.active?'Disable':'Reactivate')+'</button></div></div><div class="alloc"><div><small>FREE MINTS</small><strong>'+Number(u.free_remaining||0)+' remaining</strong><small>'+Number(u.free_consumed||0)+' used · '+Number(u.free_reserved||0)+' reserved · '+Number(e.free_mint_quantity||0)+' allocated</small></div><div><small>DISCOUNTED MINTS</small><strong>'+Number(u.discount_remaining||0)+' remaining</strong><small>'+Number(u.discount_consumed||0)+' used · '+Number(u.discount_reserved||0)+' reserved · '+Number(e.discounted_mint_quantity||0)+' allocated</small></div><div><small>DISCOUNT PRICE</small><strong>'+esc(discount)+'</strong><small>Public: '+Number(e.public_price||0)+' XRP</small></div></div>'+(e.note?'<p class="note">'+esc(e.note)+'</p>':'')+'</div>';}).join('');
+ root.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>editEntry(b.dataset.edit)));
+ root.querySelectorAll('[data-toggle]').forEach(b=>b.addEventListener('click',()=>toggle(b.dataset.toggle,b.dataset.active==='1')));
+}
+async function load(){
+ if(!uuid.test(campaign)){ $('entries').innerHTML='<div class="empty">Open this page from a specific Mint campaign.</div>'; $('save').disabled=true; return; }
+ try{const d=await call('list'); const c=d.campaign||{};$('campaignName').textContent=c.name||'One Home Mint';$('network').textContent=c.network==='mainnet'?'XRPL Mainnet':'XRPL Testnet';$('publicPrice').textContent=Number(c.public_price||0)+' XRP';render(d.entries||[]);}catch(e){$('entries').innerHTML='<div class="empty">'+esc(e.message)+'</div>';setStatus(e.message,true);}
+}
+$('save').addEventListener('click',async()=>{const wasEditing=Boolean(editing);try{const wallet=$('wallet').value.trim();if(!xrpl.test(wallet))throw new Error('Enter a valid XRP Ledger r-address.');const free=intValue('free'),discounted=intValue('discountQty');const raw=$('discountPrice').value.trim();if(free===0&&discounted===0)throw new Error('Give this wallet at least one free or discounted mint.');if(discounted>0&&!/^\d+(?:\.\d{1,6})?$/.test(raw))throw new Error('Enter the discounted XRP price with no more than 6 decimal places.');$('save').disabled=true;setStatus('Saving…');const d=await call('upsert',{wallet_address:wallet,free_mint_quantity:free,discounted_mint_quantity:discounted,discounted_price:discounted>0?raw:null,note:$('note').value.trim(),active:true});render(d.entries||[]);reset();setStatus(wasEditing?'Changes saved.':'Wallet added to the Allow List.');}catch(e){setStatus(e.message,true);}finally{$('save').disabled=false;}});
+$('cancelEdit').addEventListener('click',reset);$('refresh').addEventListener('click',load);load();
+})();
+</script>
+</body></html>

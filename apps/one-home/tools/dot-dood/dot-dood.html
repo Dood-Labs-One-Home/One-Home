@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="/shared/onehome-global-appearance-v1467200.js?v=1467200"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dot-Dood | Bubble Pixel Draw (Layers + Templates + Animation)</title>
@@ -140,7 +141,7 @@
   .dood-logo,
   .site-logo,
   .app-logo {
-    background: transparent url('/assets/dood-portal-guide-v54.png?v=54') center/contain no-repeat !important;
+    background: transparent url('/assets/one-home-logo.png?v=107') center/contain no-repeat !important;
     color: transparent !important;
     overflow: hidden !important;
   }
@@ -159,7 +160,7 @@
   .dood-logo img,
   .site-logo img,
   .app-logo img {
-    content: url('/assets/dood-portal-guide-v54.png?v=54') !important;
+    content: url('/assets/one-home-logo.png?v=107') !important;
     width: 100% !important;
     height: 100% !important;
     object-fit: contain !important;
@@ -170,7 +171,7 @@
 
 <style id="dood-v54-portal-logo-component">
   :root {
-    --dood-portal-logo-url: url('/assets/dood-portal-guide-v54.png?v=54');
+    --dood-portal-logo-url: url('/assets/one-home-logo.png?v=107');
   }
 
   .dood-portal-logo,
@@ -216,7 +217,7 @@
   .logo-mark img,
   .site-logo img,
   .app-logo img {
-    content: url('/assets/dood-portal-guide-v54.png?v=54') !important;
+    content: url('/assets/one-home-logo.png?v=107') !important;
     width: 100% !important;
     height: 100% !important;
     display: block !important;
@@ -436,13 +437,18 @@
   }
 </style>
 
+<link rel="stylesheet" href="/shared/onehome-choice-header-v146780.css?v=146780">
+<script defer src="/shared/onehome-choice-header-v1467200.js?v=1467200"></script>
+
+<link rel="stylesheet" href="/shared/onehome-interior-shell-v1467141.css?v=1467141">
+  <link rel="stylesheet" href="/shared/onehome-global-appearance-v1467142.css?v=1467141">
 </head>
 
 <body class="creator-tool-page" data-lab-active="tools" data-lab-badge="Dot-Dood" data-lab-page="/lab/Dot-dood.html">
 
 <div class="dood-return-header">
   <a class="dood-brand" href="../../index.html#districts" aria-label="Back to Dood Labs">
-    <img src="/assets/dood-portal-guide-v54.png?v=54" alt="Dood Labs logo">
+    <img src="/assets/one-home-logo.png?v=107" alt="One Home logo">
     <strong>Dood Labs</strong>
   </a>
   <div class="dood-return-actions">
@@ -474,9 +480,9 @@
     <p>Now with templates, layers, animation, and creator upgrades… built for real artists.</p>
     <div class="wallet-strip">
       <span id="labWalletLine" class="pill-lab warn">Wallet: not connected</span>
-      <span id="labGatePill" class="pill-lab warn">Dood Mode: locked (1M $dOOd)</span></div>
+      <span id="labGatePill" class="pill-lab warn">Advanced Tools: locked (1M $dOOd)</span></div>
     <div class="cta-row" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:10px 0;">
-      <button id="doodModeBtn" class="dood-btn" type="button" style="padding:10px 16px;border-radius:999px;border:0;font-weight:900;cursor:pointer;background:linear-gradient(135deg,#00ccff,#00ff99);color:#0d0d0d;">🧠 Dood Mode (1M $dOOd)</button>
+      <button id="doodModeBtn" class="dood-btn" type="button" style="padding:10px 16px;border-radius:999px;border:0;font-weight:900;cursor:pointer;background:linear-gradient(135deg,#00ccff,#00ff99);color:#0d0d0d;">🧠 Advanced Tools (1M $dOOd)</button>
       <button id="doodClear" type="button" style="padding:10px 14px;border-radius:12px;border:1px solid #2a2a2a;background:transparent;color:#eaeaea;font-weight:800;cursor:pointer;">Disconnect</button></div></div>
 
   <canvas id="canvas" width="640" height="640"></canvas>
@@ -519,7 +525,7 @@
       </select>
     </label></div>
 
-  <!-- Lighting + Autosave + Dood mode -->
+  <!-- Lighting + Autosave + Advanced tools -->
   <div class="controls">
     <button id="threeDBtn" title="Toggle 3D shading">🫧 3D</button>
     <label>Light
@@ -628,7 +634,7 @@
 
 <div id="doodModeModal" class="dood-modal" role="dialog" aria-modal="true" style="position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .18s;">
   <div style="width:min(620px,92vw);background:#121212;border:1px solid #222;border-radius:16px;padding:18px;">
-    <h3 style="margin:0 0 8px;color:#00ccff;">Dood Mode</h3>
+    <h3 style="margin:0 0 8px;color:#00ccff;">Advanced Tools</h3>
     <p id="doodModeStatus">Connect your wallet to verify you hold ≥ 1,000,000 $dOOd.</p>
     <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:12px;">
       <button id="doodConnect" type="button" style="padding:10px 16px;border-radius:12px;border:0;font-weight:900;background:linear-gradient(135deg,#00ccff,#00ff99);cursor:pointer;">Connect &amp; Verify</button>
@@ -1414,7 +1420,7 @@
     doodMode = !!on;
     $('doodModeBtn').classList.toggle('active', doodMode);
     applyDoodMode();
-    if (on) toast('Dood Mode unlocked');
+    if (on) toast('Advanced Tools unlocked');
     markDirty();
     doAutosave('doodMode');
   };
@@ -1775,7 +1781,7 @@
     };
 
     $('mergeDownBtn').onclick=()=>{
-      if(!doodMode) return toast('Enable Dood Mode to merge layers');
+      if(!doodMode) return toast('Enable Advanced Tools to merge layers');
       if(!confirm('Merge this layer down?')) return;
 
       const idx=layerOrder.indexOf(activeLayerId);
@@ -1946,7 +1952,7 @@
   };
 
   $('clearFrameBtn').onclick=()=>{
-    if(!doodMode) return toast('Enable Dood Mode to clear frames');
+    if(!doodMode) return toast('Enable Advanced Tools to clear frames');
     if(!confirm('Clear this frame?')) return;
 
     history.push(snapshotAll()); redoStack=[];
@@ -1979,7 +1985,7 @@
   };
 
   $('exportGifBtn').onclick=async ()=>{
-    if(!doodMode) return toast('Enable Dood Mode to export GIF');
+    if(!doodMode) return toast('Enable Advanced Tools to export GIF');
     try{
       if(typeof GIF === 'undefined') return toast('GIF encoder not loaded');
       toast('Building GIF…');
@@ -2249,7 +2255,7 @@
 
 <script id="dood-v54-portal-logo-component-js">
 (function () {
-  const logoUrl = "/assets/dood-portal-guide-v54.png?v=54";
+  const logoUrl = "/assets/one-home-logo.png?v=107";
 
   function goHome(event) {
     event.preventDefault();
@@ -2260,10 +2266,10 @@
     if (!el) return;
     el.classList.add("dood-portal-logo", "is-alive");
     el.setAttribute("role", "link");
-    el.setAttribute("aria-label", "Dood Labs Home");
-    el.setAttribute("title", "Dood Labs Home");
+    el.setAttribute("aria-label", "One Home");
+    el.setAttribute("title", "One Home");
     el.onclick = goHome;
-    el.innerHTML = '<img src="' + logoUrl + '" alt="Dood Labs Portal Guide">';
+    el.innerHTML = '<img src="' + logoUrl + '" alt="One Home">';
   }
 
   function initDoodPortalLogo() {
@@ -2289,13 +2295,11 @@
 <script id="dood-v56-theme-modes-js">
 (function(){
   const modes = [
-    { id: "dood", label: "Dood Mode" },
-    { id: "doodette", label: "Doodette Mode" },
     { id: "dark", label: "Dark Mode" }
   ];
 
   function applyTheme(mode){
-    const clean = modes.some(m => m.id === mode) ? mode : "dood";
+    const clean = modes.some(m => m.id === mode) ? mode : "dark";
     document.body.classList.remove("theme-dood", "theme-doodette", "theme-dark");
     document.body.classList.add("theme-" + clean);
     localStorage.setItem("doodLabsThemeMode", clean);
@@ -2305,6 +2309,7 @@
   }
 
   function addThemeSwitcher(){
+    return;
     if(document.getElementById("doodThemeSwitcher")) return;
     const wrap = document.createElement("div");
     wrap.id = "doodThemeSwitcher";
@@ -2321,8 +2326,7 @@
   }
 
   function initThemeModes(){
-    addThemeSwitcher();
-    applyTheme(localStorage.getItem("doodLabsThemeMode") || "dood");
+    applyTheme((function(saved){return (saved === "dood" || saved === "doodette" || saved === "dark") ? "dark" : (saved || "dark");})(localStorage.getItem("doodLabsThemeMode")));
   }
 
   if(document.readyState === "loading"){
@@ -2349,7 +2353,7 @@
     setTimeout(function(){
       const notice = document.getElementById("profileAuthNotice") || document.getElementById("profileNotice");
       if(notice){
-        notice.textContent = "Email confirmed. You can now log in and save your profile.";
+        notice.textContent = "Email confirmed. You can now log in and save your Passport.";
         notice.classList.add("show");
         notice.style.display = "block";
       }
@@ -2367,5 +2371,7 @@
 })();
 </script>
 
+
+<script defer src="/shared/onehome-interior-shell-v1467141.js?v=1467200"></script>
 </body>
 <script>'undefined'=== typeof _trfq || (window._trfq = []);'undefined'=== typeof _trfd && (window._trfd=[]),_trfd.push({'tccl.baseHost':'secureserver.net'},{'ap':'cpsh-oh'},{'server':'p3plzcpnl509316'},{'dcenter':'p3'},{'cp_id':'10478751'},{'cp_cl':'8'}) // Monitoring performance to make your website faster. If you want to opt-out, please contact web hosting support.</script><script src='https://img1.wsimg.com/traffic-assets/js/tccl.min.js'></script></html>

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script src="/shared/onehome-global-appearance-v1467200.js?v=1467200"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050505">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<title>Mint on One Home</title>
+<meta id="ohShareDescription" name="description" content="Open this mint on One Home.">
+<meta id="ohShareOgType" property="og:type" content="website">
+<meta id="ohShareOgSite" property="og:site_name" content="One Home">
+<meta id="ohShareOgTitle" property="og:title" content="Mint on One Home">
+<meta id="ohShareOgDescription" property="og:description" content="Open this mint on One Home.">
+<meta id="ohShareOgUrl" property="og:url" content="https://doodlabs.app/mint-share.html">
+<meta id="ohShareOgImage" property="og:image" content="https://doodlabs.app/assets/one-home-sign-logo.png">
+<meta id="ohShareOgImageSecure" property="og:image:secure_url" content="https://doodlabs.app/assets/one-home-sign-logo.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta id="ohShareOgImageAlt" property="og:image:alt" content="One Home mint">
+<meta name="twitter:card" content="summary_large_image">
+<meta id="ohShareTwitterTitle" name="twitter:title" content="Mint on One Home">
+<meta id="ohShareTwitterDescription" name="twitter:description" content="Open this mint on One Home.">
+<meta id="ohShareTwitterImage" name="twitter:image" content="https://doodlabs.app/assets/one-home-sign-logo.png">
+<meta id="ohShareTwitterImageAlt" name="twitter:image:alt" content="One Home mint">
+<link id="ohShareCanonical" rel="canonical" href="https://doodlabs.app/mint-share.html">
+<script>
+/* One Home v14.67.62 — dedicated lightweight social-preview page.
+   This page intentionally does NOT load Passport auth, wallet SDKs, mint runtime,
+   or campaign APIs before its social metadata is ready. */
+window.prerenderReady=false;
+(function(){
+  'use strict';
+  function t(v){return String(v==null?'':v).trim();}
+  function validId(v){return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(t(v));}
+  function set(id,value){var n=document.getElementById(id);if(n)n.setAttribute('content',value);}
+  try{
+    var p=new URLSearchParams(location.search||'');
+    var id=t(p.get('campaign'));
+    var version='146762';
+    if(!validId(id)){window.prerenderReady=true;return;}
+    var name=t(p.get('name'))||'One Home Mint';
+    var title=name+' | One Home';
+    var description='Mint '+name+' on One Home.';
+    var image='https://fshvettlltcujmwvikfq.supabase.co/functions/v1/onehome-mint-page/card/'+encodeURIComponent(id)+'/'+version+'.png';
+    var canonical=location.origin+location.pathname+location.search;
+    var destination=t(p.get('to'));
+    if(!destination||destination.charAt(0)!=='/')destination='/mint/'+encodeURIComponent(id)+'?source=x';
+    try{
+      var dest=new URL(destination,location.origin);
+      if(dest.origin!==location.origin)throw new Error('external');
+      dest.pathname='/mint/'+encodeURIComponent(id);
+      dest.searchParams.set('source','x');
+      destination=dest.pathname+(dest.search||'');
+    }catch(_e){destination='/mint/'+encodeURIComponent(id)+'?source=x';}
+
+    document.title=title;
+    set('ohShareDescription',description);
+    set('ohShareOgTitle',title);
+    set('ohShareOgDescription',description);
+    set('ohShareOgUrl',canonical);
+    set('ohShareOgImage',image);
+    set('ohShareOgImageSecure',image);
+    set('ohShareOgImageAlt',name+' mint artwork');
+    set('ohShareTwitterTitle',title);
+    set('ohShareTwitterDescription',description);
+    set('ohShareTwitterImage',image);
+    set('ohShareTwitterImageAlt',name+' mint artwork');
+    var canonicalLink=document.getElementById('ohShareCanonical');if(canonicalLink)canonicalLink.href=canonical;
+    window.ONE_HOME_MINT_SHARE={campaignId:id,name:name,image:image,destination:destination};
+    document.documentElement.dataset.onehomeMintShareReady='1';
+    document.documentElement.dataset.onehomeMintShareVersion=version;
+  }catch(_error){}
+  window.prerenderReady=true;
+})();
+</script>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#050505;color:#fff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}body{display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 50% 20%,rgba(255,43,214,.12),transparent 35%),#050505}.shell{width:min(760px,100%);border:1px solid rgba(255,255,255,.15);border-radius:26px;background:#0b0d0f;box-shadow:0 24px 80px rgba(0,0,0,.5);overflow:hidden}.art{aspect-ratio:1200/630;background:#070707;display:grid;place-items:center}.art img{width:100%;height:100%;object-fit:contain;display:block}.copy{padding:24px}.eyebrow{margin:0 0 8px;color:#ff2bd6;font-weight:900;letter-spacing:.14em;text-transform:uppercase;font-size:12px}.copy h1{margin:0;font-size:clamp(28px,6vw,48px);line-height:1}.copy p{color:#c9c9c9;line-height:1.5}.open{display:flex;align-items:center;justify-content:center;width:100%;min-height:58px;border:1px solid #ff2bd6;border-radius:999px;background:#ff2bd6;color:#080808;font:900 16px/1 inherit;text-decoration:none;box-shadow:0 0 24px rgba(255,43,214,.28)}.small{font-size:12px;color:#898989;text-align:center;margin:12px 0 0}
+</style>
+  <link rel="stylesheet" href="/shared/onehome-global-appearance-v1467142.css?v=1467141">
+</head>
+<body>
+<main class="shell">
+  <div class="art"><img id="ohShareArtwork" src="/assets/one-home-sign-logo.png" alt="One Home mint artwork"></div>
+  <section class="copy">
+    <p class="eyebrow">One Home Mint</p>
+    <h1 id="ohShareName">Open this mint</h1>
+    <p>Continue to the live One Home mint page to review supply, quantity, wallet, price, and transaction details.</p>
+    <a class="open" id="ohShareOpenMint" href="/open-mints.html">Open Mint</a>
+    <p class="small">One Home Passport is your identity. Your wallet is used only to approve the mint.</p>
+  </section>
+</main>
+<script>
+(function(){
+  var state=window.ONE_HOME_MINT_SHARE||{};
+  var name=document.getElementById('ohShareName');
+  var open=document.getElementById('ohShareOpenMint');
+  if(name&&state.name)name.textContent=state.name;
+  if(open&&state.destination)open.href=state.destination;
+})();
+</script>
+</body>
+</html>

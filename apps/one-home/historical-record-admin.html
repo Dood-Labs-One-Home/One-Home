@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <script src="/shared/onehome-global-appearance-v1467200.js?v=1467200"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>One Home Historical Record Admin</title>
+<link rel="icon" href="/favicon.png">
+<script src="/shared/onehome-supabase-lite.js?v=1214"></script>
+<style>
+:root{--bg:#080706;--panel:#11100f;--panel2:#191512;--line:#3b3028;--cream:#fff1db;--muted:#baa999;--red:#ef1825;--pink:#ff36d6;--green:#68dc6d;--gold:#d99a44;--danger:#ff6770}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 20% 0,#29170c 0,#080706 42%,#030303 100%);color:var(--cream);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}.hidden{display:none!important}
+button,.button{border:1px solid #5d4434;background:#171310;color:var(--cream);border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer}button:hover,.button:hover{border-color:var(--red);background:#211713}button.primary{background:var(--red);border-color:var(--red);color:#fff}button.pink{border-color:var(--pink);color:#ffb7ee}button.danger{border-color:var(--danger);color:#ffd0d3}button:disabled{opacity:.45;cursor:not-allowed}input,textarea,select{width:100%;border:1px solid #544437;background:#090807;color:var(--cream);border-radius:9px;padding:10px 12px}textarea{min-height:95px;resize:vertical}label{display:block;color:#ead6c2;font-size:13px;font-weight:800;margin-bottom:7px}.small{font-size:12px}.muted{color:var(--muted)}
+.topbar{height:74px;display:flex;align-items:center;gap:16px;padding:10px 18px;border-bottom:1px solid #3a2920;background:rgba(4,4,4,.92);position:sticky;top:0;z-index:20}.topbar img{width:62px;height:52px;object-fit:contain}.brand-title{font-size:18px;font-weight:950;letter-spacing:.03em}.brand-sub{font-size:11px;color:var(--muted);letter-spacing:.13em;text-transform:uppercase}.top-actions{margin-left:auto;display:flex;align-items:center;gap:8px}.user-pill{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#d9c7b7;font-size:12px}
+.login-shell{min-height:calc(100vh - 74px);display:grid;place-items:center;padding:24px}.login-card{width:min(460px,100%);background:linear-gradient(145deg,#1a140f,#0c0b0a);border:1px solid var(--red);border-radius:20px;padding:28px;box-shadow:0 24px 80px #000}.login-card h1{margin:0 0 8px;font-size:32px}.login-card .stack{display:grid;gap:14px;margin-top:22px}.notice{display:none;white-space:pre-wrap;border:1px solid #8a373d;background:#321217;color:#ffd5d8;padding:12px;border-radius:10px;margin-top:12px}.notice.show{display:block}.notice.good{border-color:#317d45;background:#0e2b17;color:#d8ffe0}
+.editor{height:calc(100vh - 74px);display:grid;grid-template-columns:245px minmax(420px,1fr) minmax(360px,42vw);gap:0}.sidebar{overflow:auto;border-right:1px solid #332820;background:rgba(10,9,8,.96);padding:15px}.sidebar h2{font-size:16px;margin:0 0 6px}.sidebar-intro{font-size:12px;line-height:1.45;margin-bottom:15px}.group{margin:15px 0}.group-title{font-size:10px;letter-spacing:.16em;color:var(--gold);font-weight:900;margin:0 0 7px}.page-btn{display:flex;width:100%;justify-content:space-between;gap:8px;text-align:left;margin:4px 0;padding:9px 10px;border-color:transparent;background:transparent;font-size:12px}.page-btn:hover{background:#1c1511}.page-btn.active{border-color:var(--red);background:#27110f}.count{color:var(--muted);font-size:10px}.sidebar-foot{border-top:1px solid #34271f;margin-top:18px;padding-top:14px;font-size:11px;color:var(--muted)}
+.controls{overflow:auto;padding:18px;background:rgba(14,12,10,.96)}.control-header{position:sticky;top:-18px;background:rgba(14,12,10,.98);z-index:5;padding:4px 0 12px;border-bottom:1px solid #382a22}.control-header h1{margin:0;font-size:25px}.control-tools{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:12px}.summary{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.chip{border:1px solid #4d3b30;border-radius:999px;padding:5px 9px;font-size:10px;color:#d7c2b0}.chip.red{border-color:var(--red);color:#ff9da5}.elements{display:grid;gap:10px;padding:13px 0 40px}.element-card{border:1px solid #3d3028;background:linear-gradient(145deg,#171310,#0c0b0a);border-radius:14px;overflow:hidden}.element-card.selected{border-color:var(--pink);box-shadow:0 0 0 2px rgba(255,54,214,.12)}.element-summary{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:11px 12px;cursor:pointer}.type-badge{font-size:9px;letter-spacing:.12em;text-transform:uppercase;border:1px solid #65483a;color:#e4c9b4;border-radius:999px;padding:4px 7px}.element-title{font-size:12px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.override-dot{width:9px;height:9px;border-radius:50%;background:#51443a}.override-dot.on{background:var(--green);box-shadow:0 0 10px var(--green)}.element-body{display:none;border-top:1px solid #32261f;padding:13px}.element-card.selected .element-body{display:block}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.form-grid .full{grid-column:1/-1}.inline{display:flex;gap:8px;align-items:end}.inline>*:first-child{flex:1}.toggle-row{display:flex;align-items:center;gap:9px;padding:8px 0}.toggle-row input{width:auto}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.key{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:9px;color:#7f7065;word-break:break-all;margin-top:8px}.empty{border:1px dashed #564336;border-radius:14px;padding:28px;text-align:center;color:var(--muted)}
+.preview{border-left:1px solid #392b23;background:#030303;display:flex;flex-direction:column;min-width:0}.preview-bar{height:48px;display:flex;align-items:center;gap:8px;padding:8px;border-bottom:1px solid #372a22;background:#0d0b0a}.preview-bar strong{font-size:12px}.preview-bar .spacer{flex:1}.preview iframe{border:0;width:100%;height:calc(100% - 48px);background:#000}.loading{display:grid;place-items:center;min-height:180px;color:var(--muted)}
+.dashboard{display:grid;gap:14px}.dash-card{border:1px solid #49362b;background:#14110e;border-radius:14px;padding:16px}.dash-card h3{margin:0 0 6px}.dash-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{border:1px solid #3b2f27;border-radius:12px;padding:12px}.stat b{display:block;font-size:25px;color:var(--red)}
+
+.mint-manager{display:grid;gap:14px}.mint-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.mint-toolbar .spacer{flex:1}.mint-list{display:grid;gap:10px}.mint-row{border:1px solid #49362b;background:linear-gradient(145deg,#171310,#0c0b0a);border-radius:14px;padding:14px}.mint-row-head{display:flex;gap:12px;align-items:flex-start}.mint-thumb{width:76px;height:76px;object-fit:cover;border:1px solid #4b392e;border-radius:12px;background:#090807}.mint-row-copy{min-width:0;flex:1}.mint-row h3{margin:0 0 4px}.mint-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.mint-tabs{display:flex;gap:7px;flex-wrap:wrap;border-bottom:1px solid #3b3028;padding-bottom:10px}.mint-tabs button.active{background:var(--red);border-color:var(--red);color:#fff}.mint-section{border:1px solid #49362b;background:#14110e;border-radius:14px;padding:16px}.mint-section h3{margin:0 0 6px}.mint-section h4{margin:18px 0 8px}.mint-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.mint-form .full{grid-column:1/-1}.mint-form .third{grid-column:span 1}.mint-checks{display:flex;gap:18px;flex-wrap:wrap;padding:6px 0}.mint-checks label{display:flex;gap:8px;align-items:center;margin:0}.mint-checks input{width:auto}.mint-status{font-size:10px;text-transform:uppercase;letter-spacing:.12em;border:1px solid #5c4739;border-radius:999px;padding:4px 8px}.mint-status.open,.mint-status.active{border-color:var(--green);color:#a7ffad}.mint-status.paused{border-color:var(--gold);color:#ffd18d}.mint-status.closed{border-color:var(--danger);color:#ffb5ba}.mint-table-wrap{overflow:auto;border:1px solid #3b3028;border-radius:12px}.mint-table{width:100%;border-collapse:collapse;font-size:12px}.mint-table th,.mint-table td{padding:9px 10px;border-bottom:1px solid #30251f;text-align:left;white-space:nowrap}.mint-table th{color:#e9cfb8;background:#0d0b0a;position:sticky;top:0}.mint-code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:10px;max-width:210px;overflow:hidden;text-overflow:ellipsis}.mint-import-help{border:1px dashed #564336;border-radius:10px;padding:10px;color:var(--muted);font-size:11px;line-height:1.5}.mint-empty{border:1px dashed #564336;border-radius:14px;padding:28px;text-align:center;color:var(--muted)}
+.archive-manager{display:grid;gap:14px}.archive-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.archive-toolbar .spacer{flex:1}.archive-list{display:grid;gap:10px}.archive-row{border:1px solid #49362b;background:linear-gradient(145deg,#171310,#0c0b0a);border-radius:14px;padding:14px}.archive-row-head{display:flex;gap:12px;align-items:flex-start}.archive-row-copy{min-width:0;flex:1}.archive-row h3{margin:0 0 4px}.archive-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.archive-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.archive-form .full{grid-column:1/-1}.archive-section{border:1px solid #49362b;background:#14110e;border-radius:14px;padding:16px}.archive-section h3{margin:0 0 6px}.archive-checks{display:flex;gap:18px;flex-wrap:wrap;padding:6px 0}.archive-checks label{display:flex;gap:8px;align-items:center;margin:0}.archive-checks input{width:auto}.archive-status{font-size:10px;text-transform:uppercase;letter-spacing:.12em;border:1px solid #5c4739;border-radius:999px;padding:4px 8px}.archive-status.published{border-color:var(--green);color:#a7ffad}.archive-status.draft{border-color:var(--gold);color:#ffd18d}.archive-status.archived{border-color:#777;color:#ccc}.archive-empty{border:1px dashed #564336;border-radius:14px;padding:28px;text-align:center;color:var(--muted)}.archive-media-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin:8px 0}.archive-media-list{display:grid;gap:8px;margin-top:10px}.archive-media-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;border:1px solid #3b3028;border-radius:10px;padding:9px}.archive-media-item a{color:#ffb7ee;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:1150px){.editor{grid-template-columns:220px 1fr}.preview{position:fixed;right:12px;bottom:12px;width:min(500px,calc(100vw - 24px));height:55vh;border:1px solid var(--red);border-radius:14px;overflow:hidden;z-index:15;display:none}.preview.open{display:flex}.preview-toggle{display:inline-block!important}}
+@media(max-width:760px){.mint-form,.archive-form{grid-template-columns:1fr}.archive-form .full{grid-column:auto}.archive-media-row{grid-template-columns:1fr}.mint-form .full{grid-column:auto}.mint-row-head{align-items:center}.mint-thumb{width:60px;height:60px}.topbar{height:auto;flex-wrap:wrap}.editor{height:auto;min-height:calc(100vh - 100px);grid-template-columns:1fr}.sidebar{border-right:0;border-bottom:1px solid #332820;max-height:260px}.controls{overflow:visible}.control-tools{grid-template-columns:1fr 1fr}.control-tools input{grid-column:1/-1}.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.user-pill{display:none}}
+</style>
+  <link rel="stylesheet" href="/shared/onehome-global-appearance-v1467142.css?v=1467141">
+</head>
+<body>
+<header class="topbar">
+  <img src="/assets/one-home-logo.png?v=109" alt="One Home">
+  <div><div class="brand-title">One Home Historical Record</div><div class="brand-sub">Document the journey</div></div>
+  <div class="top-actions">
+    <span id="userEmail" class="user-pill"></span>
+    <a class="button" href="/admin.html">Back to Site Editor</a>
+    <a class="button" href="/" target="_blank" rel="noopener">Open One Home</a>
+    <button id="logoutBtn" class="hidden" type="button">Log Out</button>
+  </div>
+</header>
+
+<section id="loginView" class="login-shell">
+  <div class="login-card">
+    <div class="brand-sub">Protected Editor</div>
+    <h1>Admin Sign In</h1>
+    <p class="muted">Use an approved One Home admin account.</p>
+    <div class="stack">
+      <div><label for="loginEmail">Email</label><input id="loginEmail" type="email" autocomplete="username"></div>
+      <div><label for="loginPassword">Password</label><input id="loginPassword" type="password" autocomplete="current-password"></div>
+      <button id="loginBtn" class="primary" type="button">Sign In</button>
+    </div>
+    <div id="loginNotice" class="notice"></div>
+  </div>
+</section>
+
+<main id="editorView" class="editor hidden">
+  <aside class="sidebar">
+    <h2>Current One Home</h2>
+    <p class="sidebar-intro muted">Every item below is read from the current public site. Old admin workflows have been removed.</p>
+    <button class="page-btn active" data-special="dashboard"><span>Site Overview</span><span>›</span></button>
+    <button class="page-btn" data-special="mint-manager"><span>Mint Manager</span><span>›</span></button>
+    <button class="page-btn" data-special="historical-record"><span>Historical Record</span><span>›</span></button>
+    <div id="pageNavigation"></div>
+    <div class="sidebar-foot">Collection price, supply, reveal files, and mint settings remain controlled by the integrated Rare Ink Studio NFT Creator.</div>
+  </aside>
+
+  <section class="controls">
+    <div class="control-header">
+      <div class="brand-sub" id="pageKicker">LIVE SITE</div>
+      <h1 id="pageTitle">Site Overview</h1>
+      <p id="pageHelp" class="muted small">Choose a page or room from the left.</p>
+      <div class="control-tools">
+        <input id="searchInput" type="search" placeholder="Search words, buttons, images, or boxes">
+        <button id="refreshInventoryBtn" type="button">Refresh</button>
+        <button id="previewToggle" class="preview-toggle pink" type="button" style="display:none">Preview</button>
+      </div>
+      <div id="adminNotice" class="notice"></div>
+    </div>
+    <div id="summary" class="summary"></div>
+    <div id="contentArea" class="elements"><div class="loading">Loading the current One Home pages…</div></div>
+  </section>
+
+  <section id="previewPanel" class="preview">
+    <div class="preview-bar"><strong>Live Preview</strong><span id="previewPath" class="muted small">One Home</span><span class="spacer"></span><button id="closePreview" type="button">Close</button></div>
+    <iframe id="sitePreview" title="One Home page preview" src="about:blank"></iframe>
+  </section>
+</main>
+
+<script>
+(function(){
+'use strict';
+const SUPABASE_URL='https://fshvettlltcujmwvikfq.supabase.co';
+const SUPABASE_KEY='sb_publishable_ARrX-vYhy8l-yhs6384S_g_n6214taB';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
+  auth:{
+    persistSession:true,
+    autoRefreshToken:true,
+    detectSessionInUrl:false,
+    storageKey:'onehome-admin-auth-v2'
+  }
+});
+const TABLE='onehome_admin_overrides';
+const ARCHIVE_TABLE='onehome_historical_records';
+const $=id=>document.getElementById(id);
+const GROUPS=[
+  {title:'FRONT DOOR',ids:['globalHeader','homePage','onehomePassportEntrancePage','onehomeEntryChoicePage']},
+  {title:'FOUNDER JOURNEY',ids:['onehomeFounderEligibilityPage','onehomeFounderMintPage','onehomeFounderPage']},
+  {title:'ONE HOME ROOMS',ids:['onehomeStartHerePage','onehomeExplorePage','onehomeRareInkPage','onehomeCreatePage','onehomeCollectPage','onehomePlayPage','onehomeMyHomePage','onehomeLabPage']},
+  {title:'CURRENT AREAS',ids:['arcadePage','nightShotsPage','profilePage','creatorPage','collectorPage','shopPage','doodUPage','labPage']},
+  {title:'TOOLS & SYSTEM SCREENS',ids:['nftCreatorPage','liveFramePage','comingSoonPage','globalFooter']}
+];
+const PAGE_LABELS={globalHeader:'Global Header & Navigation',globalFooter:'Global Footer',homePage:'Front Porch',onehomePassportEntrancePage:'Sign In / Create Home ID',onehomeEntryChoicePage:'Destination Choice',onehomeFounderEligibilityPage:'Founder Eligibility',onehomeFounderMintPage:'Founder Mint Page',onehomeStartHerePage:'Start Here',onehomeExplorePage:'Explore Rooms',onehomeRareInkPage:'Rare Ink Studio',onehomeCreatePage:'Creative Studio',onehomeCollectPage:'Collect',onehomePlayPage:'Play',onehomeFounderPage:'Founder Room',onehomeLabPage:'Lab / XRPL Home',onehomeMyHomePage:'My Home',arcadePage:'Rollies Arcade',creatorPage:'Creator Tools',collectorPage:'Collector Area',shopPage:'Shop',nightShotsPage:'Night Shots',doodUPage:'Dood U',labPage:'The Lab',profilePage:'Passport',comingSoonPage:'Coming Soon Screen',liveFramePage:'Embedded Tool Screen',nftCreatorPage:'NFT Creator'};
+let currentUser=null,currentPage='historicalRecord',selectedKey='',currentSource='site';
+let inventories={site:{pages:[],items:[]},tool:{pages:[],items:[]}},overrides=new Map();
+let inventoryReceived={site:false,tool:false},inventoryRequestedAt=0;
+let mintCampaigns=[],activeMintCampaign=null,mintView='list',mintTab='details',mintBusy=false,mintLoaded=false,mintPrepareTimer=null;
+let archiveRecords=[],activeArchiveRecord=null,archiveView='list',archiveLoaded=false,archiveMedia=[];
+const MINT_PREP_PENDING_KEY='onehome_mint_preparation_pending';
+
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
+function notice(msg,good=false){const el=$('adminNotice');el.textContent=msg;el.className='notice show'+(good?' good':'');setTimeout(()=>el.classList.remove('show'),6500);}
+function loginNotice(msg){const el=$('loginNotice');el.textContent=msg;el.classList='notice show';}
+function labelFor(id){return PAGE_LABELS[id]||String(id||'Page').replace(/Page$/,'').replace(/([a-z])([A-Z])/g,'$1 $2').replace(/^./,m=>m.toUpperCase());}
+function sourceFor(pageId){return pageId==='nftCreatorPage'?'tool':'site';}
+function inventory(){return inventories[sourceFor(currentPage)]||{pages:[],items:[]};}
+function currentItems(){return inventory().items.filter(x=>x.pageId===currentPage);}
+
+async function checkAdmin(){
+  const email=(currentUser&&currentUser.email||'').toLowerCase();
+  const {data,error}=await sb.from('dood_admin_users').select('email,role').eq('role','admin');
+  if(error) throw error;
+  return (data||[]).some(row=>String(row.email||'').toLowerCase()===email);
+}
+async function login(){
+  const email=$('loginEmail').value.trim(),password=$('loginPassword').value;
+  if(!email||!password){loginNotice('Enter your email and password.');return;}
+  $('loginBtn').disabled=true;
+  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  $('loginBtn').disabled=false;
+  if(error){loginNotice(error.message);return;}
+  currentUser=data.user;
+  try{if(!await checkAdmin()){await sb.auth.signOut();loginNotice('This account is not approved as a One Home admin.');return;}showEditor();}catch(err){loginNotice('Admin check failed: '+err.message);}
+}
+async function logout(){await sb.auth.signOut();location.reload();}
+function showEditor(){
+  $('loginView').classList.add('hidden');$('editorView').classList.remove('hidden');$('logoutBtn').classList.remove('hidden');$('userEmail').textContent=currentUser.email||'';
+  // Keep the heavy One Home preview unloaded until a site page is actually opened.
+  // This prevents hidden preview Supabase clients from competing with Admin writes.
+  if($('sitePreview').src==='about:blank'||$('sitePreview').getAttribute('src')==='about:blank'){
+    $('previewPath').textContent='Preview loads when needed';
+  }
+  loadOverrides();
+}
+
+async function loadOverrides(){
+  const {data,error}=await sb.from(TABLE).select('element_key,page_id,element_type,value,is_active');
+  if(error){notice('The new live editor table is not ready yet. Run ONE_HOME_LIVE_SITE_EDITOR.sql in Supabase, then refresh.\n\n'+error.message);return;}
+  overrides.clear();(data||[]).forEach(row=>{if(row.is_active!==false)overrides.set(row.element_key,row);});
+  renderCurrent();
+}
+
+function previewFrame(){return $('sitePreview').contentWindow;}
+function setPreviewSource(source,after){
+  const frame=$('sitePreview');
+  const wanted=source==='tool'?'/tools/nft-creator/index.html?v=1346&onehome_admin_preview=1':'/index.html?onehome_admin_preview=1';
+  const loaded=frame.getAttribute('src')&&frame.getAttribute('src')!=='about:blank';
+  if(currentSource===source&&loaded){if(after)after();return;}
+  currentSource=source;
+  frame.src=wanted;
+  $('previewPath').textContent=source==='tool'?'NFT Creator':'One Home';
+  frame.onload=()=>setTimeout(()=>{requestInventory();if(after)after();},900);
+}
+function requestInventory(){
+  inventoryRequestedAt=Date.now();
+  try{previewFrame().postMessage({type:'onehome-admin-get-inventory'},location.origin);}catch(err){notice('The page preview is not ready yet. Retrying…');}
+}
+function reloadPreview(){
+  const source=sourceFor(currentPage); currentSource=''; inventoryReceived[source]=false;
+  const base=source==='tool'?'/tools/nft-creator/index.html?v=1346':'/index.html';
+  $('sitePreview').src=base+'?onehome_admin_preview=1&editor_refresh='+Date.now();
+  $('previewPath').textContent=source==='tool'?'NFT Creator':'One Home';
+  $('contentArea').innerHTML='<div class="loading">Reloading the current pages and rebuilding the editable list…</div>';
+  $('sitePreview').onload=()=>[300,900,1800].forEach(ms=>setTimeout(requestInventory,ms));
+}
+window.addEventListener('message',event=>{
+  if(event.origin!==location.origin||!event.data||event.data.type!=='onehome-admin-inventory')return;
+  const payload=event.data.payload||{pages:[],items:[]};
+  const source=String(payload.path||'').includes('/tools/nft-creator')?'tool':'site';
+  inventories[source]=payload; inventoryReceived[source]=true;
+  renderNavigation();
+  // The live preview can report its inventory several times while it finishes loading.
+  // Those updates belong to the Site Editor and must not redraw an open Mint Manager form.
+  if(currentPage!=='mintManager'){
+    renderCurrent();
+    if(payload.items&&payload.items.length) notice('Editor connected: '+payload.items.length+' editable items loaded.',true);
+  }
+});
+
+function renderNavigation(){
+  const mapped=new Set(GROUPS.flatMap(group=>group.ids));
+  const discovered=[...inventories.site.pages,...inventories.tool.pages].map(p=>p.id).filter(id=>!mapped.has(id));
+  let html=GROUPS.map(group=>{
+    return `<div class="group"><div class="group-title">${esc(group.title)}</div>${group.ids.map(id=>{const inv=(sourceFor(id)==='tool'?inventories.tool:inventories.site);const found=inv.pages.some(p=>p.id===id);const count=inv.items.filter(x=>x.pageId===id).length;const badge=inventoryReceived[sourceFor(id)]?(found?String(count):'0'):'…';return `<button class="page-btn ${currentPage===id?'active':''}" data-page="${esc(id)}"><span>${esc(labelFor(id))}</span><span class="count">${badge}</span></button>`;}).join('')}</div>`;
+  }).join('');
+  if(discovered.length){html+=`<div class="group"><div class="group-title">OTHER CURRENT PAGES</div>${discovered.map(id=>{const inv=sourceFor(id)==='tool'?inventories.tool:inventories.site;const count=inv.items.filter(x=>x.pageId===id).length;return `<button class="page-btn ${currentPage===id?'active':''}" data-page="${esc(id)}"><span>${esc(labelFor(id))}</span><span class="count">${count}</span></button>`;}).join('')}</div>`;}
+  $('pageNavigation').innerHTML=html;
+  document.querySelectorAll('.page-btn[data-page]').forEach(btn=>btn.onclick=()=>selectPage(btn.dataset.page));
+  document.querySelector('[data-special="dashboard"]').classList.toggle('active',currentPage==='dashboard');
+  document.querySelector('[data-special="mint-manager"]').classList.toggle('active',currentPage==='mintManager');
+  document.querySelector('[data-special="historical-record"]').classList.toggle('active',currentPage==='historicalRecord');
+}
+
+function selectPage(pageId){
+  currentPage=pageId;selectedKey='';$('searchInput').value='';renderNavigation();
+  const source=sourceFor(pageId);
+  setPreviewSource(source,()=>{
+    previewFrame().postMessage({type:'onehome-admin-show-page',pageId},location.origin);
+    setTimeout(requestInventory,500);
+  });
+  renderCurrent();
+}
+
+function dashboard(){
+  const siteCount=inventories.site.items.length,toolCount=inventories.tool.items.length,changed=overrides.size;
+  $('pageKicker').textContent='CURRENT WORKFLOW';$('pageTitle').textContent='Site Overview';$('pageHelp').textContent='This editor mirrors the pages and rooms in the deployed One Home build. Old admin workflows are no longer shown.';
+  $('summary').innerHTML='';
+  $('contentArea').innerHTML=`<div class="dashboard">
+    <div class="dash-grid"><div class="stat"><b>${inventoryReceived.site?siteCount:'…'}</b><span>editable One Home items</span></div><div class="stat"><b>${inventoryReceived.tool?toolCount:'…'}</b><span>editable NFT Creator items</span></div><div class="stat"><b>${changed}</b><span>saved custom changes</span></div><div class="stat"><b>${inventories.site.pages.length+inventories.tool.pages.length}</b><span>current pages and rooms detected</span></div></div>
+    <div class="dash-card"><h3>Editor connection</h3><p class="muted">${inventoryReceived.site?'One Home pages are connected.':'One Home pages are still loading.'} ${inventoryReceived.tool?'NFT Creator is connected.':'Open NFT Creator from the left when you need to edit it.'}</p><button type="button" onclick="reloadPreview()">Reload Pages</button></div>
+    <div class="dash-card"><h3>What this replaces</h3><p class="muted">Legacy Text Controls, old Home Sections, old Home Cards, old app maps, mirror audits, V162 settings, retired social workflows, and other outdated admin screens have been removed. The left menu now follows the actual visitor journey.</p></div>
+    <div class="dash-card"><h3>What is editable</h3><p class="muted">Words, button labels, input instructions, images, image descriptions, links, page sections, cards, panels, visibility, background images, background colors, text colors, and borders.</p></div>
+    <div class="dash-card"><h3>Mint data stays in the NFT Creator</h3><p class="muted">Price, supply, reveal files, taxon, royalties, gates, and published collection data are edited in Rare Ink Studio → NFT Creator. Static wording and page appearance can be edited here.</p><button type="button" class="primary" onclick="selectPage('nftCreatorPage')">Open NFT Creator Editor</button></div>
+  </div>`;
+}
+
+function renderCurrent(){
+  if(currentPage==='dashboard'){$('searchInput').disabled=false;$('refreshInventoryBtn').textContent='Reload Pages';$('refreshInventoryBtn').onclick=()=>{loadOverrides();reloadPreview();};dashboard();return;}
+  if(currentPage==='mintManager'){renderMintManager();return;}
+  if(currentPage==='historicalRecord'){renderHistoricalRecord();return;}
+  $('searchInput').disabled=false;$('refreshInventoryBtn').textContent='Reload Pages';$('refreshInventoryBtn').onclick=()=>{loadOverrides();reloadPreview();};
+  const items=currentItems();
+  $('pageKicker').textContent='LIVE PAGE';$('pageTitle').textContent=labelFor(currentPage);$('pageHelp').textContent='Select an item below, edit it, save it, and see the change in the preview.';
+  const q=$('searchInput').value.trim().toLowerCase();
+  const filtered=items.filter(item=>!q||[item.label,item.type,item.key,item.tag,JSON.stringify(item.currentValue)].join(' ').toLowerCase().includes(q));
+  const types={};items.forEach(i=>types[i.type]=(types[i.type]||0)+1);
+  $('summary').innerHTML=`<span class="chip red">${items.length} editable items</span>`+Object.entries(types).map(([k,v])=>`<span class="chip">${esc(k)}: ${v}</span>`).join('')+`<span class="chip">saved changes: ${items.filter(i=>overrides.has(i.key)).length}</span>`;
+  if(!items.length){
+    const source=sourceFor(currentPage);
+    $('contentArea').innerHTML=inventoryReceived[source]?'<div class="empty"><b>No editable items were found for this page.</b><br><br>Click Reload Pages. If this page is built dynamically, open it once in the preview and click Reload Pages again.</div>':'<div class="loading">Connecting to the live preview and building the editable list…</div>';
+    if(!inventoryReceived[source])requestInventory(); return;
+  }
+  if(!filtered.length){$('contentArea').innerHTML='<div class="empty">No editable items match that search.</div>';return;}
+  $('contentArea').innerHTML=filtered.map(elementCard).join('');
+  document.querySelectorAll('.element-summary').forEach(el=>el.onclick=()=>selectElement(el.dataset.key));
+  bindForms();
+}
+
+
+async function getFreshAdminSession(){
+  let session=null;
+  const sessionResult=await sb.auth.getSession();
+  session=sessionResult?.data?.session||null;
+
+  const expiresSoon=session?.expires_at&&session.expires_at*1000<Date.now()+60000;
+  if(!session||expiresSoon){
+    const refreshed=await sb.auth.refreshSession();
+    if(refreshed.error) throw new Error('Your admin session expired. Sign in again.');
+    session=refreshed.data.session;
+  }
+
+  if(!session?.access_token) throw new Error('Your admin session expired. Sign in again.');
+  currentUser=session.user||currentUser;
+  return session;
+}
+function readableApiError(data,status){
+  const detail=data?.detail||data?.details||data?.hint||'';
+  const message=data?.error||data?.message||`Mint Manager request failed (${status}).`;
+  if(typeof message==='string') return detail&&String(detail)!==message?`${message} ${detail}`:message;
+  try{return JSON.stringify(message);}catch(_error){return `Mint Manager request failed (${status}).`;}
+}
+async function mintApi(action,payload={}){
+  const session=await getFreshAdminSession();
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),30000);
+  try{
+    const response=await fetch(SUPABASE_URL+'/functions/v1/admin-mint-manager',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+session.access_token},
+      body:JSON.stringify({action,...payload}),
+      signal:controller.signal
+    });
+    const raw=await response.text();
+    let data={};
+    try{data=raw?JSON.parse(raw):{};}catch(_error){data={error:raw||`Mint Manager returned ${response.status}.`};}
+    if(response.status===401){await sb.auth.signOut();throw new Error('Your admin session expired. Please sign in again.');}
+    if(!response.ok||data.success===false) throw new Error(readableApiError(data,response.status));
+    return data;
+  }catch(error){
+    if(error?.name==='AbortError') throw new Error('Mint Manager timed out. Nothing was changed. Refresh and try once more.');
+    throw error;
+  }finally{clearTimeout(timer);}
+}
+function mintDateValue(value){if(!value)return'';const d=new Date(value);if(Number.isNaN(d.getTime()))return'';const pad=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;}
+function mintIso(value){return value?new Date(value).toISOString():null;}
+function slugify(value){return String(value||'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');}
+function shortHash(value){const s=String(value||'');return s.length>18?s.slice(0,9)+'…'+s.slice(-7):s||'—';}
+function campaignStatus(c){if(c.minting_enabled&&c.public_page_enabled)return'open';if(c.status==='closed')return'closed';if(c.public_page_enabled)return'paused';return String(c.status||'draft');}
+async function loadMintCampaigns(selectId=''){
+  $('contentArea').innerHTML='<div class="loading">Loading mint campaigns…</div>';
+  try{
+    const result=await mintApi('list_campaigns');mintCampaigns=result.campaigns||[];mintLoaded=true;
+    if(selectId){activeMintCampaign=mintCampaigns.find(c=>c.id===selectId)||null;mintView=activeMintCampaign?'edit':'list';}
+    renderMintManager();
+  }catch(error){$('contentArea').innerHTML=`<div class="empty"><b>Mint Manager could not load.</b><br><br>${esc(error.message)}<br><br><span class="muted">Deploy the included Supabase Edge Function named admin-mint-manager, then reload this page.</span></div>`;}
+}
+function openMintList(){mintView='list';activeMintCampaign=null;mintTab='details';renderMintManager();}
+function openNewCampaign(event){if(event){event.preventDefault();event.stopPropagation();}mintView='new';activeMintCampaign=null;mintTab='details';renderMintCampaignEditor();}
+async function openCampaign(id){
+  mintBusy=true;renderMintManager();
+  try{const result=await mintApi('get_campaign',{campaign_id:id});activeMintCampaign=result.campaign;mintView='edit';mintTab='details';}
+  catch(error){notice(error.message);}finally{mintBusy=false;renderMintManager();}
+}
+function renderMintManager(){
+  $('pageKicker').textContent='RARE INK STUDIO';$('pageTitle').textContent='Mint Manager';$('pageHelp').textContent='Create, prepare, open, pause, and monitor reusable NFT mint campaigns.';
+  $('summary').innerHTML='';$('searchInput').value='';$('searchInput').disabled=true;$('refreshInventoryBtn').textContent='Refresh Mints';$('refreshInventoryBtn').onclick=()=>loadMintCampaigns(activeMintCampaign?.id||'');
+  if(!mintLoaded&&mintView==='list'&&!mintBusy){$('contentArea').innerHTML='<div class="loading">Loading mint campaigns…</div>';setTimeout(()=>loadMintCampaigns(),0);return;}
+  if(mintView==='list'){renderMintCampaignList();return;}
+  renderMintCampaignEditor();
+}
+function renderMintCampaignList(){
+  const rows=mintCampaigns.map(c=>`<article class="mint-row"><div class="mint-row-head">${c.artwork_url?`<img class="mint-thumb" src="${esc(c.artwork_url)}" alt="">`:'<div class="mint-thumb"></div>'}<div class="mint-row-copy"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><h3>${esc(c.name)}</h3><span class="mint-status ${esc(campaignStatus(c))}">${esc(campaignStatus(c))}</span></div><div class="muted small">/${esc(c.slug)} · ${esc(String(c.network||'mainnet').toUpperCase())} · ${esc(c.price)} XRP</div><div class="mint-meta"><span class="chip">Supply ${esc(c.total_supply||0)}</span><span class="chip">Available ${esc(c.inventory_counts?.available||0)}</span><span class="chip">Reserved ${esc(c.inventory_counts?.reserved||0)}</span><span class="chip">Claimed ${esc(c.inventory_counts?.claimed||0)}</span><span class="chip">Limit ${esc(c.per_wallet_limit||1)}/wallet</span></div></div><button type="button" class="primary" onclick="openCampaign('${esc(c.id)}')">Manage</button></div></article>`).join('');
+  $('contentArea').innerHTML=`<div class="mint-manager"><div class="mint-toolbar"><button id="createMintCampaignBtn" class="primary" type="button">+ Create New Campaign</button><span class="spacer"></span><span class="muted small">${mintCampaigns.length} campaign${mintCampaigns.length===1?'':'s'}</span></div>${rows?`<div class="mint-list">${rows}</div>`:'<div class="mint-empty"><b>No campaigns exist yet.</b><br><br>Create the Founder Supply Drop as the first reusable campaign.</div>'}</div>`;
+  const createButton=$('createMintCampaignBtn');
+  if(createButton)createButton.addEventListener('click',openNewCampaign);
+}
+function campaignForm(c={}){
+ return `<div class="mint-form">
+  <div><label>Collection by / Creator Display Name</label><input id="mintCreator" maxlength="120" placeholder="Artist, creator, studio, business, or project" value="${esc(c.creator_display_name||'')}"></div>
+  <div><label>Campaign Name</label><input id="mintName" value="${esc(c.name||'One Home Founder Supply Drop')}"></div>
+  <div class="full"><label>Public URL Slug</label><input id="mintSlug" value="${esc(c.slug||'one-home-founder-supply-drop')}"></div>
+  <div class="full"><label>Description</label><textarea id="mintDescription">${esc(c.description||'')}</textarea></div>
+  <div><label>Artwork URL</label><input id="mintArtwork" value="${esc(c.artwork_url||'/assets/founder-supply-drop-sealed.png')}"></div>
+  <div><label>Banner URL</label><input id="mintBanner" value="${esc(c.banner_url||'')}"></div>
+  <div class="full"><label>Metadata URL (optional)</label><input id="mintMetadata" value="${esc(c.metadata_url||'')}"></div>
+  <div><label>XRPL Network</label><select id="mintNetwork"><option value="mainnet" ${c.network!=='testnet'?'selected':''}>Mainnet</option><option value="testnet" ${c.network==='testnet'?'selected':''}>Testnet</option></select></div>
+  <div><label>NFToken Taxon</label><input id="mintTaxon" type="number" min="0" value="${esc(c.nftoken_taxon??'')}"></div>
+  <div><label>Issuer Wallet</label><input id="mintIssuer" value="${esc(c.issuer_wallet||'')}"></div>
+  <div><label>Inventory / Seller Wallet</label><input id="mintInventoryWallet" value="${esc(c.inventory_wallet||'')}"></div>
+  <div><label>Price in XRP</label><input id="mintPrice" type="number" min="0" step="0.000001" value="${esc(c.price??'')}"></div>
+  <div><label>Total Supply</label><input id="mintSupply" type="number" min="1" step="1" value="${esc(c.total_supply??'')}"></div>
+  <div><label>Maximum Per Wallet</label><input id="mintLimit" type="number" min="1" step="1" value="${esc(c.per_wallet_limit??1)}"></div>
+  <div><label>Reservation Minutes</label><input id="mintReservation" type="number" min="2" step="1" value="${esc(c.claim_reservation_minutes??10)}"></div>
+  <div><label>Sale Starts (optional)</label><input id="mintStarts" type="datetime-local" value="${esc(mintDateValue(c.sale_starts_at))}"></div>
+  <div><label>Sale Ends (optional)</label><input id="mintEnds" type="datetime-local" value="${esc(mintDateValue(c.sale_ends_at))}"></div>
+ </div>`;
+}
+function collectCampaignForm(){
+ const name=$('mintName').value.trim(),slug=slugify($('mintSlug').value||name),issuer=$('mintIssuer').value.trim(),inventory=$('mintInventoryWallet').value.trim();
+ if(!name)throw new Error('Campaign Name is required.');if(!slug)throw new Error('Public URL Slug is required.');
+ if(issuer&&!/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(issuer))throw new Error('Issuer Wallet is not a valid XRPL address.');
+ if(inventory&&!/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/.test(inventory))throw new Error('Inventory Wallet is not a valid XRPL address.');
+ return {creator_display_name:$('mintCreator').value.trim(),name,slug,description:$('mintDescription').value.trim(),artwork_url:$('mintArtwork').value.trim(),banner_url:$('mintBanner').value.trim(),metadata_url:$('mintMetadata').value.trim(),network:$('mintNetwork').value,issuer_wallet:issuer,inventory_wallet:inventory,nftoken_taxon:$('mintTaxon').value===''?null:Number($('mintTaxon').value),currency_type:'XRP',price:Number($('mintPrice').value||0),payment_currency_code:'XRP',payment_currency_issuer:null,total_supply:Number($('mintSupply').value||0),per_wallet_limit:Number($('mintLimit').value||1),claim_reservation_minutes:Number($('mintReservation').value||10),sale_starts_at:mintIso($('mintStarts').value),sale_ends_at:mintIso($('mintEnds').value)};
+}
+function setAdminActionBusy(busy,label='Saving…'){
+  document.querySelectorAll('.mint-manager button').forEach(button=>{
+    if(busy){button.dataset.wasDisabled=button.disabled?'1':'0';button.disabled=true;}
+    else if(button.dataset.wasDisabled!=='1'){button.disabled=false;}
+  });
+  if(busy) notice(label,true);
+}
+async function runMintAction(label,work){
+  if(mintBusy){notice('Please wait for the current Admin action to finish.');return null;}
+  mintBusy=true;setAdminActionBusy(true,label);
+  try{return await work();}
+  catch(error){notice(error?.message||String(error));return null;}
+  finally{mintBusy=false;setAdminActionBusy(false);}
+}
+async function saveCampaign(){
+ const campaign=collectCampaignForm();
+ await runMintAction(activeMintCampaign?'Saving campaign…':'Creating campaign…',async()=>{
+   const result=await mintApi(activeMintCampaign?'update_campaign':'create_campaign',{campaign_id:activeMintCampaign?.id||null,campaign});
+   notice(activeMintCampaign?'Campaign saved.':'Campaign created.',true);
+   await loadMintCampaigns(result.campaign.id);
+ });
+}
+async function setCampaignState(state){
+ if(!activeMintCampaign)return;
+ if((state==='open'||state==='closed')&&!confirm(state==='open'?'Open this mint to collectors now?':'Close this campaign?'))return;
+ await runMintAction('Updating campaign state…',async()=>{
+   await mintApi('set_campaign_state',{campaign_id:activeMintCampaign.id,state});
+   notice('Campaign state updated.',true);
+   await loadMintCampaigns(activeMintCampaign.id);
+ });
+}
+function renderMintCampaignEditor(){
+ const c=activeMintCampaign||{};const isNew=mintView==='new';
+ const tabs=isNew?'':`<div class="mint-tabs"><button type="button" class="${mintTab==='details'?'active':''}" onclick="setMintTab('details')">Campaign</button><button type="button" class="${mintTab==='eligibility'?'active':''}" onclick="setMintTab('eligibility')">Eligibility</button><button type="button" class="${mintTab==='inventory'?'active':''}" onclick="setMintTab('inventory')">Inventory</button><button type="button" class="${mintTab==='claims'?'active':''}" onclick="setMintTab('claims')">Claims</button></div>`;
+ let body='';
+ if(isNew||mintTab==='details')body=`<section class="mint-section"><h3>${isNew?'Create Campaign':'Campaign Settings'}</h3><p class="muted small">The campaign remains private and disabled until you explicitly open it.</p>${campaignForm(c)}<div class="actions"><button type="button" class="primary" onclick="saveCampaign()">${isNew?'Create Draft Campaign':'Save Campaign'}</button>${isNew?'':`<button type="button" onclick="setCampaignState('open')">Open Mint</button><button type="button" class="pink" onclick="setCampaignState('paused')">Pause Mint</button><button type="button" class="danger" onclick="setCampaignState('closed')">Close Campaign</button>`}</div></section>`;
+ if(!isNew&&mintTab==='eligibility')body=eligibilityPanel(c);
+ if(!isNew&&mintTab==='inventory')body=inventoryPanel(c);
+ if(!isNew&&mintTab==='claims')body=claimsPanel(c);
+ $('contentArea').innerHTML=`<div class="mint-manager"><div class="mint-toolbar"><button type="button" onclick="openMintList()">← All Campaigns</button>${!isNew?`<span class="mint-status ${esc(campaignStatus(c))}">${esc(campaignStatus(c))}</span><strong>${esc(c.name)}</strong>`:'<strong>New Campaign</strong>'}<span class="spacer"></span>${!isNew?`<span class="muted small">${esc(c.price)} XRP · ${esc(c.inventory_counts?.available||0)} available</span>`:''}</div>${tabs}${body}</div>`;
+ if($('mintName')&&isNew){$('mintName').addEventListener('input',()=>{if(!$('mintSlug').dataset.edited)$('mintSlug').value=slugify($('mintName').value);});$('mintSlug').addEventListener('input',()=>{$('mintSlug').dataset.edited='1';});}
+}
+function setMintTab(tab){mintTab=tab;renderMintManager();}
+function eligibilityPanel(c){
+ const gates=c.eligibility_gates||[];const rows=gates.map(g=>`<tr><td>${esc(g.gate_name)}</td><td>${esc(g.gate_type)}</td><td>${g.required?'Required':'Optional'}</td><td>${g.active?'Active':'Off'}</td><td><button type="button" class="danger" onclick="deleteGate('${esc(g.id)}')">Remove</button></td></tr>`).join('');
+ return `<section class="mint-section"><h3>Eligibility Gates</h3><p class="muted small">Home ID is the standard entrance requirement. Add NFT or token gates only when this drop needs them.</p><div class="mint-table-wrap"><table class="mint-table"><thead><tr><th>Name</th><th>Type</th><th>Requirement</th><th>Status</th><th></th></tr></thead><tbody>${rows||'<tr><td colspan="5">No gates added yet.</td></tr>'}</tbody></table></div><h4>Add Gate</h4><div class="mint-form"><div><label>Gate Name</label><input id="gateName" value="Home ID Required"></div><div><label>Gate Type</label><select id="gateType"><option value="HOME_ID">Home ID</option><option value="NFT_OWNERSHIP">NFT Ownership</option><option value="TOKEN_BALANCE">Issued Token Balance</option><option value="WALLET_ALLOWLIST">Wallet Allowlist</option></select></div><div><label>NFT Issuer (optional)</label><input id="gateNftIssuer"></div><div><label>NFT Taxon (optional)</label><input id="gateNftTaxon" type="number"></div><div><label>NFTokenID (optional)</label><input id="gateNftId"></div><div><label>Token Currency (optional)</label><input id="gateCurrency"></div><div><label>Token Issuer (optional)</label><input id="gateTokenIssuer"></div><div><label>Minimum Balance</label><input id="gateMinimum" type="number" step="any"></div></div><div class="mint-checks"><label><input id="gateRequired" type="checkbox" checked> Required</label><label><input id="gateActive" type="checkbox" checked> Active</label></div><div class="actions"><button type="button" class="primary" onclick="addGate()">Add Eligibility Gate</button></div></section>`;
+}
+async function addGate(){try{const gate={gate_name:$('gateName').value.trim(),gate_type:$('gateType').value,required:$('gateRequired').checked,active:$('gateActive').checked,nft_issuer:$('gateNftIssuer').value.trim()||null,nft_taxon:$('gateNftTaxon').value===''?null:Number($('gateNftTaxon').value),nftoken_id:$('gateNftId').value.trim()||null,token_currency_code:$('gateCurrency').value.trim()||null,token_issuer:$('gateTokenIssuer').value.trim()||null,minimum_token_balance:$('gateMinimum').value===''?null:Number($('gateMinimum').value),configuration:{}};await mintApi('add_gate',{campaign_id:activeMintCampaign.id,gate});notice('Eligibility gate added.',true);await openCampaign(activeMintCampaign.id);mintTab='eligibility';renderMintManager();}catch(error){notice(error.message);}}
+async function deleteGate(id){if(!confirm('Remove this eligibility gate?'))return;try{await mintApi('delete_gate',{campaign_id:activeMintCampaign.id,gate_id:id});notice('Gate removed.',true);await openCampaign(activeMintCampaign.id);mintTab='eligibility';renderMintManager();}catch(error){notice(error.message);}}
+function preparationControls(c){
+ const prep=c.preparation||{};
+ if(prep.error)return `<div class="mint-import-help"><b>On-chain preparation needs attention.</b><br>${esc(prep.error)}</div>`;
+ const counts=prep.counts||{};const completed=Number(counts.completed||0);const supply=Number(prep.supply||c.total_supply||0);const current=prep.current||null;
+ const waiting=current&&['wallet_pending','submitted'].includes(String(current.status||''));
+ const failed=current&&['rejected','expired','failed'].includes(String(current.status||''));
+ const complete=supply>0&&completed>=supply;
+ let action='';
+ if(complete)action='<button type="button" disabled>All NFTs Prepared</button>';
+ else if(waiting)action=`<button type="button" class="primary" onclick="openPendingPrepareRequest()">Open Current Xaman Request</button><button type="button" onclick="checkPreparedNft()">Check Xaman Result</button>`;
+ else if(failed)action=`<button type="button" class="danger" onclick="retryPreparedNft()">Retry NFT ${esc(current.inventory_number)}</button>`;
+ else action='<button type="button" class="primary" onclick="prepareNextNft()">Prepare Next NFT with Xaman</button>';
+ const statusText=complete?'Ready to open':waiting?`Waiting for Xaman: NFT ${current.inventory_number} of ${supply}`:failed?`NFT ${current.inventory_number} needs a retry`:`Next: NFT ${current?.inventory_number||completed+1} of ${supply}`;
+ return `<div class="mint-import-help"><b>Prepare On-Chain Mint</b><br>One Home creates each NFT and its priced sell offer, verifies it on XRPL, and adds it here automatically. No CSV or copying blockchain IDs is required.</div><div class="mint-meta"><span class="chip red">Prepared ${esc(completed)} / ${esc(supply)}</span><span class="chip">Pending ${esc(counts.pending||0)}</span><span class="chip">Waiting ${esc((counts.wallet_pending||0)+(counts.submitted||0))}</span><span class="chip">Royalty ${esc(prep.royalty_percentage??0)}%</span></div><p class="muted small">${esc(statusText)}</p><div class="actions">${action}</div>`;
+}
+function inventoryPanel(c){
+ const items=c.inventory||[];const rows=items.slice(0,250).map(i=>`<tr><td>${esc(i.inventory_number)}</td><td class="mint-code" title="${esc(i.nftoken_id)}">${esc(shortHash(i.nftoken_id))}</td><td class="mint-code" title="${esc(i.sell_offer_index)}">${esc(shortHash(i.sell_offer_index))}</td><td>${esc(i.sell_offer_amount||'—')}</td><td>${esc(i.status)}</td><td>${esc(i.claimed_by_wallet?shortHash(i.claimed_by_wallet):'—')}</td></tr>`).join('');
+ return `<section class="mint-section"><h3>NFT Inventory</h3><div class="mint-meta"><span class="chip">Total ${esc(c.inventory_counts?.total||0)}</span><span class="chip">Available ${esc(c.inventory_counts?.available||0)}</span><span class="chip">Reserved ${esc(c.inventory_counts?.reserved||0)}</span><span class="chip">Claimed ${esc(c.inventory_counts?.claimed||0)}</span></div><h4>Automatic Preparation</h4>${preparationControls(c)}<h4>Current Inventory</h4><div class="mint-table-wrap"><table class="mint-table"><thead><tr><th>#</th><th>NFTokenID</th><th>Sell Offer</th><th>Amount</th><th>Status</th><th>Claimed By</th></tr></thead><tbody>${rows||'<tr><td colspan="6">No on-chain inventory prepared yet.</td></tr>'}</tbody></table></div>${items.length>250?'<p class="muted small">Showing the first 250 items.</p>':''}<details style="margin-top:18px"><summary class="muted small" style="cursor:pointer">Advanced: import existing XRPL inventory by CSV</summary><div style="margin-top:12px"><div class="mint-import-help">Paste CSV with this exact first row:<br><b>inventory_number,nftoken_id,sell_offer_index,sell_offer_amount,metadata_uri</b><br>For XRP offers, sell_offer_amount must be XRP drops. Example: 8.88 XRP = 8880000 drops.</div><textarea id="inventoryCsv" style="min-height:180px" placeholder="inventory_number,nftoken_id,sell_offer_index,sell_offer_amount,metadata_uri&#10;1,64_CHARACTER_NFTOKEN_ID,64_CHARACTER_OFFER_INDEX,8880000,ipfs://..."></textarea><div class="actions"><button type="button" onclick="importInventory()">Import Existing Inventory</button></div></div></details></section>`;
+}
+function parseCsvLine(line){const out=[];let cur='',quoted=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(quoted&&line[i+1]==='"'){cur+='"';i++;}else quoted=!quoted;}else if(ch===','&&!quoted){out.push(cur.trim());cur='';}else cur+=ch;}out.push(cur.trim());return out;}
+async function importInventory(){try{const text=$('inventoryCsv').value.trim();if(!text)throw new Error('Paste the inventory CSV first.');const lines=text.split(/\r?\n/).filter(Boolean);const headers=parseCsvLine(lines.shift()).map(x=>x.toLowerCase());const required=['inventory_number','nftoken_id','sell_offer_index','sell_offer_amount'];required.forEach(h=>{if(!headers.includes(h))throw new Error('CSV is missing '+h+'.');});const items=lines.map(line=>{const cells=parseCsvLine(line),row={};headers.forEach((h,i)=>row[h]=cells[i]??'');return row;});if(!items.length)throw new Error('The CSV has no inventory rows.');await mintApi('import_inventory',{campaign_id:activeMintCampaign.id,items});notice(items.length+' inventory item(s) imported.',true);await openCampaign(activeMintCampaign.id);mintTab='inventory';renderMintManager();}catch(error){notice(error.message);}}
+
+function savePreparePending(item,xaman){
+ try{localStorage.setItem(MINT_PREP_PENDING_KEY,JSON.stringify({campaign_id:activeMintCampaign.id,preparation_item_id:item.id,payload_uuid:xaman?.payload_uuid||item.xaman_payload_uuid||'',sign_url:xaman?.sign_url||item.xaman_sign_url||'',saved_at:Date.now()}));}catch(_error){}
+}
+function readPreparePending(){try{return JSON.parse(localStorage.getItem(MINT_PREP_PENDING_KEY)||'null');}catch(_error){return null;}}
+function clearPreparePending(){try{localStorage.removeItem(MINT_PREP_PENDING_KEY);}catch(_error){}if(mintPrepareTimer){clearTimeout(mintPrepareTimer);mintPrepareTimer=null;}}
+function openPendingPrepareRequest(){const pending=readPreparePending();const url=pending?.sign_url||activeMintCampaign?.preparation?.current?.xaman_sign_url;if(!url){notice('No Xaman request is waiting.');return;}window.open(url,'_blank','noopener');}
+function schedulePreparationCheck(){if(mintPrepareTimer)clearTimeout(mintPrepareTimer);mintPrepareTimer=setTimeout(()=>checkPreparedNft(true),3500);}
+async function prepareNextNft(){
+ if(!activeMintCampaign)return;
+ const xamanWindow=window.open('about:blank','_blank');
+ try{
+  const result=await mintApi('prepare_create_request',{campaign_id:activeMintCampaign.id});
+  if(result.completed){if(xamanWindow&&!xamanWindow.closed)xamanWindow.close();notice('All NFTs are already prepared.',true);await refreshActiveMintInventory();return;}
+  const item=result.preparation_item,xaman=result.xaman||{};if(!item?.id||!xaman.sign_url)throw new Error('Xaman did not return a signing request.');
+  savePreparePending(item,xaman);notice(`NFT ${item.inventory_number} is ready for your Xaman approval.`,true);if(xamanWindow&&!xamanWindow.closed)xamanWindow.location.href=xaman.sign_url;else location.href=xaman.sign_url;schedulePreparationCheck();
+ }catch(error){if(xamanWindow&&!xamanWindow.closed)xamanWindow.close();notice(error.message);}
+}
+async function checkPreparedNft(quiet=false){
+ if(!activeMintCampaign)return;
+ const pending=readPreparePending();const itemId=pending?.campaign_id===activeMintCampaign.id?pending.preparation_item_id:activeMintCampaign?.preparation?.current?.id;
+ try{
+  const result=await mintApi('prepare_verify_request',{campaign_id:activeMintCampaign.id,preparation_item_id:itemId||null});
+  if(result.pending){if(!quiet)notice(result.message||'Waiting for Xaman and XRPL confirmation.',true);schedulePreparationCheck();return;}
+  if(result.completed){const number=result.nft?.inventory_number||result.preparation_item?.inventory_number;clearPreparePending();notice(`NFT ${number} is prepared and available.`,true);await refreshActiveMintInventory();return;}
+ }catch(error){
+  clearPreparePending();notice(error.message);await refreshActiveMintInventory();
+ }
+}
+async function retryPreparedNft(){
+ if(!activeMintCampaign)return;
+ try{const current=activeMintCampaign.preparation?.current;await mintApi('prepare_retry',{campaign_id:activeMintCampaign.id,preparation_item_id:current?.id||null});clearPreparePending();notice('The NFT is ready to try again.',true);await refreshActiveMintInventory();}catch(error){notice(error.message);}
+}
+async function refreshActiveMintInventory(){const id=activeMintCampaign?.id;if(!id)return;await openCampaign(id);mintTab='inventory';renderMintManager();}
+async function resumeMintPreparationReturn(){
+ const pending=readPreparePending();const params=new URLSearchParams(location.search);const campaignId=params.get('campaign')||pending?.campaign_id||'';
+ if(!campaignId||!params.get('mint_prepare'))return;
+ currentPage='mintManager';mintView='edit';mintTab='inventory';mintLoaded=true;renderNavigation();renderCurrent();
+ try{await openCampaign(campaignId);mintTab='inventory';renderMintManager();await checkPreparedNft(true);}catch(error){notice(error.message);}
+}
+function claimsPanel(c){const claims=c.claims||[];const rows=claims.map(x=>`<tr><td>${esc(new Date(x.created_at).toLocaleString())}</td><td>${esc(shortHash(x.collector_wallet))}</td><td>${esc(x.wallet_provider||'—')}</td><td>${esc(x.status)}</td><td class="mint-code" title="${esc(x.xrpl_transaction_hash||'')}">${esc(shortHash(x.xrpl_transaction_hash))}</td></tr>`).join('');return `<section class="mint-section"><h3>Claims and Sales</h3><p class="muted small">The newest 250 claims are shown.</p><div class="mint-table-wrap"><table class="mint-table"><thead><tr><th>Created</th><th>Collector Wallet</th><th>Wallet</th><th>Status</th><th>XRPL Transaction</th></tr></thead><tbody>${rows||'<tr><td colspan="5">No claims yet.</td></tr>'}</tbody></table></div></section>`;}
+
+
+const ARCHIVE_ROOMS=['The Blueprint Room','The Build Log','The Decision Record','The Founder Supply Drop','The One Home Story','The Lessons Room','The Artifact Archive'];
+const ARCHIVE_TYPES=['Documented Fact','Personal Recollection','Reflection','Interpretation','Theory','Decision','Milestone','Mistake','Draft','Future Vision'];
+function archiveStatus(record){return record?.status||'draft';}
+function archiveDate(value){if(!value)return 'No event date';try{return new Date(value+'T12:00:00').toLocaleDateString();}catch{return value;}}
+function cleanArchiveRecord(record={}){return {id:record.id||'',title:record.title||'',event_date:record.event_date||'',room:record.room||ARCHIVE_ROOMS[0],record_type:record.record_type||ARCHIVE_TYPES[0],summary:record.summary||'',full_story:record.full_story||'',why_it_matters:record.why_it_matters||'',people_projects:record.people_projects||'',decision_change_reason:record.decision_change_reason||'',related_links:record.related_links||'',blockchain_reference:record.blockchain_reference||'',related_record_ids:Array.isArray(record.related_record_ids)?record.related_record_ids:[],media:Array.isArray(record.media)?record.media:[],status:record.status||'draft',is_featured:record.is_featured===true,display_order:Number(record.display_order||0),created_at:record.created_at||'',updated_at:record.updated_at||''};}
+async function loadArchiveRecords(force=false){
+ if(archiveLoaded&&!force){renderArchiveList();return;}
+ $('contentArea').innerHTML='<div class="loading">Loading the One Home Historical Record…</div>';
+ const {data,error}=await sb.from(ARCHIVE_TABLE).select('*').order('display_order',{ascending:true}).order('event_date',{ascending:false,nullsFirst:false}).order('created_at',{ascending:false});
+ if(error){$('contentArea').innerHTML=`<div class="archive-empty"><b>The Historical Record table is not ready yet.</b><br><br>Run <b>one_home_historical_record.sql</b> in Supabase, then click Reload Records.<br><br><span class="muted">${esc(error.message)}</span></div>`;return;}
+ archiveRecords=(data||[]).map(cleanArchiveRecord);archiveLoaded=true;renderArchiveList();
+}
+function renderHistoricalRecord(){
+ $('searchInput').disabled=false;$('searchInput').placeholder='Search historical records';$('refreshInventoryBtn').textContent='Reload Records';$('refreshInventoryBtn').onclick=()=>{archiveLoaded=false;loadArchiveRecords(true);};
+ $('pageKicker').textContent='ONE HOME ARCHIVE';$('pageTitle').textContent='Historical Record';$('pageHelp').textContent='Create, correct, organize, publish, unpublish, feature, archive, or delete entries without changing site code.';
+ $('summary').innerHTML=`<span class="chip red">${archiveRecords.length} total records</span><span class="chip">published: ${archiveRecords.filter(x=>x.status==='published').length}</span><span class="chip">drafts: ${archiveRecords.filter(x=>x.status==='draft').length}</span><span class="chip">archived: ${archiveRecords.filter(x=>x.status==='archived').length}</span>`;
+ if(!archiveLoaded){loadArchiveRecords();return;}
+ if(archiveView==='edit'){renderArchiveEditor(activeArchiveRecord||cleanArchiveRecord());return;}renderArchiveList();
+}
+function renderArchiveList(){
+ archiveView='list';activeArchiveRecord=null;
+ const q=$('searchInput').value.trim().toLowerCase();
+ const filtered=archiveRecords.filter(r=>!q||[r.title,r.room,r.record_type,r.summary,r.full_story,r.people_projects,r.status].join(' ').toLowerCase().includes(q));
+ const rows=filtered.map(r=>`<article class="archive-row"><div class="archive-row-head"><div class="archive-row-copy"><div class="archive-meta"><span class="archive-status ${esc(archiveStatus(r))}">${esc(archiveStatus(r))}</span>${r.is_featured?'<span class="chip red">Featured</span>':''}<span class="chip">${esc(r.room)}</span><span class="chip">${esc(r.record_type)}</span></div><h3>${esc(r.title||'Untitled record')}</h3><div class="muted small">Event date: ${esc(archiveDate(r.event_date))} · Last edited: ${esc(r.updated_at?new Date(r.updated_at).toLocaleString():'—')}</div><p class="muted small">${esc(r.summary||'No summary yet.')}</p></div><button type="button" onclick="openArchiveRecord('${esc(r.id)}')">Edit</button></div></article>`).join('');
+ $('contentArea').innerHTML=`<div class="archive-manager"><div class="archive-toolbar"><button class="primary" type="button" onclick="newArchiveRecord()">+ Create Historical Entry</button><span class="spacer"></span><span class="muted small">${filtered.length} shown</span></div>${rows?`<div class="archive-list">${rows}</div>`:'<div class="archive-empty"><b>No matching historical records.</b><br><br>Create the first entry or clear the search.</div>'}</div>`;
+}
+function newArchiveRecord(){activeArchiveRecord=cleanArchiveRecord();archiveMedia=[];archiveView='edit';renderHistoricalRecord();}
+function openArchiveRecord(id){activeArchiveRecord=cleanArchiveRecord(archiveRecords.find(x=>x.id===id)||{});archiveMedia=[...activeArchiveRecord.media];archiveView='edit';renderHistoricalRecord();}
+function archiveOptions(values,current){return values.map(v=>`<option value="${esc(v)}" ${v===current?'selected':''}>${esc(v)}</option>`).join('');}
+function renderArchiveEditor(record){
+ const r=cleanArchiveRecord(record),isNew=!r.id;archiveMedia=[...(archiveMedia.length||isNew?archiveMedia:r.media)];
+ const mediaHtml=archiveMedia.map((m,i)=>`<div class="archive-media-item"><a href="${esc(m.url||'#')}" target="_blank" rel="noopener">${esc(m.label||m.filename||m.url||'Attachment')}</a><button class="danger" type="button" onclick="removeArchiveMedia(${i})">Remove</button></div>`).join('');
+ $('contentArea').innerHTML=`<div class="archive-manager"><div class="archive-toolbar"><button type="button" onclick="backToArchiveList()">← All Records</button>${!isNew?`<span class="archive-status ${esc(r.status)}">${esc(r.status)}</span>`:''}<strong>${esc(isNew?'New Historical Entry':r.title||'Untitled record')}</strong><span class="spacer"></span>${!isNew?`<button class="danger" type="button" onclick="deleteArchiveRecord('${esc(r.id)}')">Delete Permanently</button>`:''}</div>
+ <section class="archive-section"><h3>Record Identity</h3><p class="muted small">The event date and the date this record is entered are stored separately.</p><div class="archive-form">
+ <div class="full"><label>Entry title</label><input id="arTitle" value="${esc(r.title)}" placeholder="Example: Founder Supply Drop mint paused for Safari repair"></div>
+ <div><label>Date the event happened</label><input id="arEventDate" type="date" value="${esc(r.event_date)}"></div><div><label>Room or category</label><select id="arRoom">${archiveOptions(ARCHIVE_ROOMS,r.room)}</select></div>
+ <div><label>Record type</label><select id="arType">${archiveOptions(ARCHIVE_TYPES,r.record_type)}</select></div><div><label>Display order</label><input id="arOrder" type="number" value="${esc(r.display_order)}"></div>
+ <div class="full"><label>Summary</label><textarea id="arSummary" placeholder="A clear, short description of what happened.">${esc(r.summary)}</textarea></div></div></section>
+ <section class="archive-section"><h3>The Full Record</h3><div class="archive-form"><div class="full"><label>Full story</label><textarea id="arStory" style="min-height:220px" placeholder="Preserve the complete account, context, and sequence of events.">${esc(r.full_story)}</textarea></div><div class="full"><label>Why it matters</label><textarea id="arWhy">${esc(r.why_it_matters)}</textarea></div><div class="full"><label>People or projects involved</label><textarea id="arPeople">${esc(r.people_projects)}</textarea></div><div class="full"><label>Why a decision changed</label><textarea id="arChange" placeholder="Leave blank when no decision changed.">${esc(r.decision_change_reason)}</textarea></div></div></section>
+ <section class="archive-section"><h3>Evidence and Connections</h3><div class="archive-form"><div class="full"><label>Related links (one per line)</label><textarea id="arLinks">${esc(r.related_links)}</textarea></div><div class="full"><label>Blockchain transaction, NFT, or on-chain reference</label><textarea id="arBlockchain">${esc(r.blockchain_reference)}</textarea></div><div class="full"><label>Related record IDs (one per line)</label><textarea id="arRelated">${esc((r.related_record_ids||[]).join('\n'))}</textarea></div></div>
+ <h4>Images, videos, documents, and original files</h4><div class="archive-media-row"><div><label>Choose a file</label><input id="arMediaFile" type="file"></div><div><label>Attachment label</label><input id="arMediaLabel" placeholder="Example: Original launch screenshot"></div><button id="arUploadBtn" type="button" onclick="uploadArchiveMedia()">Upload File</button></div><div id="archiveMediaList" class="archive-media-list">${mediaHtml||'<span class="muted small">No attachments added yet.</span>'}</div></section>
+ <section class="archive-section"><h3>Publishing Controls</h3><div class="archive-form"><div><label>Status</label><select id="arStatus"><option value="draft" ${r.status==='draft'?'selected':''}>Draft — private to admin</option><option value="published" ${r.status==='published'?'selected':''}>Published — available to public archive</option><option value="archived" ${r.status==='archived'?'selected':''}>Archived — retained but hidden</option></select></div><div class="archive-checks"><label><input id="arFeatured" type="checkbox" ${r.is_featured?'checked':''}> Feature this entry</label></div></div><div class="actions"><button id="arSaveBtn" class="primary" type="button" onclick="saveArchiveRecord('${esc(r.id)}')">${isNew?'Create Entry':'Save Changes'}</button>${!isNew&&r.status!=='published'?`<button type="button" onclick="quickArchiveStatus('${esc(r.id)}','published')">Publish Now</button>`:''}${!isNew&&r.status==='published'?`<button type="button" onclick="quickArchiveStatus('${esc(r.id)}','draft')">Unpublish to Draft</button>`:''}${!isNew&&r.status!=='archived'?`<button type="button" onclick="quickArchiveStatus('${esc(r.id)}','archived')">Archive</button>`:''}</div></section></div>`;
+}
+function archivePayload(){return {title:$('arTitle').value.trim(),event_date:$('arEventDate').value||null,room:$('arRoom').value,record_type:$('arType').value,summary:$('arSummary').value.trim(),full_story:$('arStory').value.trim(),why_it_matters:$('arWhy').value.trim(),people_projects:$('arPeople').value.trim(),decision_change_reason:$('arChange').value.trim(),related_links:$('arLinks').value.trim(),blockchain_reference:$('arBlockchain').value.trim(),related_record_ids:$('arRelated').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean),media:archiveMedia,status:$('arStatus').value,is_featured:$('arFeatured').checked,display_order:Number($('arOrder').value||0),updated_by:currentUser.id,updated_at:new Date().toISOString()};}
+async function saveArchiveRecord(id){const payload=archivePayload();if(!payload.title){notice('Enter a title before saving.');return;}const btn=$('arSaveBtn');btn.disabled=true;let result;if(id)result=await sb.from(ARCHIVE_TABLE).update(payload).eq('id',id).select('*').single();else result=await sb.from(ARCHIVE_TABLE).insert({...payload,created_by:currentUser.id}).select('*').single();btn.disabled=false;if(result.error){notice('Historical record save failed: '+result.error.message);return;}const saved=cleanArchiveRecord(result.data);const at=archiveRecords.findIndex(x=>x.id===saved.id);if(at>=0)archiveRecords[at]=saved;else archiveRecords.unshift(saved);activeArchiveRecord=saved;archiveMedia=[...saved.media];notice('Historical record saved.',true);renderHistoricalRecord();}
+async function quickArchiveStatus(id,status){const {data,error}=await sb.from(ARCHIVE_TABLE).update({status,updated_by:currentUser.id,updated_at:new Date().toISOString()}).eq('id',id).select('*').single();if(error){notice('Status change failed: '+error.message);return;}activeArchiveRecord=cleanArchiveRecord(data);archiveRecords=archiveRecords.map(x=>x.id===id?activeArchiveRecord:x);notice(status==='published'?'Entry published.':'Entry moved to '+status+'.',true);renderHistoricalRecord();}
+async function deleteArchiveRecord(id){if(!confirm('Permanently delete this historical record? This cannot be undone.'))return;const {error}=await sb.from(ARCHIVE_TABLE).delete().eq('id',id);if(error){notice('Delete failed: '+error.message);return;}archiveRecords=archiveRecords.filter(x=>x.id!==id);archiveView='list';activeArchiveRecord=null;archiveMedia=[];notice('Historical record permanently deleted.',true);renderHistoricalRecord();}
+function backToArchiveList(){archiveView='list';activeArchiveRecord=null;archiveMedia=[];renderHistoricalRecord();}
+function removeArchiveMedia(index){archiveMedia.splice(index,1);renderArchiveEditor(activeArchiveRecord||cleanArchiveRecord());}
+async function uploadArchiveMedia(){const file=$('arMediaFile')?.files?.[0];if(!file){notice('Choose a file first.');return;}const btn=$('arUploadBtn');btn.disabled=true;const ext=(file.name.split('.').pop()||'bin').toLowerCase();const clean=file.name.replace(/\.[^.]+$/,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'artifact';const path=`onehome-historical-record/${new Date().getFullYear()}/${Date.now()}-${clean}.${ext}`;const {error}=await sb.storage.from('doodlabs-media').upload(path,file,{contentType:file.type||'application/octet-stream',upsert:false});btn.disabled=false;if(error){notice('Attachment upload failed: '+error.message);return;}const {data}=sb.storage.from('doodlabs-media').getPublicUrl(path);archiveMedia.push({url:data.publicUrl,label:$('arMediaLabel').value.trim()||file.name,filename:file.name,mime_type:file.type||'',size_bytes:file.size,uploaded_at:new Date().toISOString()});notice('Attachment uploaded. Save the entry to keep it.',true);renderArchiveEditor(activeArchiveRecord||cleanArchiveRecord());}
+
+function elementCard(item){
+  const saved=overrides.get(item.key);const val=saved?saved.value:item.currentValue;const selected=selectedKey===item.key;
+  return `<article class="element-card ${selected?'selected':''}" data-card-key="${esc(item.key)}">
+    <div class="element-summary" data-key="${esc(item.key)}"><span class="type-badge">${esc(item.type)}</span><span class="element-title">${esc(item.label||item.key)}</span><span class="override-dot ${saved?'on':''}" title="${saved?'Saved custom value':'Using built-in value'}"></span></div>
+    <div class="element-body">${editorFields(item,val)}<div class="key">${esc(item.key)}</div></div>
+  </article>`;
+}
+function checked(v){return v===false?'':'checked';}
+function editorFields(item,val){
+  const common=`<label class="toggle-row"><input data-field="visible" type="checkbox" ${checked(val.visible)}> Show this item on the public site</label>`;
+  let fields='';
+  if(item.type==='text') fields=`<div class="full"><label>Words shown on the page</label><textarea data-field="text">${esc(val.text||'')}</textarea></div>`;
+  if(item.type==='image') fields=`<div class="full"><label>Image URL</label><input data-field="src" value="${esc(val.src||'')}"></div><div><label>Image description</label><input data-field="alt" value="${esc(val.alt||'')}"></div><div><label>Hover title</label><input data-field="title" value="${esc(val.title||'')}"></div><div class="full inline"><div><label>Upload replacement image</label><input class="upload-file" type="file" accept="image/*"></div><button class="upload-btn" type="button">Upload</button></div>`;
+  if(item.type==='link') fields=`<div class="full"><label>Link destination</label><input data-field="href" value="${esc(val.href||'')}"></div><div><label>Hover title</label><input data-field="title" value="${esc(val.title||'')}"></div><div><label>Accessibility label</label><input data-field="aria_label" value="${esc(val.aria_label||'')}"></div>`;
+  if(item.type==='input') fields=`<div class="full"><label>Input instruction / placeholder</label><input data-field="placeholder" value="${esc(val.placeholder||'')}"></div><div class="full"><label>Accessibility label</label><input data-field="aria_label" value="${esc(val.aria_label||'')}"></div>`;
+  if(item.type==='box') fields=`<div class="full"><label>Background image URL</label><input data-field="background_image" value="${esc(val.background_image||'')}"></div><div class="full inline"><div><label>Upload box/page background</label><input class="upload-file" type="file" accept="image/*"></div><button class="upload-btn" type="button">Upload</button></div><div><label>Background color</label><input data-field="background_color" value="${esc(val.background_color||'')}" placeholder="#111111 or rgba(...)"></div><div><label>Text color</label><input data-field="text_color" value="${esc(val.text_color||'')}" placeholder="#ffffff"></div><div><label>Border color</label><input data-field="border_color" value="${esc(val.border_color||'')}" placeholder="#ef1825"></div>`;
+  return `<div class="form-grid">${fields}<div class="full">${common}</div></div><div class="actions"><button class="save-btn primary" type="button">Save This Item</button><button class="preview-btn pink" type="button">Preview Changes</button><button class="reset-btn danger" type="button" ${overrides.has(item.key)?'':'disabled'}>Reset to Built-In</button></div>`;
+}
+
+function selectElement(key){selectedKey=selectedKey===key?'':key;renderCurrent();if(selectedKey){previewFrame().postMessage({type:'onehome-admin-highlight',key:selectedKey},location.origin);setTimeout(()=>document.querySelector(`[data-card-key="${CSS.escape(key)}"]`)?.scrollIntoView({block:'nearest'}),50);}}
+function bindForms(){
+  document.querySelectorAll('.element-card.selected').forEach(card=>{
+    const key=card.dataset.cardKey,item=currentItems().find(x=>x.key===key);if(!item)return;
+    card.querySelector('.save-btn').onclick=()=>saveItem(card,item);
+    card.querySelector('.preview-btn').onclick=()=>previewItem(card,item);
+    card.querySelector('.reset-btn').onclick=()=>resetItem(item);
+    const upload=card.querySelector('.upload-btn');if(upload)upload.onclick=()=>uploadForItem(card,item,upload);
+  });
+}
+function valueFromCard(card,item){
+  const val={};card.querySelectorAll('[data-field]').forEach(el=>{val[el.dataset.field]=el.type==='checkbox'?el.checked:el.value;});return val;
+}
+function previewItem(card,item){const value=valueFromCard(card,item);previewFrame().postMessage({type:'onehome-admin-temp-apply',key:item.key,value},location.origin);previewFrame().postMessage({type:'onehome-admin-highlight',key:item.key},location.origin);$('previewPanel').classList.add('open');}
+async function saveItem(card,item){
+  const value=valueFromCard(card,item);const btn=card.querySelector('.save-btn');btn.disabled=true;
+  const row={element_key:item.key,page_id:item.pageId,page_label:item.pageLabel,element_type:item.type,element_label:item.label||item.key,value,is_active:true,updated_by:currentUser.id,updated_at:new Date().toISOString()};
+  const {data,error}=await sb.from(TABLE).upsert(row,{onConflict:'element_key'}).select('element_key,page_id,element_type,value,is_active').single();btn.disabled=false;
+  if(error){notice('Save failed: '+error.message);return;}
+  overrides.set(item.key,data);previewFrame().postMessage({type:'onehome-admin-temp-apply',key:item.key,value},location.origin);notice('Saved. This change is now available to One Home.',true);renderCurrent();
+}
+async function resetItem(item){
+  if(!confirm('Reset this item to the built-in site value?'))return;
+  const {error}=await sb.from(TABLE).delete().eq('element_key',item.key);if(error){notice('Reset failed: '+error.message);return;}
+  overrides.delete(item.key);notice('Reset. Refreshing the preview…',true);setPreviewSource(sourceFor(currentPage),()=>{previewFrame().postMessage({type:'onehome-admin-show-page',pageId:currentPage},location.origin);});renderCurrent();
+}
+async function uploadForItem(card,item,btn){
+  const file=card.querySelector('.upload-file')?.files?.[0];if(!file){notice('Choose an image first.');return;}
+  btn.disabled=true;const ext=(file.name.split('.').pop()||'png').toLowerCase();const clean=file.name.replace(/\.[^.]+$/,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'image';const path=`onehome-site-editor/${item.pageId}/${Date.now()}-${clean}.${ext}`;
+  const {error}=await sb.storage.from('doodlabs-media').upload(path,file,{contentType:file.type||'image/png',upsert:false});btn.disabled=false;if(error){notice('Upload failed: '+error.message);return;}
+  const {data}=sb.storage.from('doodlabs-media').getPublicUrl(path);const url=data.publicUrl;
+  const target=card.querySelector(item.type==='image'?'[data-field="src"]':'[data-field="background_image"]');if(target)target.value=url;previewItem(card,item);notice('Image uploaded. Click Save This Item to publish it.',true);
+}
+
+$('loginBtn').onclick=login;$('loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')login();});$('logoutBtn').onclick=logout;
+$('searchInput').addEventListener('input',renderCurrent);$('refreshInventoryBtn').textContent='Reload Pages';$('refreshInventoryBtn').onclick=()=>{loadOverrides();reloadPreview();};$('previewToggle').onclick=()=>$('previewPanel').classList.add('open');$('closePreview').onclick=()=>$('previewPanel').classList.remove('open');
+document.querySelector('[data-special="dashboard"]').onclick=()=>{currentPage='dashboard';selectedKey='';renderNavigation();renderCurrent();};
+document.querySelector('[data-special="mint-manager"]').onclick=()=>{currentPage='mintManager';selectedKey='';renderNavigation();renderCurrent();};
+document.querySelector('[data-special="historical-record"]').onclick=()=>{currentPage='historicalRecord';selectedKey='';archiveView='list';$('searchInput').value='';renderNavigation();renderCurrent();};
+
+sb.auth.onAuthStateChange((_event,session)=>{
+  if(session?.user){currentUser=session.user;}
+});
+(async function init(){
+  try{
+    const {data,error}=await sb.auth.getSession();
+    if(error) throw error;
+    if(data.session){
+      currentUser=data.session.user;
+      if(await checkAdmin()){showEditor();await resumeMintPreparationReturn();}
+      else await sb.auth.signOut();
+    }
+  }catch(error){
+    console.warn('Admin session restore failed',error);
+    await sb.auth.signOut().catch(()=>{});
+    loginNotice('Please sign in to continue.');
+  }
+})();
+// Admin reliability repair v12.11: isolated auth, lazy preview, readable writes.
+window.selectPage=selectPage;window.newArchiveRecord=newArchiveRecord;window.openArchiveRecord=openArchiveRecord;window.saveArchiveRecord=saveArchiveRecord;window.quickArchiveStatus=quickArchiveStatus;window.deleteArchiveRecord=deleteArchiveRecord;window.backToArchiveList=backToArchiveList;window.removeArchiveMedia=removeArchiveMedia;window.uploadArchiveMedia=uploadArchiveMedia;window.openMintList=openMintList;window.openNewCampaign=openNewCampaign;window.openCampaign=openCampaign;window.saveCampaign=saveCampaign;window.setCampaignState=setCampaignState;window.setMintTab=setMintTab;window.addGate=addGate;window.deleteGate=deleteGate;window.importInventory=importInventory;window.prepareNextNft=prepareNextNft;window.checkPreparedNft=checkPreparedNft;window.retryPreparedNft=retryPreparedNft;window.openPendingPrepareRequest=openPendingPrepareRequest;
+})();
+</script>
+</body>
+</html>

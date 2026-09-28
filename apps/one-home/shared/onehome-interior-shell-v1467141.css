@@ -1,0 +1,399 @@
+/* One Home v14.67.141 — cohesive mobile shell and stable navigation controls. */
+:root{
+  --onehome-interior-bg-desktop:url('/assets/spooky-time-main-entry-pc-v1467200.webp');
+  --onehome-interior-bg-mobile:url('/assets/spooky-time-main-entry-mobile-v1467200.webp');
+  --onehome-shell-neon:#ff2bd6;
+  --onehome-shell-neon-rgb:255,43,214;
+  --onehome-desktop-button-scale:1.10;
+  --oh-mobile-edge:12px;
+  --oh-mobile-header-top:calc(env(safe-area-inset-top,0px) + 10px);
+  --oh-mobile-content-top:calc(env(safe-area-inset-top,0px) + 102px);
+  --oh-mobile-content-bottom:calc(env(safe-area-inset-bottom,0px) + 28px);
+  --oh-mobile-content-max:520px;
+  --oh-mobile-action-height:56px;
+  --oh-mobile-action-gap:12px;
+}
+
+html{min-height:100%;background:#080503;}
+html.onehome-interior-shell-active,
+body.onehome-interior-shell-active{
+  min-height:100vh!important;
+  min-height:100dvh!important;
+  background-color:#080503!important;
+  background-image:linear-gradient(180deg,rgba(9,5,3,.42),rgba(3,3,3,.62)),var(--onehome-interior-bg-desktop)!important;
+  background-position:center top!important;
+  background-size:cover!important;
+  background-repeat:no-repeat!important;
+  background-attachment:fixed!important;
+}
+body.onehome-interior-shell-active::before{background:none!important;mask-image:none!important;}
+
+/* The old floating picker is replaced by one persistent, accessible menu. */
+#onehomeNeonPicker{display:none!important;}
+
+#onehomeGlobalMenu{
+  position:fixed;
+  top:max(14px,env(safe-area-inset-top));
+  right:16px;
+  z-index:2147483000;
+  display:none;
+  width:max-content;
+  max-width:calc(100vw - 24px);
+  font-family:Inter,Arial,Helvetica,sans-serif;
+  pointer-events:none;
+}
+body.onehome-interior-shell-active #onehomeGlobalMenu{display:block;}
+#onehomeGlobalMenu .oh-shell-controls{
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  width:100%;
+  pointer-events:auto;
+}
+#onehomeGlobalMenu .oh-menu-toggle{
+  width:48px;
+  height:48px;
+  min-width:48px;
+  padding:0!important;
+  display:grid;
+  place-items:center;
+  border:1.5px solid var(--onehome-neon,var(--onehome-shell-neon))!important;
+  border-radius:14px!important;
+  background:rgba(0,0,0,.86)!important;
+  color:var(--onehome-neon,var(--onehome-shell-neon))!important;
+  font-size:25px!important;
+  line-height:1!important;
+  font-weight:900!important;
+  box-shadow:0 0 5px var(--onehome-neon,var(--onehome-shell-neon)),0 0 16px rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.42)!important;
+  text-shadow:0 0 8px rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.82)!important;
+  cursor:pointer;
+}
+#onehomeGlobalMenu .oh-menu-toggle[aria-expanded="true"]{font-size:31px!important;font-weight:500!important;}
+
+#onehomeGlobalMenu .oh-prev-page{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:auto;
+  min-height:38px;
+  margin:0;
+  padding:8px 13px!important;
+  border:1px solid rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.58)!important;
+  border-radius:999px!important;
+  background:rgba(0,0,0,.82)!important;
+  color:var(--onehome-neon,var(--onehome-shell-neon))!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  line-height:1.1!important;
+  white-space:nowrap;
+  text-shadow:0 0 7px rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.62)!important;
+  box-shadow:0 0 10px rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.18)!important;
+  cursor:pointer;
+}
+#onehomeGlobalMenu .oh-prev-page[hidden]{display:none!important;}
+#onehomeGlobalMenu .oh-prev-page:hover{background:rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.14)!important;}
+
+#onehomeGlobalMenu .oh-menu-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  display:none;
+  background:rgba(0,0,0,.54);
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+  pointer-events:auto;
+}
+#onehomeGlobalMenu.open .oh-menu-backdrop{display:block;}
+#onehomeGlobalMenu .oh-menu-panel{
+  position:absolute;
+  top:calc(100% + 10px);
+  right:0;
+  z-index:2;
+  display:none;
+  width:min(320px,calc(100vw - 28px));
+  max-height:min(78vh,680px);
+  overflow:auto;
+  margin:0;
+  padding:14px;
+  border:1px solid rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.52);
+  border-radius:18px;
+  background:rgba(5,5,7,.97);
+  color:#fff;
+  box-shadow:0 18px 50px rgba(0,0,0,.64),0 0 18px rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.20);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  overscroll-behavior:contain;
+  pointer-events:auto;
+}
+#onehomeGlobalMenu.open .oh-menu-panel{display:block;}
+#onehomeGlobalMenu .oh-menu-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:3px 4px 11px;
+  margin-bottom:8px;
+  border-bottom:1px solid rgba(255,255,255,.13);
+  font-size:13px;
+  font-weight:950;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+#onehomeGlobalMenu .oh-menu-section{margin-top:0;padding-top:4px;}
+#onehomeGlobalMenu .oh-menu-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+#onehomeGlobalMenu .oh-menu-label{font-size:13px;font-weight:900;color:#fff;}
+#onehomeGlobalMenu .oh-neon-switch{
+  min-width:76px;
+  min-height:36px;
+  padding:7px 10px!important;
+  border-radius:999px!important;
+  border:1px solid var(--onehome-neon,var(--onehome-shell-neon))!important;
+  background:rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.11)!important;
+  color:var(--onehome-neon,var(--onehome-shell-neon))!important;
+  font-weight:950!important;
+  cursor:pointer;
+}
+#onehomeGlobalMenu .oh-neon-swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:11px 8px;margin-top:14px;}
+#onehomeGlobalMenu .oh-neon-swatch{
+  width:38px;
+  height:38px;
+  min-width:38px;
+  min-height:38px;
+  padding:0!important;
+  justify-self:center;
+  border-radius:999px!important;
+  border:2px solid var(--swatch)!important;
+  background:var(--swatch)!important;
+  background-color:var(--swatch)!important;
+  box-shadow:0 0 9px var(--swatch)!important;
+  cursor:pointer;
+}
+#onehomeGlobalMenu .oh-neon-swatch[aria-pressed="true"]{outline:2px solid #fff!important;outline-offset:3px!important;}
+#onehomeGlobalMenu .oh-menu-action{
+  width:100%;
+  min-height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:10px;
+  padding:10px 13px!important;
+  border:1px solid rgba(255,255,255,.28)!important;
+  border-radius:12px!important;
+  background:rgba(255,255,255,.06)!important;
+  color:#fff!important;
+  font-size:14px!important;
+  font-weight:850!important;
+  text-align:left!important;
+  text-shadow:none!important;
+  box-shadow:none!important;
+  cursor:pointer;
+}
+#onehomeGlobalMenu .oh-contact-action{margin-top:14px;}
+#onehomeGlobalMenu .oh-logout{margin-top:8px;}
+#onehomeGlobalMenu button:focus-visible{outline:2px solid #fff!important;outline-offset:3px!important;}
+body.oh-menu-open{overflow:hidden!important;}
+
+/* Rare Ink Studio contact modal */
+.oh-contact-modal{position:fixed;inset:0;z-index:2147483600;display:none;align-items:center;justify-content:center;padding:18px;font-family:Inter,Arial,Helvetica,sans-serif;}
+.oh-contact-modal.open{display:flex;}
+.oh-contact-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+.oh-contact-card{position:relative;z-index:1;width:min(620px,100%);max-height:min(88dvh,760px);overflow:auto;border:1px solid rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.6);border-radius:22px;background:rgba(7,7,10,.985);color:#fff;padding:20px;box-shadow:0 24px 70px rgba(0,0,0,.72),0 0 26px rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.18);}
+.oh-contact-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:8px;}
+.oh-contact-kicker{font-size:11px;font-weight:950;letter-spacing:.12em;color:var(--onehome-neon,var(--onehome-shell-neon));}
+.oh-contact-card h2{margin:4px 0 0;color:#fff;font-size:24px;line-height:1.12;}
+.oh-contact-copy{margin:8px 0 16px;color:rgba(255,255,255,.78);line-height:1.45;}
+.oh-contact-close{width:42px;height:42px;min-width:42px;padding:0!important;border-radius:12px!important;border:1px solid rgba(255,255,255,.28)!important;background:rgba(255,255,255,.06)!important;color:#fff!important;font-size:28px!important;line-height:1!important;cursor:pointer;}
+.oh-contact-form{display:grid;gap:12px;}
+.oh-contact-form label{display:grid;gap:6px;font-size:13px;font-weight:900;color:#fff;}
+.oh-contact-form input,.oh-contact-form select,.oh-contact-form textarea{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.23);border-radius:12px;background:rgba(255,255,255,.065);color:#fff;padding:11px 12px;font:inherit;outline:none;}
+.oh-contact-form select option{background:#111;color:#fff;}
+.oh-contact-form input:focus,.oh-contact-form select:focus,.oh-contact-form textarea:focus{border-color:var(--onehome-neon,var(--onehome-shell-neon));box-shadow:0 0 0 2px rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.18);}
+.oh-contact-form textarea{resize:vertical;min-height:132px;}
+.oh-contact-submit{min-height:48px;padding:11px 15px!important;border:1px solid var(--onehome-neon,var(--onehome-shell-neon))!important;border-radius:13px!important;background:rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.12)!important;color:var(--onehome-neon,var(--onehome-shell-neon))!important;font-size:14px!important;font-weight:950!important;cursor:pointer;}
+.oh-contact-submit:disabled{opacity:.65;cursor:wait;}
+.oh-contact-status{min-height:20px;color:#fff;font-size:13px;font-weight:800;}
+.oh-contact-note{margin:12px 0 0;color:rgba(255,255,255,.58);font-size:12px;line-height:1.4;}
+.oh-contact-hp{position:absolute!important;left:-10000px!important;top:auto!important;width:1px!important;height:1px!important;overflow:hidden!important;}
+body.oh-contact-open{overflow:hidden!important;}
+body.onehome-neon-off .oh-contact-card{border-color:rgba(255,255,255,.5);box-shadow:0 24px 70px rgba(0,0,0,.72);}
+body.onehome-neon-off .oh-contact-kicker,body.onehome-neon-off .oh-contact-submit{color:#fff!important;border-color:rgba(255,255,255,.55)!important;box-shadow:none!important;}
+@media(max-width:760px){.oh-contact-modal{padding:12px;align-items:flex-end;}.oh-contact-card{width:100%;max-height:92dvh;border-radius:20px 20px 14px 14px;padding:17px;}.oh-contact-card h2{font-size:21px;}}
+
+/* JS assigns the semantic neon class; CSS owns presentation at each viewport. */
+body.onehome-interior-shell-active:not(.onehome-neon-off) .onehome-user-neon,
+body.onehome-interior-shell-active:not(.onehome-neon-off) [data-onehome-user-neon="1"]{
+  color:var(--onehome-neon,var(--onehome-shell-neon))!important;
+  border-color:var(--onehome-neon,var(--onehome-shell-neon))!important;
+  background:rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.085)!important;
+  text-shadow:0 0 4px var(--onehome-neon,var(--onehome-shell-neon)),0 0 10px rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.92),0 0 18px rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.60)!important;
+  box-shadow:0 0 3px var(--onehome-neon,var(--onehome-shell-neon)),0 0 10px rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.78),0 0 22px rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.40),inset 0 0 12px rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.14)!important;
+  outline-color:var(--onehome-neon,var(--onehome-shell-neon))!important;
+}
+
+/* Neon OFF is intentionally clean and high contrast. */
+body.onehome-neon-off{--onehome-neon:#ffffff!important;--onehome-neon-rgb:255,255,255!important;}
+body.onehome-neon-off .onehome-user-neon,
+body.onehome-neon-off .onehome-v15-btn:not(.primary),
+body.onehome-neon-off .btn:not(.primary):not(.danger),
+body.onehome-neon-off .machine-btn:not(.primary),
+body.onehome-neon-off .creator-city-btn:not(.primary),
+body.onehome-neon-off .project-mini-btn,
+body.onehome-neon-off .rare-routes-neon-button,
+body.onehome-neon-off [data-onehome-user-neon="1"]{
+  color:#fff!important;
+  border-color:rgba(255,255,255,.52)!important;
+  background:rgba(0,0,0,.62)!important;
+  text-shadow:none!important;
+  box-shadow:none!important;
+  filter:none!important;
+  outline-color:#fff!important;
+}
+body.onehome-neon-off #onehomeGlobalMenu .oh-menu-toggle,
+body.onehome-neon-off #onehomeGlobalMenu .oh-menu-action,
+body.onehome-neon-off #onehomeGlobalMenu .oh-prev-page,
+body.onehome-neon-off #onehomeGlobalMenu .oh-neon-switch{
+  color:#fff!important;
+  border-color:rgba(255,255,255,.55)!important;
+  text-shadow:none!important;
+  box-shadow:none!important;
+  background:rgba(0,0,0,.78)!important;
+}
+body.onehome-neon-off #onehomePassportJourneyPage .onehome-journey-button,
+body.onehome-neon-off #onehomePassportJourneyPage .onehome-v1414-passport-actions .onehome-journey-button{
+  color:#fff!important;
+  border-color:rgba(255,255,255,.62)!important;
+  background:rgba(0,0,0,.62)!important;
+  text-shadow:none!important;
+  box-shadow:none!important;
+  filter:none!important;
+  outline-color:#fff!important;
+}
+
+@media(min-width:761px){
+  body.onehome-interior-shell-active .onehome-v15-btn,
+  body.onehome-interior-shell-active .btn,
+  body.onehome-interior-shell-active .machine-btn,
+  body.onehome-interior-shell-active .creator-city-btn,
+  body.onehome-interior-shell-active .project-mini-btn{
+    min-height:calc(42px * var(--onehome-desktop-button-scale,1.10));
+    padding-left:calc(18px * var(--onehome-desktop-button-scale,1.10))!important;
+    padding-right:calc(18px * var(--onehome-desktop-button-scale,1.10))!important;
+  }
+}
+
+@media(max-width:760px){
+  html,
+  body{
+    width:100%;
+    max-width:100%;
+    min-height:100%;
+    overflow-x:hidden;
+    background:#080503;
+  }
+  html.onehome-interior-shell-active,
+  body.onehome-interior-shell-active{
+    min-height:100svh!important;
+    min-height:100dvh!important;
+    background-image:linear-gradient(180deg,rgba(8,4,2,.40),rgba(3,3,3,.60)),var(--onehome-interior-bg-mobile)!important;
+    background-position:center top!important;
+    background-size:cover!important;
+    background-repeat:no-repeat!important;
+    background-attachment:scroll!important;
+  }
+  #onehomeGlobalMenu{
+    top:var(--oh-mobile-header-top);
+    right:var(--oh-mobile-edge);
+    max-width:calc(100vw - 108px);
+  }
+  #onehomeGlobalMenu .oh-shell-controls{gap:8px;}
+  #onehomeGlobalMenu .oh-menu-toggle{
+    width:48px;
+    height:48px;
+    min-width:48px;
+    border-radius:15px!important;
+    box-shadow:0 0 12px rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.34)!important;
+  }
+  #onehomeGlobalMenu .oh-prev-page{
+    min-height:40px;
+    padding:9px 12px!important;
+    font-size:12px!important;
+    box-shadow:0 0 9px rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.14)!important;
+  }
+  #onehomeGlobalMenu .oh-menu-panel{
+    position:fixed;
+    top:calc(var(--oh-mobile-header-top) + 62px);
+    right:var(--oh-mobile-edge);
+    width:min(308px,calc(100vw - 24px));
+    max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 86px);
+    padding:16px;
+    border-radius:20px;
+  }
+  #onehomeGlobalMenu .oh-menu-title{font-size:12px;}
+  #onehomeGlobalMenu .oh-neon-swatches{gap:13px 8px;}
+  #onehomeGlobalMenu .oh-neon-swatch{
+    width:36px;
+    height:36px;
+    min-width:36px;
+    min-height:36px;
+    box-shadow:0 0 7px var(--swatch)!important;
+  }
+  body.onehome-interior-shell-active:not(.onehome-neon-off) .onehome-user-neon,
+  body.onehome-interior-shell-active:not(.onehome-neon-off) [data-onehome-user-neon="1"]{
+    background:rgba(2,12,8,.72)!important;
+    text-shadow:0 0 7px rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.62)!important;
+    box-shadow:0 0 12px rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.34),inset 0 0 9px rgba(var(--onehome-neon-rgb,var(--onehome-shell-neon-rgb)),.10)!important;
+  }
+}
+
+@media(max-width:350px){
+  :root{--oh-mobile-edge:8px;}
+  #onehomeGlobalMenu{max-width:calc(100vw - 96px);}
+  #onehomeGlobalMenu .oh-shell-controls{gap:6px;}
+  #onehomeGlobalMenu .oh-prev-page{padding:8px 9px!important;font-size:11px!important;}
+  #onehomeGlobalMenu .oh-menu-toggle{width:46px;height:46px;min-width:46px;}
+}
+
+@media(prefers-reduced-motion:reduce){
+  #onehomeGlobalMenu *,
+  body.onehome-interior-shell-active *{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important;}
+}
+
+/* Logout lives in the persistent menu instead of floating in individual rooms. */
+body.onehome-interior-shell-active #oneHomePassportLogoutBtn,
+body.onehome-interior-shell-active .onehome-main-entry-logout,
+body.onehome-interior-shell-active #profileLogoutBtn{display:none!important;}
+body.onehome-interior-shell-active #oneHomePassportLogoutStatus{display:none!important;}
+
+
+/* One Home v14.67.141 — No Neon is the site-wide default.
+   This is deliberately scoped to OFF mode; switching Neon ON restores the existing
+   room/page styling without duplicating or rebuilding individual page rules. */
+html.onehome-neon-off,body.onehome-neon-off{
+  --onehome-neon:#fff!important;
+  --onehome-neon-rgb:255,255,255!important;
+  --onehome-shell-neon:#fff!important;
+  --onehome-shell-neon-rgb:255,255,255!important;
+}
+body.onehome-neon-off *{text-shadow:none!important;}
+body.onehome-neon-off :where(
+  button,.btn,[class*="-btn"],[class*="button"],[class*="card"],[class*="panel"],
+  [class*="box"],[class*="tile"],[class*="section"],[class*="modal"],[class*="dialog"],
+  [class*="shell"],article,fieldset,input,select,textarea
+){box-shadow:none!important;}
+body.onehome-neon-off :where(
+  button,.btn,[class*="-btn"],[class*="button"],[class*="neon"],[data-onehome-user-neon="1"]
+){filter:none!important;}
+body.onehome-neon-off :where(
+  [class*="card"],[class*="panel"],[class*="box"],[class*="tile"],[class*="section"],article,fieldset
+){border-color:rgba(255,255,255,.22)!important;}
+body.onehome-neon-off :where(
+  .onehome-user-neon,.rare-routes-neon-button,[class*="neon-button"],[data-onehome-user-neon="1"]
+){color:#fff!important;border-color:rgba(255,255,255,.56)!important;background-color:rgba(0,0,0,.56)!important;}
+body.onehome-neon-off :where(
+  [class*="card"],[class*="panel"],[class*="box"],[class*="tile"],[class*="section"],article,fieldset
+)::before,
+body.onehome-neon-off :where(
+  [class*="card"],[class*="panel"],[class*="box"],[class*="tile"],[class*="section"],article,fieldset
+)::after{box-shadow:none!important;text-shadow:none!important;}

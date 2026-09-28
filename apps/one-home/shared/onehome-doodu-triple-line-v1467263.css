@@ -1,0 +1,35 @@
+/* OH-263: Triple Line's own Dood U room. All existing Dood U styling stays intact. */
+#doodUPage .doodu-house-directory .doodu-triple-door{
+  grid-column:1 / -1;display:flex!important;flex-direction:column;align-items:center;
+  justify-content:center;gap:8px;min-height:150px;white-space:normal;text-align:center;
+  background:linear-gradient(120deg,rgba(35,37,92,.97),rgba(15,76,94,.95))!important;
+  border:1px solid rgba(100,233,216,.64)!important;border-radius:20px!important;color:#fff!important;
+  box-shadow:0 10px 32px rgba(0,0,0,.19)!important;padding:20px!important;
+}
+#doodUPage .doodu-triple-door strong{font-size:clamp(22px,2.2vw,31px);letter-spacing:.04em}
+#doodUPage .doodu-triple-door span{font-size:clamp(15px,1.6vw,21px);font-weight:500}
+#doodUPage .doodu-triple-door small{font-size:clamp(13px,1.25vw,17px);font-weight:650;color:#91ffe6}
+#doodUPage .doodu-triple-door:hover{filter:brightness(1.13)}
+#doodUPage .doodu-triple-door:focus-visible,#doodUTripleLinePage :is(button,a):focus-visible{outline:3px solid #fff!important;outline-offset:4px}
+body:has(#doodUTripleLinePage.active){background:#061020!important}
+body:has(#doodUTripleLinePage.active) main#top{width:100%!important;max-width:none!important;padding:0!important;margin:0!important}
+html body #doodUTripleLinePage.active{width:100%!important;max-width:none!important;min-height:100dvh!important;padding:0!important;margin:0!important;transform:none!important;border:0!important;border-radius:0!important;background:#061020!important;box-shadow:none!important}
+#doodUTripleLinePage,#doodUTripleLinePage *{box-sizing:border-box}
+#doodUTripleLinePage{font-family:DoodLearning,'Trebuchet MS',Arial,sans-serif;color:#fff}
+#doodUTripleLinePage .doodu-triple-room{min-height:100dvh;background:radial-gradient(ellipse at 7% 7%,#1b265b 0,transparent 48%),radial-gradient(ellipse at 90% 95%,#103d4b 0,transparent 44%),#061020;padding:clamp(18px,4vw,52px)}
+#doodUTripleLinePage .doodu-triple-inner{max-width:980px;margin:0 auto}
+#doodUTripleLinePage .doodu-triple-back{display:inline-flex;align-items:center;background:transparent!important;color:#dce8fa!important;border:1px solid #7081a1!important;border-radius:999px!important;padding:11px 20px!important;font:700 17px DoodLearning,'Trebuchet MS',Arial,sans-serif!important;cursor:pointer}
+#doodUTripleLinePage .doodu-triple-hero{margin:clamp(24px,5vw,66px) auto 0;padding:clamp(24px,6vw,66px);background:linear-gradient(155deg,rgba(22,37,77,.94),rgba(5,27,46,.96))!important;border:1px solid #426785;border-radius:30px;box-shadow:0 25px 70px rgba(0,0,0,.2)}
+#doodUTripleLinePage .doodu-triple-lines{display:flex;gap:10px;align-items:center;margin-bottom:22px}
+#doodUTripleLinePage .doodu-triple-lines i{display:block;width:clamp(58px,8vw,90px);height:9px;border-radius:12px;background:#59ecbf}
+#doodUTripleLinePage .doodu-triple-lines i:nth-child(2){background:#ffe078}
+#doodUTripleLinePage .doodu-triple-lines i:nth-child(3){background:#a9a1ff}
+#doodUTripleLinePage .doodu-triple-eyebrow{color:#8ae6d1;font-size:14px;font-weight:900;letter-spacing:.14em;margin:0 0 10px}
+#doodUTripleLinePage #doodUTripleLineTitle{font:900 clamp(42px,7vw,76px)/1.1 DoodLearning,'Trebuchet MS',Arial,sans-serif!important;letter-spacing:-.03em;color:#fff!important;text-transform:none!important;margin:0 0 8px!important}
+#doodUTripleLinePage .doodu-triple-tagline{font-size:clamp(23px,2.9vw,34px);font-weight:700;color:#ffe078;margin:0!important}
+#doodUTripleLinePage .doodu-triple-description{font-size:clamp(17px,2vw,23px);line-height:1.5;max-width:700px;margin:32px 0 20px!important;color:#ecf6ff}
+#doodUTripleLinePage .doodu-triple-languages{font-size:clamp(16px,2vw,22px);font-weight:800;line-height:1.7;color:#c1ffe9;margin:0 0 32px!important}
+#doodUTripleLinePage .doodu-triple-languages span{color:#ffe078;margin:0 .25em}
+#doodUTripleLinePage .doodu-triple-open{display:inline-flex;align-items:center;justify-content:center;min-height:58px;padding:13px 28px!important;border-radius:17px;background:#71edc0!important;color:#092b31!important;text-decoration:none!important;font:900 20px DoodLearning,'Trebuchet MS',Arial,sans-serif!important}
+#doodUTripleLinePage .doodu-triple-open:hover{background:#b2ffe0!important}
+@media(max-width:560px){#doodUPage .doodu-triple-door{grid-column:1 / -1;min-height:136px}#doodUTripleLinePage .doodu-triple-hero{border-radius:20px;padding:25px 20px}#doodUTripleLinePage .doodu-triple-languages{font-size:16px}#doodUTripleLinePage .doodu-triple-open{width:100%}}

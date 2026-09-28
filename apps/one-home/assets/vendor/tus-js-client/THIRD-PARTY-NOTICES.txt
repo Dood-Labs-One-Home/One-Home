@@ -1,0 +1,333 @@
+Notices for libraries present in the tus 4.3.1 browser bundle source map. Versions follow its pinned upstream yarn.lock; both buffer resolutions are attributed. The bundle is unchanged.
+
+===== browser-pack 6.1.0 / LICENSE =====
+This software is released under the MIT license:
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+===== base64-js 1.5.1 / LICENSE =====
+The MIT License (MIT)
+
+Copyright (c) 2014 Jameson Little
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+===== buffer 5.7.1 / LICENSE =====
+The MIT License (MIT)
+
+Copyright (c) Feross Aboukhadijeh, and other contributors.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+===== buffer 5.7.1 / AUTHORS.md =====
+# Authors
+
+#### Ordered by first contribution.
+
+- Romain Beauxis (toots@rastageeks.org)
+- Tobias Koppers (tobias.koppers@googlemail.com)
+- Janus (ysangkok@gmail.com)
+- Rainer Dreyer (rdrey1@gmail.com)
+- Tõnis Tiigi (tonistiigi@gmail.com)
+- James Halliday (mail@substack.net)
+- Michael Williamson (mike@zwobble.org)
+- elliottcable (github@elliottcable.name)
+- rafael (rvalle@livelens.net)
+- Andrew Kelley (superjoe30@gmail.com)
+- Andreas Madsen (amwebdk@gmail.com)
+- Mike Brevoort (mike.brevoort@pearson.com)
+- Brian White (mscdex@mscdex.net)
+- Feross Aboukhadijeh (feross@feross.org)
+- Ruben Verborgh (ruben@verborgh.org)
+- eliang (eliang.cs@gmail.com)
+- Jesse Tane (jesse.tane@gmail.com)
+- Alfonso Boza (alfonso@cloud.com)
+- Mathias Buus (mathiasbuus@gmail.com)
+- Devon Govett (devongovett@gmail.com)
+- Daniel Cousens (github@dcousens.com)
+- Joseph Dykstra (josephdykstra@gmail.com)
+- Parsha Pourkhomami (parshap+git@gmail.com)
+- Damjan Košir (damjan.kosir@gmail.com)
+- daverayment (dave.rayment@gmail.com)
+- kawanet (u-suke@kawa.net)
+- Linus Unnebäck (linus@folkdatorn.se)
+- Nolan Lawson (nolan.lawson@gmail.com)
+- Calvin Metcalf (calvin.metcalf@gmail.com)
+- Koki Takahashi (hakatasiloving@gmail.com)
+- Guy Bedford (guybedford@gmail.com)
+- Jan Schär (jscissr@gmail.com)
+- RaulTsc (tomescu.raul@gmail.com)
+- Matthieu Monsch (monsch@alum.mit.edu)
+- Dan Ehrenberg (littledan@chromium.org)
+- Kirill Fomichev (fanatid@ya.ru)
+- Yusuke Kawasaki (u-suke@kawa.net)
+- DC (dcposch@dcpos.ch)
+- John-David Dalton (john.david.dalton@gmail.com)
+- adventure-yunfei (adventure030@gmail.com)
+- Emil Bay (github@tixz.dk)
+- Sam Sudar (sudar.sam@gmail.com)
+- Volker Mische (volker.mische@gmail.com)
+- David Walton (support@geekstocks.com)
+- Сковорода Никита Андреевич (chalkerx@gmail.com)
+- greenkeeper[bot] (greenkeeper[bot]@users.noreply.github.com)
+- ukstv (sergey.ukustov@machinomy.com)
+- Renée Kooi (renee@kooi.me)
+- ranbochen (ranbochen@qq.com)
+- Vladimir Borovik (bobahbdb@gmail.com)
+- greenkeeper[bot] (23040076+greenkeeper[bot]@users.noreply.github.com)
+- kumavis (aaron@kumavis.me)
+- Sergey Ukustov (sergey.ukustov@machinomy.com)
+- Fei Liu (liu.feiwood@gmail.com)
+- Blaine Bublitz (blaine.bublitz@gmail.com)
+- clement (clement@seald.io)
+- Koushik Dutta (koushd@gmail.com)
+- Jordan Harband (ljharb@gmail.com)
+- Niklas Mischkulnig (mischnic@users.noreply.github.com)
+- Nikolai Vavilov (vvnicholas@gmail.com)
+- Fedor Nezhivoi (gyzerok@users.noreply.github.com)
+- Peter Newman (peternewman@users.noreply.github.com)
+- mathmakgakpak (44949126+mathmakgakpak@users.noreply.github.com)
+- jkkang (jkkang@smartauth.kr)
+
+#### Generated by bin/update-authors.sh.
+
+===== buffer 5.2.1 / AUTHORS.md =====
+# Authors
+
+#### Ordered by first contribution.
+
+- Romain Beauxis (toots@rastageeks.org)
+- Tobias Koppers (tobias.koppers@googlemail.com)
+- Janus (ysangkok@gmail.com)
+- Rainer Dreyer (rdrey1@gmail.com)
+- Tõnis Tiigi (tonistiigi@gmail.com)
+- James Halliday (mail@substack.net)
+- Michael Williamson (mike@zwobble.org)
+- elliottcable (github@elliottcable.name)
+- rafael (rvalle@livelens.net)
+- Andrew Kelley (superjoe30@gmail.com)
+- Andreas Madsen (amwebdk@gmail.com)
+- Mike Brevoort (mike.brevoort@pearson.com)
+- Brian White (mscdex@mscdex.net)
+- Feross Aboukhadijeh (feross@feross.org)
+- Ruben Verborgh (ruben@verborgh.org)
+- eliang (eliang.cs@gmail.com)
+- Jesse Tane (jesse.tane@gmail.com)
+- Alfonso Boza (alfonso@cloud.com)
+- Mathias Buus (mathiasbuus@gmail.com)
+- Devon Govett (devongovett@gmail.com)
+- Daniel Cousens (github@dcousens.com)
+- Joseph Dykstra (josephdykstra@gmail.com)
+- Parsha Pourkhomami (parshap+git@gmail.com)
+- Damjan Košir (damjan.kosir@gmail.com)
+- daverayment (dave.rayment@gmail.com)
+- kawanet (u-suke@kawa.net)
+- Linus Unnebäck (linus@folkdatorn.se)
+- Nolan Lawson (nolan.lawson@gmail.com)
+- Calvin Metcalf (calvin.metcalf@gmail.com)
+- Koki Takahashi (hakatasiloving@gmail.com)
+- Guy Bedford (guybedford@gmail.com)
+- Jan Schär (jscissr@gmail.com)
+- RaulTsc (tomescu.raul@gmail.com)
+- Matthieu Monsch (monsch@alum.mit.edu)
+- Dan Ehrenberg (littledan@chromium.org)
+- Kirill Fomichev (fanatid@ya.ru)
+- Yusuke Kawasaki (u-suke@kawa.net)
+- DC (dcposch@dcpos.ch)
+- John-David Dalton (john.david.dalton@gmail.com)
+- adventure-yunfei (adventure030@gmail.com)
+- Emil Bay (github@tixz.dk)
+- Sam Sudar (sudar.sam@gmail.com)
+- Volker Mische (volker.mische@gmail.com)
+- David Walton (support@geekstocks.com)
+- Сковорода Никита Андреевич (chalkerx@gmail.com)
+- greenkeeper[bot] (greenkeeper[bot]@users.noreply.github.com)
+- ukstv (sergey.ukustov@machinomy.com)
+- ranbochen (ranbochen@qq.com)
+- Vladimir Borovik (bobahbdb@gmail.com)
+
+#### Generated by bin/update-authors.sh.
+
+===== buffer 5.2.1 / LICENSE =====
+The MIT License (MIT)
+
+Copyright (c) Feross Aboukhadijeh, and other contributors.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+===== ieee754 1.2.1 / LICENSE =====
+Copyright 2008 Fair Oaks Labs, Inc.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+===== js-base64 3.7.7 / LICENSE.md =====
+Copyright (c) 2014, Dan Kogai
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of {{{project}}} nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+===== querystringify 2.2.0 / LICENSE =====
+The MIT License (MIT)
+
+Copyright (c) 2015 Unshift.io, Arnout Kazemier,  the Contributors.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+===== requires-port 1.0.0 / LICENSE =====
+The MIT License (MIT)
+
+Copyright (c) 2015 Unshift.io, Arnout Kazemier,  the Contributors.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+===== url-parse 1.5.10 / LICENSE =====
+The MIT License (MIT)
+
+Copyright (c) 2015 Unshift.io, Arnout Kazemier,  the Contributors.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+

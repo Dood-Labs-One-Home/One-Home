@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>One Home Admin · SHRUNK Bookings</title><link rel="icon" href="/favicon.png">
+<script src="/shared/onehome-supabase-lite.js?v=1214"></script>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;background:#0a0a0a;color:#f8efe4;margin:0}a{color:#ffb7d5}
+header{border-bottom:1px solid #64433b;padding:16px max(16px,calc((100vw - 1100px)/2));display:flex;gap:18px;align-items:center;flex-wrap:wrap}h1{font-size:25px;margin:0}h2{font-size:21px;margin:0 0 12px}
+main{max-width:1100px;margin:25px auto;padding:0 16px 55px;display:grid;gap:19px}section{background:#181310;border:1px solid #594138;border-radius:16px;padding:20px}
+small,.subtle{color:#d3bead}label{display:grid;gap:5px;font-weight:650;margin:9px 0}input[type=number],input[type=date]{font:inherit;width:110px;padding:9px;background:#080808;color:#fff;border:1px solid #9b8072;border-radius:8px}input[type=checkbox]{width:21px;height:21px}
+button{font:inherit;background:#2a1918;color:#fff;border:1px solid #aa5c6b;padding:9px 14px;border-radius:9px;cursor:pointer}button.primary{background:#ba2545}button:disabled{opacity:.45;cursor:not-allowed}.line{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.status{padding:12px;border:1px solid #78584e;border-radius:10px;margin:10px 0;overflow-wrap:anywhere}.status:empty{display:none}.warn{border-color:#bc9a4d}.good{border-color:#66c58a}.bad{border-color:#ff687a}.months{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:12px}.month{background:#0e0c0a;border:1px solid #4e4038;border-radius:11px;padding:13px}.month strong{display:block;font-size:18px}.bookings{overflow:auto}.bookings table{width:100%;border-collapse:collapse;font-size:13px}.bookings th,.bookings td{padding:10px;border-bottom:1px solid #51413a;text-align:left;white-space:nowrap}.bookings th{color:#ffccdc}p{margin:8px 0 12px}.danger{border-color:#fb7683} [hidden]{display:none!important}
+</style></head><body>
+<header><a href='/admin'>← One Home Admin</a><h1>SHRUNK · Monthly Collaborations</h1><a href="/?shrunk=collaborate">Open SHRUNK Room</a></header>
+<main><p class="subtle">Only signed-in One Home administrators can change settings. Existing paid feature-month bookings are never canceled when sales pause.</p>
+<section><div id="signIn" class="status warn">Checking your One Home Admin session…</div><div id="message" class="status" role="status" aria-live="polite"></div></section>
+<section id="controls" hidden><h2>Sales and capacity</h2><p>New bookings run for an entire calendar month, starting with next month. The six-month calendar moves forward automatically on the 1st (Arizona time).</p>
+<div class="line"><label>Default spots per month<input id="capacity" type="number" min="1" max="100" step="1" value="8"></label><label class="line"><input id="sales" type="checkbox"> Accept new purchases</label><button id="saveSettings" class="primary">Save sales settings</button><button id="verifySquare">Check Square readiness</button></div>
+<div id="squareReadiness" class="status">Square production readiness has not been checked in this session.</div>
+<p class="subtle">Turning on sales authorizes real Square charges for actual customers. Pausing new sales does not cancel or refund paid bookings. Unresolved payment attempts keep their reserved spots until reconciled.</p></section>
+<section id="calendar" hidden><h2>Feature-month calendar</h2><div id="months" class="months"></div></section>
+<section id="bookingsSection" hidden><h2>Bookings and applications</h2><p class="subtle">Paid, held, and payment-review records are listed here for follow-up. Never collect another payment for an order marked paid or in review.</p><div id="bookings" class="bookings"></div></section>
+</main><script defer src="/shared/onehome-shrunk-admin-v1467255.js?v=1467255"></script>
+
+</body></html>

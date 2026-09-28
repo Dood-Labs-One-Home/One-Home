@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="/shared/onehome-global-appearance-v1467200.js?v=1467200"></script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dood Atlas • XRPL</title>
@@ -268,7 +269,7 @@
   .dood-logo,
   .site-logo,
   .app-logo {
-    background: transparent url('/assets/dood-portal-guide-v54.png?v=54') center/contain no-repeat !important;
+    background: transparent url('/assets/one-home-logo.png?v=107') center/contain no-repeat !important;
     color: transparent !important;
     overflow: hidden !important;
   }
@@ -287,7 +288,7 @@
   .dood-logo img,
   .site-logo img,
   .app-logo img {
-    content: url('/assets/dood-portal-guide-v54.png?v=54') !important;
+    content: url('/assets/one-home-logo.png?v=107') !important;
     width: 100% !important;
     height: 100% !important;
     object-fit: contain !important;
@@ -298,7 +299,7 @@
 
 <style id="dood-v54-portal-logo-component">
   :root {
-    --dood-portal-logo-url: url('/assets/dood-portal-guide-v54.png?v=54');
+    --dood-portal-logo-url: url('/assets/one-home-logo.png?v=107');
   }
 
   .dood-portal-logo,
@@ -344,7 +345,7 @@
   .logo-mark img,
   .site-logo img,
   .app-logo img {
-    content: url('/assets/dood-portal-guide-v54.png?v=54') !important;
+    content: url('/assets/one-home-logo.png?v=107') !important;
     width: 100% !important;
     height: 100% !important;
     display: block !important;
@@ -564,12 +565,16 @@
   }
 </style>
 
+<link rel="stylesheet" href="/shared/onehome-choice-header-v146780.css?v=146780">
+<script defer src="/shared/onehome-choice-header-v1467200.js?v=1467200"></script>
+<link rel="stylesheet" href="/shared/onehome-interior-shell-v1467141.css?v=1467141">
+  <link rel="stylesheet" href="/shared/onehome-global-appearance-v1467142.css?v=1467141">
 </head>
 <body>
 
 <div class="dood-return-header">
   <a class="dood-brand" href="../../../index.html#districts" aria-label="Back to Dood Labs">
-    <img src="/assets/dood-portal-guide-v54.png?v=54" alt="Dood Labs logo">
+    <img src="/assets/one-home-logo.png?v=107" alt="One Home logo">
     <strong>Dood Labs</strong>
   </a>
   <div class="dood-return-actions">
@@ -596,7 +601,7 @@
 
 <div class="dood-hub-header" style="position:fixed;left:0;right:0;top:0;height:56px;">
   <a class="dood-hub-brand" href="../../../index.html#districts" onclick="try{localStorage.setItem('doodLabsReturnTarget','districts')}catch(e){}">
-    <img class="dood-logo-img" src="/assets/dood-portal-guide-v54.png?v=54" alt="Dood Labs logo" style="width:38px;height:38px;border-radius:999px;object-fit:cover;background:#fff;">
+    <img class="dood-logo-img" src="/assets/one-home-logo.png?v=107" alt="One Home logo" style="width:38px;height:38px;border-radius:999px;object-fit:cover;background:#fff;">
     <span class="dood-hub-title">Dood Labs</span>
   </a>
   <div class="dood-hub-actions">
@@ -635,11 +640,7 @@
 
       <span class="pill" id="pill-acct">Guest</span>
       <span class="pill" id="pill-holder" style="display:none">🐸 Dood holder</span>
-      <span class="pill" id="pill-cd">CD: <b id="cd-val">0</b>s</span>
-      <span class="pill">Grid: <b id="grid-label">—</b></span>
-      <span class="pill">Pixels: <b id="pixel-count">0</b></span>
-
-      <button class="btn sm" id="btn-leaderboard" style="margin-left:auto">🏆 Board</button></div>
+      <span class="pill" id="pill-cd">Dood Atlas</span></div>
 
     <!-- Bottom toolbar -->
     <div id="toolbar">
@@ -1437,7 +1438,7 @@ window.addEventListener('load', () => {
 
 <script id="dood-v54-portal-logo-component-js">
 (function () {
-  const logoUrl = "/assets/dood-portal-guide-v54.png?v=54";
+  const logoUrl = "/assets/one-home-logo.png?v=107";
 
   function goHome(event) {
     event.preventDefault();
@@ -1448,10 +1449,10 @@ window.addEventListener('load', () => {
     if (!el) return;
     el.classList.add("dood-portal-logo", "is-alive");
     el.setAttribute("role", "link");
-    el.setAttribute("aria-label", "Dood Labs Home");
-    el.setAttribute("title", "Dood Labs Home");
+    el.setAttribute("aria-label", "One Home");
+    el.setAttribute("title", "One Home");
     el.onclick = goHome;
-    el.innerHTML = '<img src="' + logoUrl + '" alt="Dood Labs Portal Guide">';
+    el.innerHTML = '<img src="' + logoUrl + '" alt="One Home">';
   }
 
   function initDoodPortalLogo() {
@@ -1477,13 +1478,11 @@ window.addEventListener('load', () => {
 <script id="dood-v56-theme-modes-js">
 (function(){
   const modes = [
-    { id: "dood", label: "Dood Mode" },
-    { id: "doodette", label: "Doodette Mode" },
     { id: "dark", label: "Dark Mode" }
   ];
 
   function applyTheme(mode){
-    const clean = modes.some(m => m.id === mode) ? mode : "dood";
+    const clean = modes.some(m => m.id === mode) ? mode : "dark";
     document.body.classList.remove("theme-dood", "theme-doodette", "theme-dark");
     document.body.classList.add("theme-" + clean);
     localStorage.setItem("doodLabsThemeMode", clean);
@@ -1493,6 +1492,7 @@ window.addEventListener('load', () => {
   }
 
   function addThemeSwitcher(){
+    return;
     if(document.getElementById("doodThemeSwitcher")) return;
     const wrap = document.createElement("div");
     wrap.id = "doodThemeSwitcher";
@@ -1509,8 +1509,7 @@ window.addEventListener('load', () => {
   }
 
   function initThemeModes(){
-    addThemeSwitcher();
-    applyTheme(localStorage.getItem("doodLabsThemeMode") || "dood");
+    applyTheme((function(saved){return (saved === "dood" || saved === "doodette" || saved === "dark") ? "dark" : (saved || "dark");})(localStorage.getItem("doodLabsThemeMode")));
   }
 
   if(document.readyState === "loading"){
@@ -1537,7 +1536,7 @@ window.addEventListener('load', () => {
     setTimeout(function(){
       const notice = document.getElementById("profileAuthNotice") || document.getElementById("profileNotice");
       if(notice){
-        notice.textContent = "Email confirmed. You can now log in and save your profile.";
+        notice.textContent = "Email confirmed. You can now log in and save your Passport.";
         notice.classList.add("show");
         notice.style.display = "block";
       }
@@ -1555,5 +1554,6 @@ window.addEventListener('load', () => {
 })();
 </script>
 
+<script defer src="/shared/onehome-interior-shell-v1467141.js?v=1467200"></script>
 </body>
 </html>

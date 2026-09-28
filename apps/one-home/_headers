@@ -4,10 +4,25 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   Permissions-Policy: geolocation=(), microphone=(), camera=(), usb=(), payment=()
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; media-src 'self' https: blob:; frame-src 'self' https://www.youtube.com https://rare-ink-studio.github.io https://weiner-wednesday.github.io; connect-src 'self' https://fshvettlltcujmwvikfq.supabase.co wss://fshvettlltcujmwvikfq.supabase.co https://us-central1-dood-rewards-16760.cloudfunctions.net
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  Cross-Origin-Resource-Policy: same-site
+  X-Permitted-Cross-Domain-Policies: none
+  Origin-Agent-Cluster: ?1
+  Content-Security-Policy: default-src 'self'; base-uri 'self' https://rare-ink-studio.github.io; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://web.squarecdn.com; worker-src 'self' blob: https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://web.squarecdn.com; img-src 'self' data: blob: https:; font-src 'self' data: https://square-fonts-production-f.squarecdn.com; media-src 'self' https: blob:; frame-src 'self' blob: https:; connect-src 'self' https://cdn.jsdelivr.net https://fshvettlltcujmwvikfq.supabase.co https://fshvettlltcujmwvikfq.storage.supabase.co wss://fshvettlltcujmwvikfq.supabase.co https://us-central1-dood-rewards-16760.cloudfunctions.net wss://mm-sdk-relay.api.cx.metamask.io https://ethereum-sepolia-rpc.publicnode.com https://sepolia.base.org https://polygon-amoy.drpc.org https://sepolia.optimism.io https://sepolia-rollup.arbitrum.io https://rpc.sepolia.linea.build https://bsc-testnet-dataseed.bnbchain.org https://testnet.hashio.io https://evm-rpc-testnet.sei-apis.com https://api.devnet.solana.com https://horizon-testnet.stellar.org https://soroban-testnet.stellar.org wss://relay.walletconnect.com wss://relay.walletconnect.org https://verify.walletconnect.com https://verify.walletconnect.org https://web.squarecdn.com https://pci-connect.squareup.com https://connect.squareup.com https://api.avax-test.network
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
 
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+/tools/nft-creator/*
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
 
 /tools/*
   Cache-Control: public, max-age=3600
@@ -29,3 +44,274 @@
 
 /manifest.webmanifest
   Cache-Control: no-cache, no-store, must-revalidate
+
+/historical-record-admin.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/shared/onehome-supabase-lite.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/shared/onehome-creator-projects.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/shared/onehome-advanced-wizard-v1338.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/shared/onehome-advanced-wizard-v1337.css
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/mint/*
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/open-mints
+  Cache-Control: no-cache, no-store, must-revalidate
+  X-OneHome-Release: 14.67.241
+  Pragma: no-cache
+  Expires: 0
+
+/open-mints.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  X-OneHome-Release: 14.67.241
+  Pragma: no-cache
+  Expires: 0
+
+
+/open-mints-v1467218.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  X-OneHome-Release: 14.67.241
+
+/open-mints-v1467266.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  X-OneHome-Release: 14.67.266
+
+/community-open-mints-admin.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  X-OneHome-Release: 14.67.266
+
+/campaign-mint.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/passport/campaign-mint-page.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/passport/metamask-wallet.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/assets/vendor/metamask-connect-multichain-1.2.0.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/passport/stellar-wallet.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/passport/stellar-wallet.css
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/passport/home-ops-handoff.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/assets/vendor/onehome-stellar-freighter-sdk-6.0.1.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/admin-test-mint.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
+/test-mint.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
+/mint-studio.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+
+/shared/onehome-mint-source-v146760.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/mint-share.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/shared/onehome-mint-source-v146762.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/shared/onehome-master-layout-v1467143.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/shared/onehome-mint-source-v146763.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/mint-share/*
+  Cache-Control: public, max-age=60, s-maxage=60, stale-while-revalidate=300
+
+/xaman-mint-return.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
+/joey-connect-test.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+  Referrer-Policy: no-referrer
+
+/passport/metamask-home-id.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/assets/vendor/tus-js-client/tus.min.js
+  Content-Type: text/javascript; charset=utf-8
+  Cache-Control: public, max-age=31536000, immutable
+
+
+/assets/vendor/un7z-opfs-1.0.2/dist/7zz.wasm
+  Content-Type: application/wasm
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/vendor/un7z-opfs-1.0.2/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/mint-package-handoff.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/assets/onehome-7z-opfs-v1467141.mjs
+  Content-Type: text/javascript; charset=utf-8
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/assets/vendor/onehome-7z-workerfs-v1467141.js
+  Content-Type: text/javascript; charset=utf-8
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/shared/onehome-global-appearance-v1467142.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/shared/onehome-global-appearance-v1467142.css
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/shared/onehome-interior-shell-v1467141.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/shared/onehome-interior-shell-v1467141.css
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+
+/passport-credentials-admin.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
+/passport-management-admin.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
+/passport-promotion-admin.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
+/creator-projects-admin.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
+/creator-mint-admin.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
+/burn-to-build-admin.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
+/mint-links.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
+/mint-preview.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
+/passport-preview.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
+/site-builder-admin.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+
+/passport
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/xaman-mint-return.html
+  Referrer-Policy: no-referrer

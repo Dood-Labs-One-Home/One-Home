@@ -1,0 +1,11 @@
+/* Test-only wrapper. The actual SHRUNK room itself uses unchanged v14.67.241 CSS/JS. */
+#top {min-height:100vh} #onehomeShrunkCollabPage{display:block!important}
+#onehomeShrunkCollabPage .oh-test-flow{display:grid;gap:0;margin-top:20px}
+#onehomeShrunkCollabPage .oh-test-flow .panel{scroll-margin-top:95px}
+#onehomeShrunkCollabPage .oh-test-warning{border-color:#ffb434}
+#onehomeShrunkCollabPage .oh-test-warning strong{color:#ffcb65}
+#onehomeShrunkCollabPage form textarea,#onehomeShrunkCollabPage form select{width:100%;padding:13px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.72);color:#fff;font:inherit}
+#onehomeShrunkCollabPage form textarea{resize:vertical;min-height:105px}
+#onehomeShrunkCollabPage form .fields{margin-bottom:18px}
+#onehomeShrunkCollabPage .oh-test-flow details summary{cursor:pointer;padding:9px 0}
+@media(max-width:740px){#onehomeShrunkCollabPage .oh-test-flow{margin-top:12px}}
