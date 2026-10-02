@@ -27,7 +27,7 @@ where chain_key = 'avalanche-mainnet'
   and ecosystem = 'evm';
 
 insert into public.onehome_chain_registry (
-  chain_key, display_name, ecosystem, chain_namespace, network_name,
+  chain_key, display_name, ecosystem, chain_namespace, network_name, environment,
   external_chain_id, numeric_chain_id, native_symbol, wallet_providers,
   wallet_enabled, mint_enabled, payment_enabled, payout_enabled,
   status, display_order, configuration
@@ -35,13 +35,13 @@ insert into public.onehome_chain_registry (
 values
   (
     'avalanche-x-mainnet', 'Avalanche X-Chain — Mainnet', 'avalanche-x',
-    'avalanche-x', 'mainnet', null, null, 'AVAX', array['core']::text[],
+    'avalanche-x', 'mainnet', 'mainnet', null, null, 'AVAX', array['core']::text[],
     true, false, false, false, 'testing', 27,
     '{"chain_alias":"X","network_hrp":"avax","wallet_only":true,"mainnet_locked":true,"production_locked":true}'::jsonb
   ),
   (
     'avalanche-p-mainnet', 'Avalanche P-Chain — Mainnet', 'avalanche-p',
-    'avalanche-p', 'mainnet', null, null, 'AVAX', array['core']::text[],
+    'avalanche-p', 'mainnet', 'mainnet', null, null, 'AVAX', array['core']::text[],
     true, false, false, false, 'testing', 28,
     '{"chain_alias":"P","network_hrp":"avax","wallet_only":true,"mainnet_locked":true,"production_locked":true}'::jsonb
   )
@@ -50,6 +50,7 @@ on conflict (chain_key) do update set
   ecosystem = excluded.ecosystem,
   chain_namespace = excluded.chain_namespace,
   network_name = excluded.network_name,
+  environment = excluded.environment,
   external_chain_id = excluded.external_chain_id,
   numeric_chain_id = excluded.numeric_chain_id,
   native_symbol = excluded.native_symbol,
