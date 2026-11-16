@@ -3065,6 +3065,7 @@ header{
 <script defer="" src="passport/entrance.js?v=1467218"></script>
 <script defer="" src="/passport/journey.js?v=1453"></script>
 <script defer="" src="/passport/metamask-wallet.js?v=1467110"></script>
+<script defer="" src="/passport/core-wallet.js?v=146800"></script>
 <script defer="" src="/assets/vendor/onehome-stellar-freighter-sdk-6.0.1.js?v=146782"></script>
 <script defer="" src="/passport/stellar-wallet.js?v=146783"></script>
 <script type="module" src="/assets/vendor/onehome-joey-wallet-v146799.js"></script>
@@ -14247,7 +14248,9 @@ body:has(#profilePage.onehome-wallet-only.page-view.active) main#top,body:has(#p
 if(window.__oneHomeV1467108WalletFlow)return;window.__oneHomeV1467108WalletFlow=true;
 var xrplRows=[],chainRows=[],selectedChainKey='',addPickerOpen=false;
 var CHAINS=[
- {key:'avalanche-mainnet',label:'Avalanche',ecosystem:'evm',providers:[{key:'metamask',label:'MetaMask',link:function(chain){return window.OneHomeMetaMaskWallets?.link('evm',chain.key)}}]},
+ {key:'avalanche-mainnet',label:'Avalanche',ecosystem:'evm',providers:[{key:'metamask',label:'MetaMask',link:function(chain){return window.OneHomeMetaMaskWallets?.link('evm',chain.key)}},{key:'core',label:'Core Wallet',link:function(chain){return window.OneHomeCoreWallets?.link('evm',chain.key)}}]},
+ {key:'avalanche-x-mainnet',label:'Avalanche X-Chain — Mainnet',ecosystem:'avalanche-x',providers:[{key:'core',label:'Core Wallet',link:function(chain){return window.OneHomeCoreWallets?.link('xp',chain.key)}}]},
+ {key:'avalanche-p-mainnet',label:'Avalanche P-Chain — Mainnet',ecosystem:'avalanche-p',providers:[{key:'core',label:'Core Wallet',link:function(chain){return window.OneHomeCoreWallets?.link('xp',chain.key)}}]},
  {key:'avalanche-fuji',label:'Avalanche — Testnet',ecosystem:'evm',providers:[{key:'metamask',label:'MetaMask',link:function(chain){return window.OneHomeMetaMaskWallets?.link('evm',chain.key)}}]},
  {key:'arbitrum-sepolia',label:'Arbitrum — Testnet',ecosystem:'evm',providers:[{key:'metamask',label:'MetaMask',link:function(chain){return window.OneHomeMetaMaskWallets?.link('evm',chain.key)}}]},
  {key:'base-mainnet',label:'Base',ecosystem:'evm',providers:[{key:'metamask',label:'MetaMask',link:function(chain){return window.OneHomeMetaMaskWallets?.link('evm',chain.key)}}]},
@@ -14274,7 +14277,7 @@ function client(){return [window.oneHomePassportSupabase,window.doodProfileSupab
 async function user(){var c=client();if(!c)throw new Error('Your One Home Passport is still loading.');var r=await c.auth.getUser();if(r.error)throw r.error;if(!r.data?.user)throw new Error('Sign in to your One Home Passport first.');return r.data.user}
 function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 function short(v){v=String(v||'');return v.length>24?v.slice(0,11)+'…'+v.slice(-9):v}
-function providerLabel(p){return p==='crossmark'?'Crossmark':p==='joey'?'Joey Wallet':p==='xaman'?'Xaman':p==='metamask'?'MetaMask':p==='freighter'?'Freighter':String(p||'Wallet')}
+function providerLabel(p){return p==='crossmark'?'Crossmark':p==='joey'?'Joey Wallet':p==='xaman'?'Xaman':p==='metamask'?'MetaMask':p==='freighter'?'Freighter':p==='core'?'Core Wallet':String(p||'Wallet')}
 function setStatus(m,t){var el=q('oneHomeWalletTreeStatus');if(!el)return;el.textContent=String(m||'');el.className='onehome-wallet-status'+(t?' is-'+t:'')}
 function neonEnabled(){try{var raw=localStorage.getItem('onehome_neon_enabled');if(raw==='0'||raw==='false'||raw==='off'||raw==='disabled')return false;if(raw==='1'||raw==='true'||raw==='on'||raw==='enabled')return true;}catch(_e){}if(document.documentElement.getAttribute('data-onehome-neon-enabled')==='0')return false;if(document.body&&document.body.classList.contains('onehome-neon-off'))return false;return true}
 function syncWalletNeon(){var m=q('oneHomeV1455WalletManager');if(m)m.setAttribute('data-neon-enabled',neonEnabled()?'1':'0')}
